@@ -5,6 +5,9 @@
 --        Usage:  ./image-ms.lua
 --
 --  Description:  make graphic a float in Pandoc -ms export
+--                - make float if {float=true} or {float=1} in
+--                  parameters
+--                correct unlinkable labels in BibTeX ("/" -> "+")
 --
 --      Options:  ---
 -- Requirements:  ---
@@ -97,6 +100,7 @@ return {
     end,
 
     Cite = function (cit)
+      -- this is not used, anyway!?
       for k, v in pairs(cit.c[1]) do
         v.id = string.gsub(v.id, '/', "+")
       end
@@ -109,6 +113,7 @@ return {
     end,
 
     Div = function(div)
+      -- this is not used, anyway!?
       if FORMAT == "ms" then
         if string.find(div.c[1][1], "^ref-.*/") then
           io.stderr:write("changed label «" .. div.c[1][1].."»\n")
