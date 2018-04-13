@@ -161,6 +161,7 @@ return {
 
     Link = function (cit)
       -- sanitize Link ID
+      -- protect against https://github.com/jgm/pandoc/issues/4515
       if FORMAT == "ms" then
         if string.sub(cit.c[3][1], 1, 1) == "#" then
           cit.c[3][1] = string.gsub(cit.c[3][1], '/', "+")

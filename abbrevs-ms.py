@@ -44,6 +44,7 @@ def abbrevs(key, value, format, meta):
             m = pattern.match(value)
             if m:
                 return RawInline("ms", value + r'\&')
+            # protect against https://github.com/jgm/pandoc/issues/4550
             if regex.search(r'[’]', value):
                 strs = regex.split(r'[’]', value)
                 ret = [Str(strs[0])]
