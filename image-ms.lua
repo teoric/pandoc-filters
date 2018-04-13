@@ -20,7 +20,7 @@
 --------------------------------------------------------------------------------
 --
 
--- local inspect = require('inspect')
+local inspect = require('inspect')
 text = require 'text'
 List = require 'pandoc.List'
 
@@ -29,7 +29,7 @@ keep_pattern = ".ANYPIC"
 
 -- http://lua-users.org/wiki/StringRecipes
 
---[[ as yet unused
+--[[ -- as yet unused
 function string.startswith(String, Start)
   return string.sub(String, 1, string.len(Start)) == Start
 end
@@ -73,18 +73,18 @@ end
 
 --[[
   function deepcopy(orig)
-      local orig_type = type(orig)
-      local copy
-      if orig_type == 'table' then
-          copy = {}
-          for orig_key, orig_value in next, orig, nil do
-              copy[deepcopy(orig_key)] = deepcopy(orig_value)
-          end
-          setmetatable(copy, deepcopy(getmetatable(orig)))
-      else -- number, string, boolean, etc
-          copy = orig
+    local orig_type = type(orig)
+    local copy
+    if orig_type == 'table' then
+      copy = {}
+      for orig_key, orig_value in next, orig, nil do
+          copy[deepcopy(orig_key)] = deepcopy(orig_value)
       end
-      return copy
+      setmetatable(copy, deepcopy(getmetatable(orig)))
+    else -- number, string, boolean, etc
+        copy = orig
+    end
+    return copy
   end
 --]]
 -- end
@@ -113,7 +113,6 @@ return {
                       cap})
         end
         ret:extend({pandoc.RawBlock("ms", string.format('.TABLEEND'))})
-          -- pandoc.RawBlock("ms", string.format('.TABLEEND "%s"\n', cap)),
         return ret
       end
     end,
@@ -202,6 +201,21 @@ return {
         return pandoc.RawInline("ms", pat)
       end
     end,
+
+    SmallCaps = function (elem)
+      -- use macro for small caps – slightly better than size escapes
+      if FORMAT == "ms" then
+        local ret = List:new{
+          pandoc.RawInline("ms", '\n.smallcaps\n')
+        }
+        for i, el in pairs(elem.c) do
+          io.stderr:write(inspect(el))
+          ret:extend(el)
+        end
+        ret:extend(pandoc.RawInline("ms", '\\c\n./smallcaps\n'))
+      end
+    end,
+
 
   }
 }
