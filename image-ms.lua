@@ -20,7 +20,7 @@
 --------------------------------------------------------------------------------
 --
 
-local inspect = require('inspect')
+-- local inspect = require('inspect')
 text = require 'text'
 List = require 'pandoc.List'
 
@@ -209,7 +209,6 @@ return {
           pandoc.RawInline("ms", '\n.smallcaps\n')
         }
         for i, el in pairs(elem.c) do
-          io.stderr:write(inspect(el))
           ret:extend(el)
         end
         ret:extend(pandoc.RawInline("ms", '\\c\n./smallcaps\n'))
