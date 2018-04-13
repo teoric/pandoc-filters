@@ -15,9 +15,8 @@
 --        Notes:  ---
 --       Author:  Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 -- Organization:  
---      Version:  0.1
+--      Version:  0.2
 --      Created:  30.03.2018
---     Revision:  ---
 --------------------------------------------------------------------------------
 --
 
@@ -30,20 +29,22 @@ keep_pattern = ".ANYPIC"
 
 -- http://lua-users.org/wiki/StringRecipes
 
-function string.starts(String,Start)
-  return string.sub(String,1,string.len(Start))==Start
+--[[ as yet unused
+function string.startswith(String, Start)
+  return string.sub(String, 1, string.len(Start)) == Start
 end
-
-function string.ends(String,End)
-  return End=='' or string.sub(String,-string.len(End))==End
+--]]
+function string.endswith(String, End)
+  return End=='' or string.sub(String, - string.len(End)) == End
 end
 
 -- end
 
 -- https://stackoverflow.com/questions/4990990/lua-check-if-a-file-exists
 function file_exists(name)
-   local f=io.open(name,"r")
-   if f~=nil then io.close(f) return true else return false end
+  -- file exists if it is readable
+  local f=io.open(name,"r")
+  if f~=nil then io.close(f) return true else return false end
 end
 --
 
@@ -70,66 +71,35 @@ function table.clone(org)
   return {table.unpack(org)}
 end
 
-function deepcopy(orig)
-    local orig_type = type(orig)
-    local copy
-    if orig_type == 'table' then
-        copy = {}
-        for orig_key, orig_value in next, orig, nil do
-            copy[deepcopy(orig_key)] = deepcopy(orig_value)
-        end
-        setmetatable(copy, deepcopy(getmetatable(orig)))
-    else -- number, string, boolean, etc
-        copy = orig
-    end
-    return copy
-end
+--[[
+  function deepcopy(orig)
+      local orig_type = type(orig)
+      local copy
+      if orig_type == 'table' then
+          copy = {}
+          for orig_key, orig_value in next, orig, nil do
+              copy[deepcopy(orig_key)] = deepcopy(orig_value)
+          end
+          setmetatable(copy, deepcopy(getmetatable(orig)))
+      else -- number, string, boolean, etc
+          copy = orig
+      end
+      return copy
+  end
+--]]
 -- end
 
 
 return {
   {
-    -- Str = function (str)
-    --   if FORMAT == "ms" then
-    --     -- Assumption: Strings are tokenised by whitespace;
-    --     --    hence, we can rely on abbreviations' being on their own.
-    --     local s = str.text
-    --     -- German
-    --     s = string.gsub(s, "^(Nr)%.", "%1.\\&")
-    --     s = string.gsub(s, "^([Zz]%.Zt)%.", "%1.\\&")
-    --     s = string.gsub(s, "^([Gg]gf)%.", "%1.\\&")
-    --     s = string.gsub(s, "^([UuOo]%.a)%.", "%1.\\&")
-    --     s = string.gsub(s, "^([UuOo]%.ä)%.", "%1.\\&") -- lua - not Unicode-capable
-    --     s = string.gsub(s, "^([UuOo]%.Ä)%.", "%1.\\&") -- lua - not Unicode-capable
-    --     s = string.gsub(s, "^([Zz]%.B)%.", "%1.\\&")
-    --     s = string.gsub(s, "^([sS])%.", "%1.\\&")    -- (redundant)
-    --     s = string.gsub(s, "^([Vv]gl)%.", "%1.\\&")
-    --     s = string.gsub(s, "^([Uu]%.?s%.?w)%.", "%1.\\&")
-
-    --     -- English
-    --     s = string.gsub(s, "^([Pp]p?)%.", "%1.\\&")
-    --     s = string.gsub(s, "^([Nn]o)%.", "%1.\\&")
-    --     s = string.gsub(s, "^([Vv]ol)%.", "%1.\\&")
-    --     s = string.gsub(s, "^(e%.g)%.", "%1.\\&")
-    --     s = string.gsub(s, "^(i%.e)%.", "%1.\\&")
-    --     s = string.gsub(s, "^(viz)%.", "%1.\\&")
-
-    --     -- single letters
-    --     s = string.gsub(s, "^(%l)%.", "%1.\\&")
-    --     s = string.gsub(s, "^(Ä)%.", "%1.\\&") -- lua - not Unicode-capable
-    --     s = string.gsub(s, "^(Ö)%.", "%1.\\&") -- lua - not Unicode-capable
-    --     s = string.gsub(s, "^(Ü)%.", "%1.\\&") -- lua - not Unicode-capable
-    --     s = string.gsub(s, "^(ä)%.", "%1.\\&") -- lua - not Unicode-capable
-    --     s = string.gsub(s, "^(ö)%.", "%1.\\&") -- lua - not Unicode-capable
-    --     s = string.gsub(s, "^(ü)%.", "%1.\\&") -- lua - not Unicode-capable
-    --     if s ~= str.text then
-    --       io.stderr:write(s.."\n")
-    --       return pandoc.RawInline("ms", s)
-    --     end
-    --   end
-    -- end,
-
     Table = function (tab)
+      -- wrap tables in macros and a caption macro
+      -- RESULT:
+      -- .TABLESTART
+      -- .\" (table)
+      -- .TABLELABLE \" if caption
+      -- .\" caption if given
+      -- .TABLEEND
       if FORMAT == "ms" then
         cap = pandoc.Plain(table.clone(tab.caption))
         -- cap = pandoc.utils.stringify(tab.caption) or ""
@@ -159,6 +129,16 @@ return {
       end
     end,
 
+    Div = function(div)
+      -- sanitize div id
+      -- this is not used, anyway!?
+      if FORMAT == "ms" then
+        if string.find(div.c[1][1], "^ref-.*/") then
+          div.c[1][1] = string.gsub(div.c[1][1], '/', '+')
+        end
+      end
+    end,
+
     Link = function (cit)
       -- sanitize Link ID
       -- protect against https://github.com/jgm/pandoc/issues/4515
@@ -169,21 +149,13 @@ return {
         return cit
       end
     end,
-
-    Div = function(div)
-      -- sanitize div id
-      -- this is not used, anyway!?
-      if FORMAT == "ms" then
-        if string.find(div.c[1][1], "^ref-.*/") then
-          div.c[1][1] = string.gsub(div.c[1][1], '/', '+')
-        end
-      end
-    end,
     
     Image = function (im)
       -- cf. https://github.com/jgm/pandoc/issues/4475
       -- Image inclusion is by default disabled for ms in pandoc
-      -- this uses the macro .ANYPIC to include PDF graphics
+      -- this uses the private macro .ANYPIC to include PDF graphics
+      --
+      -- uses image property `float`; if set, uses ANYPIC F
       --
       -- If there is no graphics file that can be included (PDF),
       -- it is generated by ImageMagicks convert – this may not be the
@@ -191,7 +163,7 @@ return {
       --
       -- Determines size using pdfinfo not strictly necessary, but a
       -- starting point for changing size in ms.
-
+      --
       if FORMAT == "ms" then
         pat = keep_pattern
         if text.lower(im.attributes.float) == "true" or im.attributes.float == "1" then
@@ -201,7 +173,7 @@ return {
         end
         pat = pat .. string.format(' "%s"', pandoc.utils.stringify(im.caption))
         local im_src_old = im.src
-        if not string.ends(text.lower(im.src), ".pdf") then
+        if not string.endswith(text.lower(im.src), ".pdf") then
           im.src = string.gsub(im.src, "%.[^.]+$", ".pdf")
         end
         if not file_exists(im.src) and file_exists(im_src_old) then
@@ -222,12 +194,8 @@ return {
               pat = pat .. string.format(' "%s"', im.attributes.height)
             end
           else
-            -- size = pandoc.pipe('identify', {im.src}, "")
-            -- _, _, w, h = string.find(size, "(%d+)x(%d+)")
             size = pandoc.pipe('pdfinfo', {im.src}, "")
-            -- io.stderr:write(size)
             _, _, w, h = string.find(size, "Page size:%s+([%d.]+)%s+x%s+([%d.]+)")
-            -- io.stderr:write(string.format("%s %s\n", w, h))
             pat = pat .. string.format(" %sp %sp", w, h)
           end
         end

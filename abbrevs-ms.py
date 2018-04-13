@@ -2,7 +2,7 @@
 
 """
 Pandoc filter to recognise some abbreviations and prevent sentence
-spacing."""
+spacing in ``ms``."""
 
 from pandocfilters import toJSONFilter, Str, RawInline
 import regex  # allow unicode character properties
@@ -38,19 +38,12 @@ pattern = regex.compile(
 
 
 def abbrevs(key, value, format, meta):
-    # french-space guessed abbreviations
+    """French-space guessed abbreviations."""
     if format == "ms":
         if key == 'Str':
             m = pattern.match(value)
             if m:
                 return RawInline("ms", value + r'\&')
-            # protect against https://github.com/jgm/pandoc/issues/4550
-            if regex.search(r'[’]', value):
-                strs = regex.split(r'[’]', value)
-                ret = [Str(strs[0])]
-                for s in strs[1:]:
-                    ret += [RawInline("ms", "’"), Str(s)]
-                return ret
 
 
 if __name__ == "__main__":
