@@ -181,6 +181,7 @@ return {
     end,
     
     Image = function (im)
+      -- cf. https://github.com/jgm/pandoc/issues/4475
       -- Image inclusion is by default disabled for ms in pandoc
       -- this uses the macro .ANYPIC to include PDF graphics
       --
