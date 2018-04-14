@@ -4,10 +4,10 @@
 Pandoc filter to recognise some abbreviations and prevent sentence
 spacing in ``ms``."""
 
-from pandocfilters import toJSONFilter, Str, RawInline
+from pandocfilters import toJSONFilter, RawInline
 import regex  # allow unicode character properties
 
-abbrevs = {
+ABBREVS = {
     "all": [
         r'\p{L}'
     ],
@@ -30,20 +30,21 @@ abbrevs = {
     ]
 }
 
-pattern = regex.compile(
+PATTERN = regex.compile(
     r'^[\p{Pi}\p{Ps}]?(?:' +
-    r'|'.join(a for l in abbrevs for a in abbrevs[l]) +
+    r'|'.join(a for l in ABBREVS for a in ABBREVS[l]) +
     r')\.$'
 )
 
 
-def abbrevs(key, value, format, meta):
+def abbrevs(key, value, fmt, _meta):
     """French-space guessed abbreviations."""
-    if format == "ms":
+    if fmt == "ms":
         if key == 'Str':
-            m = pattern.match(value)
+            m = PATTERN.match(value)
             if m:
                 return RawInline("ms", value + r'\&')
+    return None  # change nothing
 
 
 if __name__ == "__main__":
