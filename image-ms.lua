@@ -209,12 +209,36 @@ return {
           pandoc.RawInline("ms", '\n.smallcaps\n')
         }
         for i, el in pairs(elem.c) do
-          ret:extend(el)
+          ret:extend({el})
         end
-        ret:extend(pandoc.RawInline("ms", '\\c\n./smallcaps\n'))
+        ret:extend({pandoc.RawInline("ms", '\\c\n./smallcaps\n')})
+        return ret
       end
     end,
 
+    Str = function(str)
+      if FORMAT == "ms" then
+        -- Protect U+2019 against https://github.com/jgm/pandoc/issues/4550
+        local start = 1
+        local old_start = 1
+        local ret = List:new{}
+        local val = str.c
+        while true do
+          start, ende = string.find(val, "’", start)
+          if start == nil then break end
+          local found = string.sub(val, old_start, start - 1)
+          ret:extend({
+            pandoc.Str(found),
+            pandoc.RawInline("ms", "’")
+          })
+          old_start = ende + 1
+          start = ende + 1
+        end
+        local rest = string.sub(val, old_start, string.len(val))
+        ret:extend({pandoc.Str(rest)})
+        return ret
+      end
+    end,
 
   }
 }
