@@ -1,26 +1,24 @@
 --
 --------------------------------------------------------------------------------
---         File:  image-ms.lua
+--         File: image-ms.lua
 --
---        Usage:  ./image-ms.lua
+--        Usage: ./image-ms.lua
 --
---  Description:  make graphic a float in Pandoc -ms export
---                - make float if {float=true} or {float=1} in
---                  parameters
---                correct unlinkable labels in BibTeX ("/" -> "+")
+--  Description: make graphic a float in Pandoc -ms export
+--               - make float if {float=true} or {float=1} in
+--                 parameters
+--               correct unlinkable labels in BibTeX ("/" -> "+")
+--               options to render small caps
+--               handle font within font
 --
---      Options:  ---
--- Requirements:  ---
---         Bugs:  ---
---        Notes:  ---
---       Author:  Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
--- Organization:  
---      Version:  0.2
---      Created:  30.03.2018
+--       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
+--      Version: 0.3
+--      Created: 2018-03-30
+-- Last Changed: 2018-04-15, 11:17:12 CEST
 --------------------------------------------------------------------------------
 --
 
--- local inspect = require('inspect')
+local inspect = require('inspect')
 text = require 'text'
 List = require 'pandoc.List'
 
@@ -89,8 +87,64 @@ end
 --]]
 -- end
 
+local use_small_caps = false
+
+local walker = {
+  Strong=pandoc.walk_inline,
+  Emph=pandoc.walk_inline,
+  Header=pandoc.walk_block,
+}
+
+function embolden_emph(elem)
+  if FORMAT == "ms" then
+    return walker[elem.t](
+      elem,
+      {
+        Emph = function (el)
+          local ret = List:new({
+              pandoc.RawInline("ms", "\\f[BI]"),
+          })
+          ret:extend(el.c)
+          ret:extend({
+              pandoc.RawInline("ms", "\\f[R]\\f[B]"),
+          })
+          return pandoc.Span(ret)
+        end
+    })
+  end
+end
+
+function emphasize_bold(elem)
+  if FORMAT == "ms" then
+    return walker[elem.t](
+      elem,
+      {
+        Strong = function (el)
+          local ret = List:new({
+              pandoc.RawInline("ms", "\\f[BI]")
+          })
+          ret:extend(el.c)
+          ret:extend({
+              pandoc.RawInline("ms", "\\f[R]\\f[I]"),
+          })
+          return pandoc.Span(ret)
+        end
+    })
+  end
+end
 
 return {
+  {
+    Meta = function(meta)
+      if meta["use-small-caps"] == true then
+        use_small_caps = "small-caps"
+      elseif meta["use-small-caps"] == false then
+        use_small_caps = "none"
+      else
+        use_small_caps = (meta["use-small-caps"] ~= nil) and text.lower(meta["use-small-caps"][1].c)
+      end
+    end,
+  },
   {
     Table = function (tab)
       -- wrap tables in macros and a caption macro
@@ -148,7 +202,7 @@ return {
         return cit
       end
     end,
-    
+
     Image = function (im)
       -- cf. https://github.com/jgm/pandoc/issues/4475
       -- Image inclusion is by default disabled for ms in pandoc
@@ -201,18 +255,41 @@ return {
         return pandoc.RawInline("ms", pat)
       end
     end,
-
+    Header = embolden_emph,
+    Strong = embolden_emph,
+    Emph = emphasize_bold,
     SmallCaps = function (elem)
       -- use macro for small caps – slightly better than size escapes
       if FORMAT == "ms" then
-        local ret = List:new{
-          pandoc.RawInline("ms", '\n.smallcaps\n')
-        }
-        for i, el in pairs(elem.c) do
-          ret:extend({el})
+        if use_small_caps == "underline" then
+          return List:new{
+            pandoc.RawInline("ms",
+                             string.format('\n.UL "%s"\\c\n', pandoc.utils.stringify(elem.c)))
+          }
+        elseif use_small_caps == "small-caps" then
+          local ret = List:new{
+            pandoc.RawInline("ms", '\n.smallcaps\n')
+          }
+          for i, el in pairs(elem.c) do
+            ret:extend({el})
+          end
+          ret:extend({pandoc.RawInline("ms", '\\c\n./smallcaps\n')})
+          return ret
+        elseif use_small_caps == "all-caps" then
+          return pandoc.walk_inline(
+            pandoc.Span(elem.c), {
+              Str = function(el)
+                return pandoc.Str(text.upper(el.text))
+              end
+          })
+        elseif use_small_caps == "strong" then
+          return pandoc.Strong(elem.c)
+        elseif use_small_caps == "emph" then
+          return pandoc.Emph(elem.c)
+        elseif use_small_caps == "none" then
+          return pandoc.Span(elem.c)
+        elseif use_small_caps == "pandoc-default" then
         end
-        ret:extend({pandoc.RawInline("ms", '\\c\n./smallcaps\n')})
-        return ret
       end
     end,
 
@@ -239,6 +316,5 @@ return {
         return ret
       end
     end,
-
   }
 }
