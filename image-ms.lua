@@ -14,7 +14,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.3
 --      Created: 2018-03-30
--- Last Changed: 2018-04-15, 11:17:12 CEST
+-- Last Changed: 2018-04-15, 18:03:30 CEST
 --------------------------------------------------------------------------------
 --
 
@@ -260,6 +260,7 @@ return {
     Emph = emphasize_bold,
     SmallCaps = function (elem)
       -- use macro for small caps – slightly better than size escapes
+      -- for my private use
       if FORMAT == "ms" then
         if use_small_caps == "underline" then
           return List:new{
