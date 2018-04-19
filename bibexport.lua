@@ -37,17 +37,32 @@ function bibdata (bibliography)
   local bibs = bibliography.t == 'MetaList'
     and List.map(bibliography, bibname)
     or {bibname(bibliography)}
-  return table.concat(bibs, ',')
+  return bibs
+end
+
+function yamlify(bibs, citations)
+  local biby = io.open("bibexport.yaml", "w")
+  biby:write("bibliographies:\n")
+  for i, b in ipairs(bibs) do
+    biby:write(string.format("- %s\n", b))
+  end
+  biby:write("cite-keys:\n")
+  for i, b in ipairs(citations) do
+    biby:write(string.format("- %s\n", b))
+  end
+  biby:close()
 end
 
 function aux_content(bibliography)
   local cites = citation_ids()
   table.sort(cites)
   local citations = table.concat(cites, ',')
+  local bibs = bibdata(bibliography)
+  yamlify(bibs, cites)
   return table.concat(
     {
       '\\bibstyle{alpha}',
-      '\\bibdata{' .. bibdata(bibliography) .. '}',
+      '\\bibdata{' .. table.concat(bibs, ',') .. '}',
       '\\citation{' .. citations .. '}',
       '',
     },
