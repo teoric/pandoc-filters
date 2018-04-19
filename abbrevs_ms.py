@@ -21,6 +21,7 @@ ABBREVS = {
         # r'[muMUsSiI]\.e'
         r'[Vv]gl',
         r'Kap',
+        r'\d+',
     ],
     "en": [
         r'[Pp]p?',
