@@ -1,4 +1,4 @@
--- from luafilters
+-- from https://github.com/pandoc/lua-filters
 --
 -- - added unlinking of `bibexport.bib` to prevent backups
 --
