@@ -83,7 +83,7 @@ function write_dummy_aux (bibliography, auxfile)
   local fh = io.open(filename, 'w')
   fh:write(aux_content(bibliography))
   fh:close()
-  io.stdout:write('Aux written to ' .. filename .. '\n')
+  io.stderr:write('Aux written to ' .. filename .. '\n')
   return filename
 end
 
@@ -95,8 +95,8 @@ function Pandoc (doc)
     -- create a dummy .aux file
     local auxfile_name = write_dummy_aux(meta.bibliography, meta.auxfile)
     os.remove('bibexport.bib')
-    os.execute('bibexport ' .. auxfile_name)
-    io.stdout:write('Output written to bibexport.bib\n')
+    os.execute('bibexport -t ' .. auxfile_name)
+    io.stderr:write('Output written to bibexport.bib\n')
     return nil
   end
 end
