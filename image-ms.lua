@@ -14,7 +14,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.3
 --      Created: 2018-03-30
--- Last Changed: 2018-04-19, 14:09:18 CEST
+-- Last Changed: 2018-04-19, 23:20:53 CEST
 --------------------------------------------------------------------------------
 --
 
@@ -26,7 +26,7 @@ List = require 'pandoc.List'
 local keep_pattern = ".ANYPIC"
 
 -- characters to protect from Pandoc smartness
-local protected = {"’", "…"}
+local protected = {"’", "…"} -- not used currently
 
 
 -- http://lua-users.org/wiki/StringRecipes
@@ -269,7 +269,12 @@ return {
         if use_small_caps == "underline" then
           return List:new{
             pandoc.RawInline("ms",
-                             string.format('\n.UL "%s"\\c\n', pandoc.utils.stringify(elem.c)))
+                             string.format('\\c\n.UL "%s"\\c\n', pandoc.utils.stringify(elem.c)))
+          }
+        elseif use_small_caps == "space-out" then
+          return List:new{
+            pandoc.RawInline("ms",
+                             string.format('\\c\n.SPERR "%s"\n', pandoc.utils.stringify(elem.c)))
           }
         elseif use_small_caps == "small-caps" then
           local ret = List:new{
@@ -306,18 +311,17 @@ return {
         local old_start = 1
         local ret = List:new{}
         local val = str.c
-        for i, let in ipairs(protected) do
-          while true do
-            start, ende = string.find(val, let, start)
-            if start == nil then break end
-            local found = string.sub(val, old_start, start - 1)
-            ret:extend({
-              pandoc.Str(found),
-              pandoc.RawInline("ms", let)
-            })
-            old_start = ende + 1
-            start = ende + 1
-          end
+        local let = "’"
+        while true do
+          start, ende = string.find(val, let, start)
+          if start == nil then break end
+          local found = string.sub(val, old_start, start - 1)
+          ret:extend({
+            pandoc.Str(found),
+            pandoc.RawInline("ms", let)
+          })
+          old_start = ende + 1
+          start = ende + 1
         end
         local rest = string.sub(val, old_start, string.len(val))
         ret:extend({pandoc.Str(rest)})

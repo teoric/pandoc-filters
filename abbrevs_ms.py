@@ -22,6 +22,7 @@ ABBREVS = {
         r'[Vv]gl',
         r'Kap',
         r'\d+',
+        r'[Ii]nsb',
     ],
     "en": [
         r'[Pp]p?',
