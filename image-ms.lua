@@ -14,7 +14,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.3
 --      Created: 2018-03-30
--- Last Changed: 2018-04-20, 09:48:22 CEST
+-- Last Changed: 2018-04-20, 20:21:44 CEST
 --------------------------------------------------------------------------------
 --
 
@@ -333,26 +333,38 @@ return {
 
     Str = function(str)
         -- Protect letters in `protected` against smartness
-        -- Protect U+2019ragainst https://github.com/jgm/pandoc/issues/4550
+        -- Protect U+2019 against https://github.com/jgm/pandoc/issues/4550
       if FORMAT == "ms" then
-        local start = 1
-        local old_start = 1
-        local ret = List:new{}
-        local val = str.c
-        local let = "’"
-        while true do
-          start, ende = string.find(val, let, start)
-          if start == nil then break end
-          local found = string.sub(val, old_start, start - 1)
-          ret:extend({
-            pandoc.Str(found),
-            pandoc.RawInline("ms", let)
-          })
-          old_start = ende + 1
-          start = ende + 1
+        local s = str.c
+        local substrings = List:new()
+        local i = 1
+        while i <= text.len(s) do
+          local il
+          for j, p in ipairs(protected) do
+            il = text.len(p)
+            skip = 1
+            if text.sub(s, i, i + il - 1) == p then
+              substrings:extend({{i, il}})
+              skip = il
+              break
+            end
+          end
+          i = i + skip
         end
-        local rest = string.sub(val, old_start, string.len(val))
-        ret:extend({pandoc.Str(rest)})
+        local old_start = 1
+        local ret = List:new()
+        substrings:map(function (p)
+            local start = p[1]
+            local il = p[2]
+            if start > old_start then
+              ret:extend({pandoc.Str(text.sub(s, old_start, start - 1))})
+            end
+            ret:extend({pandoc.RawInline("ms", text.sub(s, start, start + il - 1))})
+            old_start = start + il
+        end)
+        if old_start <= text.len(s) then
+          ret:extend({pandoc.Str(text.sub(s, old_start, text.len(s)))})
+        end
         return ret
       end
     end,
