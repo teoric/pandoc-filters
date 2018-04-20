@@ -14,7 +14,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.3
 --      Created: 2018-03-30
--- Last Changed: 2018-04-19, 23:20:53 CEST
+-- Last Changed: 2018-04-20, 09:24:05 CEST
 --------------------------------------------------------------------------------
 --
 
@@ -28,6 +28,15 @@ local keep_pattern = ".ANYPIC"
 -- characters to protect from Pandoc smartness
 local protected = {"’", "…"} -- not used currently
 
+-- references section title
+local refsec = {
+  References = true,
+  Literatur = true,
+  Bibliographie = true,
+  Bibliography = true,
+}
+
+local zero_space = "​"
 
 -- http://lua-users.org/wiki/StringRecipes
 
@@ -328,5 +337,33 @@ return {
         return ret
       end
     end,
+  },
+  {
+    Header = function (h)
+      if FORMAT == "ms" then
+        if refsec[pandoc.utils.stringify(h)] then
+          local pref = pandoc.RawBlock("ms", ".nr PS \\n[PS]*85/100\n.RESCALE_LINE\n")
+          return {pref, h}
+        end
+      end
+    end,
+    Link = function (cit)
+      function space(el)
+        -- allow line breaking of links
+        if el.t == "Str" then
+          if FORMAT == "ms" then
+            el.c = string.gsub(el.c, "/", "/\\:" .. zero_space)
+            el.c = string.gsub(el.c, "%.", ".\\:" .. zero_space)
+          else
+            el.c = string.gsub(el.c, "/", "/" .. zero_space)
+          end
+        end
+        return el
+      end
+      local texts = cit.c[2]
+      cit.c[2] = texts:map(space)
+      return cit
+    end,
+
   }
 }
