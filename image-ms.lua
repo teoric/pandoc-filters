@@ -14,7 +14,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.3
 --      Created: 2018-03-30
--- Last Changed: 2018-04-20, 20:21:44 CEST
+-- Last Changed: 2018-04-21, 08:52:04 CEST
 --------------------------------------------------------------------------------
 --
 
@@ -286,6 +286,13 @@ return {
         end
         return pandoc.RawInline("ms", pat)
       end
+    end,
+    BlockQuote = function(el)
+      return {
+        pandoc.RawBlock("ms", ".STARTQUOTE"),
+        el,
+        pandoc.RawBlock("ms", ".ENDQUOTE"),
+      }
     end,
     Header = embolden_emph,
     Strong = embolden_emph,
