@@ -4,17 +4,20 @@
 --
 --        Usage: ./image-ms.lua
 --
---  Description: make graphic a float in Pandoc -ms export
---               - make float if {float=true} or {float=1} in
---                 parameters
---               correct unlinkable labels in BibTeX ("/" -> "+")
---               options to render small caps
---               handle font within font
+--  Description: - make graphic a float in Pandoc -ms export
+--                 - make float if {float=true} or {float=1} in
+--                   parameters
+--               - correct unlinkable labels in BibTeX ("/" -> "+")
+--               - options to render small caps
+--               - handle font within font
+--               - wrap BlockQuote in .STARTQUOTE/.ENDQUOTE
+--               - make links breakable
+--               - scale references section down
 --
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
---      Version: 0.3
+--      Version: 0.5
 --      Created: 2018-03-30
--- Last Changed: 2018-04-21, 08:52:04 CEST
+-- Last Changed: 2018-04-21, 08:57:11 CEST
 --------------------------------------------------------------------------------
 --
 
@@ -31,9 +34,12 @@ local protected = {"’", "…"} -- not used currently
 -- references section title
 local refsec = {
   References = true,
+  Quellen = true,
   Literatur = true,
   Bibliographie = true,
   Bibliography = true,
+  Bibliografia = true,
+  ["Bibliografía"] = true,
 }
 
 local zero_space = "​"
