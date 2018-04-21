@@ -17,7 +17,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2018-03-30
--- Last Changed: 2018-04-21, 08:57:11 CEST
+-- Last Changed: 2018-04-21, 09:28:48 CEST
 --------------------------------------------------------------------------------
 --
 
@@ -386,8 +386,9 @@ return {
     Header = function (h)
       if FORMAT == "ms" then
         if refsec[pandoc.utils.stringify(h)] then
-          local pref = pandoc.RawBlock("ms", ".nr PS \\n[PS]*\\n[CITE_SIZE]/1000\n.RESCALE_LINE\n.nr PD 0.166v\n")
-          return {pref, h}
+          return {pandoc.RawBlock("ms", ".REF_SIZE"), h}
+        else
+          return{pandoc.RawBlock("ms", ".RESTORE_SIZE"), h}
         end
       end
     end,
