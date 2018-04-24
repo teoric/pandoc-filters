@@ -2,7 +2,7 @@
 --------------------------------------------------------------------------------
 --         File: image-ms.lua
 --
---        Usage: ./image-ms.lua
+--        Usage: pandoc --lua-filter=image-ms.lua
 --
 --  Description: - make graphic a float in Pandoc -ms export
 --                 - make float if {float=true} or {float=1} in
