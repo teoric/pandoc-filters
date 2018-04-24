@@ -21,6 +21,9 @@ ABBREVS = {
         # r'[muMUsSiI]\.e'
         r'[Vv]gl',
         r'Kap',
+        r'Fn',
+        r'Anm',
+        r'Abb',
         r'\d+',
         r'[Ii]nsb',
     ],
@@ -30,7 +33,8 @@ ABBREVS = {
         r'[Vv]ol',
         # r'[Ee]\.g'
         # r'[Ii]\.e'
-        r'[Vv]iz'
+        r'[Vv]iz',
+        r'fig',
     ]
 }
 
