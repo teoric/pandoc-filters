@@ -12,6 +12,7 @@ ABBREVS = {
         r'\p{L}'
     ],
     "de": [
+        r'[Ee]vtl',
         r'Nr',
         r'[Zz]\.Zt',
         r'[Gg]gf\.',
