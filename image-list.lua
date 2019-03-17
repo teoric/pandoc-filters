@@ -7,14 +7,14 @@
 --  Description: 
 --     convert SVG or PDF/EPS to EMF for inclusion into Word or RTF
 --     convert PDF/EPS to SVG for inclusion into HTML and similar
---     needs: pdf2svg and inkscape for EMF export
+--     needs: pdf2svg, inkscape and ImageMagick convert for EMF export
 --     prints: list of graphics,
 --             e.g. for packing them separately for a publisher
 --
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-03-17
--- Last Changed: 2019-03-17, 12:42:59 (CET)
+-- Last Changed: 2019-03-17, 12:53:45 (CET)
 --------------------------------------------------------------------------------
 --
 -- local inspect = require('inspect')
@@ -96,7 +96,11 @@ return {
       elseif FORMAT == "docx" or FORMAT == "rtf" then
         im = convert_to_emf(im)
       end
-      io.stderr:write(string.format("%-3d\t%s\t%s\n", image_no, im.src, image_orig))
+      if image_orig == im.src then
+        io.stderr:write(string.format("%-3d\t%s\n", image_no, im.src))
+      else
+        io.stderr:write(string.format("%-3d\t%s\t%s\n", image_no, im.src, image_orig))
+      end
       return im
     end
   }

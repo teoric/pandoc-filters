@@ -7,7 +7,7 @@
   [this](https://github.com/pandoc/lua-filters/blob/master/bibexport/bibexport.lua)
   to use [bibtool](http://www.gerd-neugebauer.de/software/TeX/BibTool/))
 - `image-list.lua` – convert graphics (PDF/EPS to SVG for HTML/ePub,
-  PDF/EPS/SVG to EMF for Word/RTF) and print a list of images in order,
+  PDF/EPS/SVG as well as non-PNG/JPEG to EMF for Word/RTF) and print a list of images in order,
   e.g. for packaging
 - `image-ms.lua` – prepare images for MS output; also handles some minor
   problems with Pandoc
