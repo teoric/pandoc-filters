@@ -73,15 +73,14 @@ image_no = 0
 return {
   {
     Image = function (im)
-      --
       image_no = image_no + 1
+      image_orig = im.src
       if FORMAT:find("html") or FORMAT:find("epub") then
         if string.endswith(text.lower(im.src), ".pdf") or
           string.endswith(text.lower(im.src), ".eps") then
             im = convert_to_svg(im)
           end
       elseif FORMAT == "docx" or FORMAT == "rtf" then
-        image_orig = im.src
         if string.endswith(text.lower(im.src), ".pdf") or
           string.endswith(text.lower(im.src), ".eps") or
           string.endswith(text.lower(im.src), ".svg") then
@@ -91,4 +90,5 @@ return {
       io.stderr:write(string.format("%-3d\t%s\t%s\n", image_no, im.src, image_orig))
       return im
     end
-  }}
+  }
+}
