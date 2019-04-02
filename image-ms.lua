@@ -17,7 +17,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2018-03-30
--- Last Changed: 2018-06-02, 08:13:02 (CEST)
+-- Last Changed: 2019-04-02, 14:54:07 (CEST)
 --------------------------------------------------------------------------------
 --
 
@@ -168,15 +168,9 @@ return {
       function space(el)
         -- allow line breaking of links
         if el.t == "Str" then
-          if FORMAT == "ms" then
-            el.c = string.gsub(el.c, "/", "/\\:" .. zero_space)
-            el.c = string.gsub(el.c, "%.", ".\\:" .. zero_space)
-            el.c = string.gsub(el.c, "_", "_\\:" .. zero_space)
-          else
-            el.c = string.gsub(el.c, "/", "/" .. zero_space)
-            el.c = string.gsub(el.c, "%.", "." .. zero_space)
-            el.c = string.gsub(el.c, "_", "_" .. zero_space)
-          end
+          el.c = string.gsub(el.c, "/", "/" .. zero_space)
+          el.c = string.gsub(el.c, "%.", "." .. zero_space)
+          el.c = string.gsub(el.c, "_", "_" .. zero_space)
         end
       end
       cit.c[2]:map(space)
@@ -227,6 +221,20 @@ return {
         if string.find(div.c[1][1], "^ref-.*/") then
           div.c[1][1] = string.gsub(div.c[1][1], '/', '+')
         end
+      end
+    end,
+
+    DefinitionList = function(div)
+      -- make definitions Bold
+      if FORMAT == "ms" then
+        for i = 1, #(div.c) do
+          local ret = pandoc.List:new{}
+          for j = 1, #(div.c[i][1]) do
+            ret:extend({pandoc.Strong(div.c[i][1][j])})
+          end
+          div.c[i][1] = table.clone(ret)
+        end
+        return div
       end
     end,
 
