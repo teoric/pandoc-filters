@@ -17,7 +17,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2018-03-30
--- Last Changed: 2019-04-02, 14:54:07 (CEST)
+-- Last Changed: 2019-04-02, 15:05:36 (CEST)
 --------------------------------------------------------------------------------
 --
 
@@ -232,7 +232,7 @@ return {
           for j = 1, #(div.c[i][1]) do
             ret:extend({pandoc.Strong(div.c[i][1][j])})
           end
-          div.c[i][1] = table.clone(ret)
+          div.c[i][1] = ret
         end
         return div
       end
