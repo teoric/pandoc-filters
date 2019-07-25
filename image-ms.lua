@@ -17,7 +17,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2018-03-30
--- Last Changed: 2019-04-02, 15:05:36 (CEST)
+-- Last Changed: 2019-07-25, 10:38:27 (CEST)
 --------------------------------------------------------------------------------
 --
 
@@ -190,7 +190,7 @@ return {
         cap = pandoc.Plain(table.clone(tab.caption))
         -- cap = pandoc.utils.stringify(tab.caption) or ""
         tab.caption = {} -- delete old caption
-        ret = List:new{
+        local ret = List:new{
           pandoc.RawBlock("ms", ".TABLESTART\n"),
           tab,
         }
@@ -395,7 +395,7 @@ return {
         if refsec[pandoc.utils.stringify(h)] then
           return {pandoc.RawBlock("ms", ".REF_SIZE"), h}
         else
-          return{pandoc.RawBlock("ms", ".RESTORE_SIZE"), h}
+          return {pandoc.RawBlock("ms", ".RESTORE_SIZE"), h}
         end
       end
     end,
