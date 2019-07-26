@@ -21,29 +21,8 @@
 text = require 'text'
 List = require 'pandoc.List'
 
+require(debug.getinfo(1, "S").source:sub(2):match("(.*[\\/])") .. "utils")
 
-
-
--- http://lua-users.org/wiki/StringRecipes
-
---[[ -- as yet unused
-function string.startswith(String, Start)
-return string.sub(String, 1, string.len(Start)) == Start
-end
---]]
-function string.endswith(String, End)
-return End=='' or string.sub(String, - string.len(End)) == End
-end
-
--- end
-
--- https://stackoverflow.com/questions/4990990/lua-check-if-a-file-exists
-function file_exists(name)
-  -- file exists if it is readable
-  local f=io.open(name,"r")
-  if f~=nil then io.close(f) return true else return false end
-end
---
 
 -- convert SVG to PDF
 function convert_to_svg(im)
