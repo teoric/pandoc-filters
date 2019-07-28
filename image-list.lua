@@ -45,8 +45,8 @@ function convert_to_emf(im)
     im.src = string.gsub(im.src, "%.[^.]+$", ".emf")
     pandoc.pipe("inkscape", {img_orig, "--export-emf", im.src}, "")
   elseif (
-    not string.endswith(text.lower(im.src), ".emf") and not 
-    (
+    not string.endswith(text.lower(im.src), ".emf") and
+    not (
       string.endswith(text.lower(im.src), ".png")
       or
       string.endswith(text.lower(im.src), ".jpg")
