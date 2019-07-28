@@ -44,26 +44,8 @@ local refsec = {
 
 local zero_space = "​"
 
--- http://lua-users.org/wiki/StringRecipes
+require(debug.getinfo(1, "S").source:sub(2):match("(.*[\\/])") .. "utils")
 
---[[ -- as yet unused
-function string.startswith(String, Start)
-  return string.sub(String, 1, string.len(Start)) == Start
-end
---]]
-function string.endswith(String, End)
-  return End=='' or string.sub(String, - string.len(End)) == End
-end
-
--- end
-
--- https://stackoverflow.com/questions/4990990/lua-check-if-a-file-exists
-function file_exists(name)
-  -- file exists if it is readable
-  local f=io.open(name,"r")
-  if f~=nil then io.close(f) return true else return false end
-end
---
 
 function convert_measurements(size)
   -- convert and guess HTML/LaTeX units to [gt]roff units
