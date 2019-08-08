@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2018-03-30
--- Last Changed: 2019-07-25, 16:06:01 (CEST)
+-- Last Changed: 2019-08-08, 16:21:14 (CEST)
 --------------------------------------------------------------------------------
 --
 
@@ -21,6 +21,7 @@ utils = require 'pandoc.utils'
 
 require(debug.getinfo(1, "S").source:sub(2):match("(.*[\\/])") .. "utils")
 
+-- box types
 local boxes = {
   "block",
   "goodbox", "badbox", "acceptbox",
@@ -44,6 +45,7 @@ return {{
     if FORMAT == "beamer" then
       local start = nil
       local finish = nil
+      -- wrap div in box containers
       for i, b in pairs(boxes) do
         if div.classes:includes(b) then
           local title=div.attributes["title"]

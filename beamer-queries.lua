@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2018-03-30
--- Last Changed: 2019-08-08, 16:19:09 (CEST)
+-- Last Changed: 2019-08-08, 16:20:14 (CEST)
 --------------------------------------------------------------------------------
 --
 
@@ -56,7 +56,7 @@ end
 -- @param el The Pandoc element
 -- @param server The server for looking up defaults
 -- @param feat The feature for which to get a value
-function get_default(typ, el, server, feat)
+function get_value(typ, el, server, feat)
   local val = el.attributes[feat]
   if not val and server then
     val = server_defaults[typ][server][feat]
@@ -110,12 +110,12 @@ return {
         end
       elseif typ == "ANNIS" then
         local server = get_server(el, typ)
-        local base = get_default(typ, el, server, "base")
+        local base = get_value(typ, el, server, "base")
         -- add slash to base if necessary
         if not(string.endswith(base, "/")) then
           base = base .. "/"
         end
-        local corpus = get_default("ANNIS", el, server, "base")
+        local corpus = get_value("ANNIS", el, server, "base")
         -- io.stderr:write(utils.stringify(el) .. "\n")
         el.target =  base ..
         "#_q=" .. base64(trim1(utils.stringify(el))) ..
@@ -124,8 +124,8 @@ return {
         return el
       elseif typ == "KorAP" then
         local server = get_server(el, typ)
-        local base = get_default(typ, el, server, "base")
-        local lang = get_default(typ, el, server, "lang")
+        local base = get_value(typ, el, server, "base")
+        local lang = get_value(typ, el, server, "lang")
         -- io.stderr:write(utils.stringify(el) .. "\n")
         el.target =  base ..
         "?q=" .. urlencode(trim1(utils.stringify(el))) ..
