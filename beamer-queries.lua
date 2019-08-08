@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2018-03-30
--- Last Changed: 2019-08-08, 16:20:14 (CEST)
+-- Last Changed: 2019-08-08, 16:24:49 (CEST)
 --------------------------------------------------------------------------------
 --
 
@@ -75,20 +75,16 @@ return {
         local meta_key = typ .. "-servers"
         server_defaults[typ] = {}
         if meta[meta_key] ~= nil then
-          io.stderr:write(string.format("%s\n", meta_key))
+          -- io.stderr:write(string.format("%s\n", meta_key))
           for server, config in pairs(meta[meta_key]) do
             -- io.stderr:write(string.format("%s\n", inspect(config)))
             server_defaults[typ][server] = {}
             for i, val in pairs(query_values[typ]) do
-              io.stderr:write(string.format("- %s [%s]\n", val, utils.stringify(config[val])))
+              -- io.stderr:write(string.format("- %s [%s]\n", val, utils.stringify(config[val])))
               server_defaults[typ][server][val] = utils.stringify(config[val])
             end
           end
         end
-      end
-      io.stderr:write(inspect(server_defaults).."\n")
-      for k, v in pairs(server_defaults) do
-        print(k)
       end
     end
   },
