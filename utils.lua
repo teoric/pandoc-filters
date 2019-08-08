@@ -57,6 +57,7 @@ local hex_to_char = function(x)
   return string.char(tonumber(x, 16))
 end
 
+
 function urldecode(url)
   if url == nil then
     return
@@ -73,6 +74,8 @@ end
 -- end https://gist.github.com/liukun/f9ce7d6d14fa45fe9b924a3eed5c3d99
 
 
+--- check if a file exists
+-- @param name The name of the hypothetical file
 -- https://stackoverflow.com/questions/4990990/lua-check-if-a-file-exists
 function file_exists(name)
   -- file exists if it is readable
@@ -85,6 +88,8 @@ function file_exists(name)
   end
 end
 
+--- get the keys of a table as a table (list)
+-- @param tab The table
 function get_keys(tab)
   local keys = {}
   for k, v in pairs(tab) do
