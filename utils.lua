@@ -84,3 +84,11 @@ function file_exists(name)
     return false
   end
 end
+
+function get_keys(tab)
+  local keys = {}
+  for k, v in pairs(tab) do
+    table.insert(keys, k)
+  end
+  return keys
+end

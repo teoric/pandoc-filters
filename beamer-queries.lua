@@ -23,7 +23,6 @@ require(debug.getinfo(1, "S").source:sub(2):match("(.*[\\/])") .. "utils")
 
 -- https://stackoverflow.com/questions/6380820/get-containing-path-of-lua-file
 
-local server_types = {"ANNIS", "KorAP"} -- currently recognized query types
 -- features for which defaults can be defined, by query type
 local query_values = {
   ["ANNIS"] = {
@@ -35,6 +34,8 @@ local query_values = {
     "lang"
   }
 }
+
+local server_types = get_keys(query_values)
 
 local server_defaults = {} -- will be filled from document metadata
 
@@ -62,7 +63,7 @@ function get_value(typ, el, server, feat)
     val = server_defaults[typ][server][feat]
   end
   if val == nil then
-    error(val .. " missing ".. utils.stringify(el) .."\n")
+    error(string.format("%s missing [%s]\n", val, utils.stringify(el)))
   end
   return val
 end
@@ -136,7 +137,7 @@ return {
         end
         -- io.stderr:write(utils.stringify(el) .. "\n")
         el.target =  base ..
-        "?expression=" .. urlencode("/"..trim1(utils.stringify(el)).."/g") ..
+        "?expression=" .. urlencode("/" .. trim1(utils.stringify(el)) .. "/g") ..
         "&engine=pcre&text=" .. urlencode(trim1(text))
         -- io.stderr:write(el.target .. "\n")
         return el
