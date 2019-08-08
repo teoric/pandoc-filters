@@ -44,7 +44,10 @@ function yamlify(bibs, citations)
   local biby = io.open("bibexport.yaml", "w")
   biby:write("bibliographies:\n")
   for i, b in ipairs(bibs) do
-    biby:write(string.format("- %s\n", b))
+    -- avoid that ’bibliographies’ are only "1" etc.
+    if not string.find(b, "^%d*$") then
+      biby:write(string.format("- %s\n", b))
+    end
   end
   biby:write("cite-keys:\n")
   for i, b in ipairs(citations) do
