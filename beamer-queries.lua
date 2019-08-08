@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2018-03-30
--- Last Changed: 2019-08-08, 15:15:40 (CEST)
+-- Last Changed: 2019-08-08, 16:19:09 (CEST)
 --------------------------------------------------------------------------------
 --
 
@@ -23,6 +23,8 @@ require(debug.getinfo(1, "S").source:sub(2):match("(.*[\\/])") .. "utils")
 
 -- https://stackoverflow.com/questions/6380820/get-containing-path-of-lua-file
 
+local server_types = {"ANNIS", "KorAP"} -- currently recognized query types
+-- features for which defaults can be defined, by query type
 local query_values = {
   ["ANNIS"] = {
     "base",
@@ -34,9 +36,11 @@ local query_values = {
   }
 }
 
-local server_defaults = {}
-local server_types = {"ANNIS", "KorAP"}
+local server_defaults = {} -- will be filled from document metadata
 
+--- get the server for a query, including defaults
+-- @param el The Pandoc element
+-- @param typ The type of query
 function get_server(el, typ)
   local server = el.attributes["server"]
   if server == nil then
@@ -47,6 +51,11 @@ function get_server(el, typ)
   return server
 end
 
+--- get a value, relying on defaults
+-- @param typ The type of query
+-- @param el The Pandoc element
+-- @param server The server for looking up defaults
+-- @param feat The feature for which to get a value
 function get_default(typ, el, server, feat)
   local val = el.attributes[feat]
   if not val and server then
@@ -60,6 +69,7 @@ end
 
 return {
   {
+    -- get defaults
     Meta = function(meta)
       for s, typ in ipairs(server_types) do
         local meta_key = typ .. "-servers"
@@ -83,6 +93,7 @@ return {
     end
   },
   {
+    -- process query links
     Link = function(el)
       local typ = el.attributes["type"]
       if string.startswith(el.target, "file:") then
