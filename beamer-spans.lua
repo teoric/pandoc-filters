@@ -1,6 +1,6 @@
 --
 --------------------------------------------------------------------------------
---         File: image-ms.lua
+--         File: beamer-spans.lua
 --
 --        Usage: pandoc --lua-filter=beamer-spans.lua
 --
@@ -8,8 +8,8 @@
 --
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
---      Created: 2018-03-30
--- Last Changed: 2019-08-08, 16:21:14 (CEST)
+--      Created: 2019-07-20
+-- Last Changed: 2019-08-08, 16:58:27 (CEST)
 --------------------------------------------------------------------------------
 --
 

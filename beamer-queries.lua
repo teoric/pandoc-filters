@@ -1,17 +1,37 @@
 --
 --------------------------------------------------------------------------------
---         File: image-ms.lua
+--         File: beamer-queries.lua
 --
---        Usage: pandoc --lua-filter=beamer-spans.lua
+--        Usage: pandoc --lua-filter=beamer-queries.lua
 --
---  Description: handle queries to corpus search engines
+--  Description: generate query links to corpus search engines
 --
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
---      Created: 2018-03-30
--- Last Changed: 2019-08-08, 16:24:49 (CEST)
+--      Created: 2019-07-20
+-- Last Changed: 2019-08-08, 16:58:18 (CEST)
 --------------------------------------------------------------------------------
---
+--[[
+
+This filter generates links to corpus search engines like ANNIS and KorAP.
+It supports the following query types, where the content of the query is
+taken from the content of a link, and several parameters can be specified:
+
+- ANNIS (defaults supported):
+  - base: the base URL, e.g. http://corpling.uis.georgetown.edu/annis/
+  - corpus: the name of the corpus, e.g. GUM
+- KorAP (defaults supported):
+  - base: the base URL, e.g. https://korap.ids-mannheim.de
+  - lang: the query language, e.g. poliqarp
+- DWDS
+- RegExr:
+  - text: the text on which to try the regular expression
+
+The filter also tries to include links starting with "file:" into PDFs
+generated from LaTeX documents as embedded files.  (Will not work in all
+PDF viewers, e.g. for me not in Evince.)
+
+--]]
 
 local inspect = require('inspect')
 text = require 'text'
@@ -22,6 +42,8 @@ utils = require 'pandoc.utils'
 require(debug.getinfo(1, "S").source:sub(2):match("(.*[\\/])") .. "utils")
 
 -- https://stackoverflow.com/questions/6380820/get-containing-path-of-lua-file
+
+
 
 -- features for which defaults can be defined, by query type
 local query_values = {
@@ -129,6 +151,11 @@ return {
         "&ql=" .. urlencode(trim1(lang))
         -- io.stderr:write(el.target .. "\n")
         return el
+      elseif el.attributes["type"] == "DWDS" then
+        local base = "https://www.dwds.de/r"
+        local query = urlencode(trim1(utils.stringify(el)))
+        el.target = base .. "?q=" .. query
+        return el
       elseif el.attributes["type"] == "RegExr" then
         local base = "https://regexr.com/"
         local text = el.attributes["text"]
@@ -140,11 +167,6 @@ return {
         "?expression=" .. urlencode("/" .. trim1(utils.stringify(el)) .. "/g") ..
         "&engine=pcre&text=" .. urlencode(trim1(text))
         -- io.stderr:write(el.target .. "\n")
-        return el
-      elseif el.attributes["type"] == "DWDS" then
-        local base = "https://www.dwds.de/r"
-        local query = urlencode(trim1(utils.stringify(el)))
-        el.target = base .. "?q=" .. query
         return el
       end
     end

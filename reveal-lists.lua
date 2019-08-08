@@ -1,6 +1,6 @@
 --
 --------------------------------------------------------------------------------
---         File: image-ms.lua
+--         File: reveal-lists.lua
 --
 --        Usage: pandoc --lua-filter=reveal-lists.lua
 --
@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2018-03-30
--- Last Changed: 2019-07-16, 10:16:03 (CEST)
+-- Last Changed: 2019-08-08, 16:58:44 (CEST)
 --------------------------------------------------------------------------------
 --
 
