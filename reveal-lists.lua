@@ -13,7 +13,7 @@
 --------------------------------------------------------------------------------
 --
 
-local inspect = require('inspect')
+-- local inspect = require('inspect')
 text = require 'text'
 List = require 'pandoc.List'
 -- io.stderr:write(FORMAT .. "\n")

@@ -21,7 +21,7 @@
 --------------------------------------------------------------------------------
 --
 
-local inspect = require('inspect')
+-- local inspect = require('inspect')
 text = require 'text'
 List = require 'pandoc.List'
 
