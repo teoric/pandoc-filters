@@ -24,7 +24,6 @@ require(debug.getinfo(1, "S").source:sub(2):match("(.*[\\/])") .. "utils")
 -- https://stackoverflow.com/questions/6380820/get-containing-path-of-lua-file
 
 return {{
-  -- TODO: move to own file, does not depend on beamer.
   Link = function(el)
     if string.startswith(el.target, "file:") then
       local file = string.gsub(el.target, "^file:/*", "")
