@@ -2,6 +2,7 @@
 --
 -- - added unlinking of `bibexport.bib` to prevent backups
 --
+local inspect = require('inspect')
 local utils = require 'pandoc.utils'
 local List = require 'pandoc.List'
 
@@ -33,10 +34,10 @@ function bibdata (bibliography)
       return utils.stringify(pandoc.Span(bibitem)):gsub('%.bib$', '')
     end
   end
-
+  io.stderr:write(inspect(bibliography) .. "\n")
   local bibs = bibliography.t == 'MetaList'
     and List.map(bibliography, bibname)
-    or {bibname(bibliography)}
+    or List:new({bibliography})
   return bibs
 end
 
@@ -45,9 +46,7 @@ function yamlify(bibs, citations)
   biby:write("bibliographies:\n")
   for i, b in ipairs(bibs) do
     -- avoid that ’bibliographies’ are only "1" etc.
-    if not string.find(b, "^%d*$") then
-      biby:write(string.format("- %s\n", b))
-    end
+    biby:write(string.format("- %s\n", b))
   end
   biby:write("cite-keys:\n")
   for i, b in ipairs(citations) do
