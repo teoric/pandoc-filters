@@ -4,7 +4,7 @@
 --
 --        Usage: pandoc --lua-filter=image-list.lua
 --
---  Description: 
+--  Description:
 --     convert SVG or PDF/EPS to EMF for inclusion into Word or RTF
 --     convert PDF/EPS to SVG for inclusion into HTML and similar
 --     needs: pdf2svg, inkscape and ImageMagick convert for EMF export
@@ -14,7 +14,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-03-17
--- Last Changed: 2019-03-17, 12:53:45 (CET)
+-- Last Changed: 2019-08-08, 17:11:56
 --------------------------------------------------------------------------------
 --
 -- local inspect = require('inspect')
