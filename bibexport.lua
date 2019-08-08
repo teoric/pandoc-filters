@@ -6,6 +6,8 @@
 local utils = require 'pandoc.utils'
 local List = require 'pandoc.List'
 
+require(debug.getinfo(1, "S").source:sub(2):match("(.*[\\/])") .. "utils")
+
 local citation_id_set = {}
 
 -- Collect all citation IDs.
@@ -14,15 +16,6 @@ function Cite (c)
   for i = 1, #cs do
     citation_id_set[cs[i].id or cs[i].citationId] = true
   end
-end
-
---- Return a list of citation IDs
-function citation_ids ()
-  local citations = {};
-  for cid, _ in pairs(citation_id_set) do
-    citations[#citations + 1] = cid
-  end
-  return citations
 end
 
 function bibdata (bibliography)
@@ -44,7 +37,6 @@ function yamlify(bibs, citations)
   local biby = io.open("bibexport.yaml", "w")
   biby:write("bibliographies:\n")
   for i, b in ipairs(bibs) do
-    -- avoid that ’bibliographies’ are only "1" etc.
     biby:write(string.format("- %s\n", b))
   end
   biby:write("cite-keys:\n")
@@ -55,7 +47,7 @@ function yamlify(bibs, citations)
 end
 
 function aux_content(bibliography)
-  local cites = citation_ids()
+  local cites = get_keys(citation_id_set)
   table.sort(cites)
   local citations = table.concat(cites, ',')
   local bibs = bibdata(bibliography)
