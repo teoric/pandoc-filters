@@ -2,7 +2,7 @@
 --
 -- - added unlinking of `bibexport.bib` to prevent backups
 --
-local inspect = require('inspect')
+-- local inspect = require('inspect')
 local utils = require 'pandoc.utils'
 local List = require 'pandoc.List'
 
@@ -34,7 +34,6 @@ function bibdata (bibliography)
       return utils.stringify(pandoc.Span(bibitem)):gsub('%.bib$', '')
     end
   end
-  io.stderr:write(inspect(bibliography) .. "\n")
   local bibs = bibliography.t == 'MetaList'
     and List.map(bibliography, bibname)
     or List:new({bibliography})
