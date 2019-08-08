@@ -1,8 +1,12 @@
 -- from https://github.com/pandoc/lua-filters
 --
 -- - added unlinking of `bibexport.bib` to prevent backups
+-- - used get_keys() to simplify code
+--
+-- Last Changed: 2019-08-08, 17:45:10 (+02:00)
 --
 -- local inspect = require('inspect')
+
 local utils = require 'pandoc.utils'
 local List = require 'pandoc.List'
 
