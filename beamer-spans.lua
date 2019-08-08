@@ -21,6 +21,14 @@ utils = require 'pandoc.utils'
 
 require(debug.getinfo(1, "S").source:sub(2):match("(.*[\\/])") .. "utils")
 
+local boxes = {
+  "block",
+  "goodbox", "badbox", "acceptbox",
+  "claimbox",
+  "yellowbox", "bluebox",
+  "exbox", "exxbox"
+}
+
 return {{
   Header = function(span)
     if FORMAT == "beamer" then
@@ -32,7 +40,37 @@ return {{
       end
     end
   end,
-
+  Div = function(div)
+    if FORMAT == "beamer" then
+      local start = nil
+      local finish = nil
+      for i, b in pairs(boxes) do
+        if div.classes:includes(b) then
+          local title=div.attributes["title"]
+          -- io.stderr:write(title.."\n")
+          start = "\\begin{"..b.."}"..
+            "{"..
+            title..
+            "}"
+          finish = "\\end{"..b.."}"
+        end
+      end
+      if div.classes:includes("only") then
+        local scope=div.attributes["scope"]
+        start = "\\only<"..
+          scope..
+          ">{"
+        finish = "}"
+      end
+      if start ~= nil then
+        local ret = List:new({pandoc.RawBlock("beamer", start)})
+        ret:extend(div.content)
+        ret:extend({pandoc.RawBlock("beamer", finish)})
+        div.content = ret
+        return div
+      end
+    end
+  end,
   Span = function(span)
     if FORMAT == "beamer" then
       local start = nil
@@ -45,6 +83,15 @@ return {{
         finish = "}}"
       elseif span.classes:includes("emph") then
         start = "\\oldemph{"
+        finish = "}"
+      elseif span.classes:includes("icon") then
+        start = "\\icontext{"
+        finish = "}"
+      elseif span.classes:includes("uni") then
+        start = "\\unitext{\\unemph{"
+        finish = "}}"
+      elseif span.classes:includes("unemph") then
+        start = "\\unemph{"
         finish = "}"
       elseif span.classes:includes("transl") then
         start = "\\transl{"
