@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2019-08-10, 17:13:23 (+02:00)
+-- Last Changed: 2019-08-10, 18:03:50 (+02:00)
 --------------------------------------------------------------------------------
 --[[
 
@@ -26,7 +26,7 @@ taken from the content of a link, and several parameters can be specified:
 - DWDS
 - RegExr:
   - text: the text on which to try the regular expression
-- Unicode: linkt to character description; give hex code as link text
+- Unicode: link to character description; give hex code as link text
 The filter also tries to include links starting with "file:" into PDFs
 generated from LaTeX documents as embedded files.  (Will not work in all
 PDF viewers, e.g. for me not in Evince.)
