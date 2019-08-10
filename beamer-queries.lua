@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2019-08-08, 17:14:43 (+02:00)
+-- Last Changed: 2019-08-10, 16:30:53 (CEST)
 --------------------------------------------------------------------------------
 --[[
 
@@ -39,7 +39,7 @@ List = require 'pandoc.List'
 utils = require 'pandoc.utils'
 -- io.stderr:write(FORMAT .. "\n")
 
-require(debug.getinfo(1, "S").source:sub(2):match("(.*[\\/])") .. "utils")
+loc_utils = require(debug.getinfo(1, "S").source:sub(2):match("(.*[\\/])") .. "utils")
 
 -- https://stackoverflow.com/questions/6380820/get-containing-path-of-lua-file
 
@@ -57,7 +57,7 @@ local query_values = {
   }
 }
 
-local server_types = get_keys(query_values)
+local server_types = loc_utils.get_keys(query_values)
 
 local server_defaults = {} -- will be filled from document metadata
 
@@ -115,9 +115,9 @@ return {
     -- process query links
     Link = function(el)
       local typ = el.attributes["type"]
-      if string.startswith(el.target, "file:") then
+      if loc_utils.startswith(el.target, "file:") then
         local file = string.gsub(el.target, "^file:/*", "")
-        if file_exists(file) then
+        if loc_utils.file_exists(file) then
           io.stderr:write(string.format("will include %s\n", file))
           return pandoc.RawInline(
           "beamer",
@@ -131,14 +131,14 @@ return {
         local server = get_server(el, typ)
         local base = get_value(typ, el, server, "base")
         -- add slash to base if necessary
-        if not(string.endswith(base, "/")) then
+        if not(loc_utils.endswith(base, "/")) then
           base = base .. "/"
         end
         local corpus = get_value("ANNIS", el, server, "base")
         -- io.stderr:write(utils.stringify(el) .. "\n")
         el.target =  base ..
-        "#_q=" .. base64(trim1(utils.stringify(el))) ..
-        "&_c=" .. base64(trim1(corpus))
+        "#_q=" .. loc_utils.base64(loc_utils.trim(utils.stringify(el))) ..
+        "&_c=" .. loc_utils.base64(loc_utils.trim(corpus))
         -- io.stderr:write(el.target .. "\n")
         return el
       elseif typ == "KorAP" then
@@ -147,13 +147,13 @@ return {
         local lang = get_value(typ, el, server, "lang")
         -- io.stderr:write(utils.stringify(el) .. "\n")
         el.target =  base ..
-        "?q=" .. urlencode(trim1(utils.stringify(el))) ..
-        "&ql=" .. urlencode(trim1(lang))
+        "?q=" .. loc_utils.urlencode(loc_utils.trim(utils.stringify(el))) ..
+        "&ql=" .. loc_utils.urlencode(loc_utils.trim(lang))
         -- io.stderr:write(el.target .. "\n")
         return el
       elseif el.attributes["type"] == "DWDS" then
         local base = "https://www.dwds.de/r"
-        local query = urlencode(trim1(utils.stringify(el)))
+        local query = loc_utils.urlencode(loc_utils.trim(utils.stringify(el)))
         el.target = base .. "?q=" .. query
         return el
       elseif el.attributes["type"] == "RegExr" then
@@ -164,8 +164,8 @@ return {
         end
         -- io.stderr:write(utils.stringify(el) .. "\n")
         el.target =  base ..
-        "?expression=" .. urlencode("/" .. trim1(utils.stringify(el)) .. "/g") ..
-        "&engine=pcre&text=" .. urlencode(trim1(text))
+        "?expression=" .. loc_utils.urlencode("/" .. loc_utils.trim(utils.stringify(el)) .. "/g") ..
+        "&engine=pcre&text=" .. loc_utils.urlencode(loc_utils.trim(text))
         -- io.stderr:write(el.target .. "\n")
         return el
       end

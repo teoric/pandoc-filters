@@ -17,7 +17,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2018-03-30
--- Last Changed: 2019-08-10, 08:29:24 (CEST)
+-- Last Changed: 2019-08-10, 16:27:34 (CEST)
 --------------------------------------------------------------------------------
 --
 
@@ -44,7 +44,7 @@ local refsec = {
 
 local zero_space = "​"
 
-require(debug.getinfo(1, "S").source:sub(2):match("(.*[\\/])") .. "utils")
+loc_utils = require(debug.getinfo(1, "S").source:sub(2):match("(.*[\\/])") .. "utils")
 
 
 function convert_measurements(size)
@@ -254,10 +254,10 @@ return {
         end
         pat = pat .. string.format(' "%s"', pandoc.utils.stringify(im.caption))
         local im_src_old = im.src
-        if not string.endswith(text.lower(im.src), ".pdf") then
+        if not loc_utils.endswith(text.lower(im.src), ".pdf") then
           im.src = string.gsub(im.src, "%.[^.]+$", ".pdf")
         end
-        if not file_exists(im.src) and file_exists(im_src_old) then
+        if not loc_utils.file_exists(im.src) and loc_utils.file_exists(im_src_old) then
           pandoc.pipe("convert", {im_src_old, im.src}, "")
         end
         pat = pat .. string.format(' "%s"', im.src)

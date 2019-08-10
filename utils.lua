@@ -1,5 +1,7 @@
+local export = {}
+
 -- -- https://stackoverflow.com/questions/6380820/get-containing-path-of-lua-file
--- function script_path()
+-- function export.script_path()
 --   return debug.getinfo(2, "S").source:sub(2):match("(.*[\\/])")
 -- end
 -- -- end https://stackoverflow.com/questions/6380820/get-containing-path-of-lua-file
@@ -12,29 +14,30 @@ local bs = { [0] =
 'w','x','y','z','0','1','2','3','4','5','6','7','8','9','+','/',
 }
 
-function base64(s)
+function export.base64(s)
   local byte, rep = string.byte, string.rep
   local pad = 2 - ((#s - 1) % 3)
-  s = (s..rep('\0', pad)):gsub("...", function(cs)
+  s = (s .. rep('\0', pad)):gsub("...", function(cs)
     local a, b, c = byte(cs, 1, 3)
-    return bs[a>>2] .. bs[(a&3)<<4|b>>4] .. bs[(b&15)<<2|c>>6] .. bs[c&63]
+    return bs[a >> 2] .. bs[(a & 3) << 4 |b >> 4] ..
+      bs[(b & 15) << 2 | c >> 6] .. bs[c & 63]
   end)
   return s:sub(1, #s-pad) -- .. rep('=', pad) -- need no padding
 end
 -- end http://lua-users.org/wiki/BaseSixtyFour
 
 -- http://lua-users.org/wiki/StringTrim
-function trim1(s)
+function export.trim(s)
   return s:gsub("^%s*(.-)%s*$", "%1")
 end
 -- http://lua-users.org/wiki/StringRecipes
 
-function string.startswith(String, Start)
+function export.startswith(String, Start)
   return string.sub(String, 1, string.len(Start)) == Start
 end
 
-function string.endswith(String, End)
-  return End=='' or string.sub(String, - string.len(End)) == End
+function export.endswith(String, End)
+  return End == '' or string.sub(String, - string.len(End)) == End
 end
 
 -- https://gist.github.com/liukun/f9ce7d6d14fa45fe9b924a3eed5c3d99
@@ -43,7 +46,7 @@ local function char_to_hex(c)
   return string.format("%%%02X", string.byte(c))
 end
 
-function urlencode(url)
+function export.urlencode(url)
   if url == nil then
     return
   end
@@ -58,7 +61,7 @@ local hex_to_char = function(x)
 end
 
 
-function urldecode(url)
+function export.urldecode(url)
   if url == nil then
     return
   end
@@ -77,7 +80,7 @@ end
 --- check if a file exists
 -- @param name The name of the hypothetical file
 -- https://stackoverflow.com/questions/4990990/lua-check-if-a-file-exists
-function file_exists(name)
+function export.file_exists(name)
   -- file exists if it is readable
   local f=io.open(name,"r")
   if f ~= nil then
@@ -90,10 +93,12 @@ end
 
 --- get the keys of a table as a table (list)
 -- @param tab The table
-function get_keys(tab)
+function export.get_keys(tab)
   local keys = {}
   for k, v in pairs(tab) do
     table.insert(keys, k)
   end
   return keys
 end
+
+return export

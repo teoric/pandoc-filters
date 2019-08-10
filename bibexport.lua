@@ -12,14 +12,14 @@
 -- - used get_keys() to simplify code
 -- - document a bit
 --
--- Last Changed: 2019-08-10, 14:25:28 (+02:00)
+-- Last Changed: 2019-08-10, 16:30:34 (+02:00)
 --
 -- local inspect = require('inspect')
 
 local utils = require 'pandoc.utils'
 local List = require 'pandoc.List'
 
-require(debug.getinfo(1, "S").source:sub(2):match("(.*[\\/])") .. "utils")
+loc_utils = require(debug.getinfo(1, "S").source:sub(2):match("(.*[\\/])") .. "utils")
 
 local citation_id_set = {}
 
@@ -66,7 +66,7 @@ end
 -- aggregate aux content and bibliography
 -- @return aux content, bibs
 function aux_content(bibliography)
-  local cites = get_keys(citation_id_set)
+  local cites = loc_utils.get_keys(citation_id_set)
   table.sort(cites)
   local citations = table.concat(cites, ',')
   local bibs = bibdata(bibliography)
