@@ -7,12 +7,13 @@
 -- Presupposed is that the bibliographies are BibTeX files.
 --
 -- Since forking:
+-- - use bibtool instead of bibexport
 -- - added unlinking of `bibexport.bib` to prevent backups
 -- - added YAML file
 -- - used get_keys() to simplify code
 -- - document a bit
 --
--- Last Changed: 2019-08-10, 16:30:34 (+02:00)
+-- Last Changed: 2019-08-10, 17:03:10 (+02:00)
 --
 -- local inspect = require('inspect')
 
