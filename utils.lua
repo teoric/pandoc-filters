@@ -14,15 +14,22 @@ local bs = { [0] =
 'w','x','y','z','0','1','2','3','4','5','6','7','8','9','+','/',
 }
 
-function export.base64(s)
+--- encode according to base64
+-- @param s String to encode
+-- @param padding Whether to pad the resulting string (by default nil)
+function export.base64(s, padding)
   local byte, rep = string.byte, string.rep
   local pad = 2 - ((#s - 1) % 3)
   s = (s .. rep('\0', pad)):gsub("...", function(cs)
     local a, b, c = byte(cs, 1, 3)
-    return bs[a >> 2] .. bs[(a & 3) << 4 |b >> 4] ..
+    return bs[a >> 2] .. bs[(a & 3) << 4 | b >> 4] ..
       bs[(b & 15) << 2 | c >> 6] .. bs[c & 63]
   end)
-  return s:sub(1, #s-pad) -- .. rep('=', pad) -- need no padding
+  local ret = s:sub(1, #s - pad)
+  if padding then
+    ret = ret .. rep('=', pad)
+  end
+  return ret
 end
 -- end http://lua-users.org/wiki/BaseSixtyFour
 
