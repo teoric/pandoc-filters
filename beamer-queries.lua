@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2019-08-10, 16:30:53 (CEST)
+-- Last Changed: 2019-08-10, 17:13:23 (+02:00)
 --------------------------------------------------------------------------------
 --[[
 
@@ -26,7 +26,7 @@ taken from the content of a link, and several parameters can be specified:
 - DWDS
 - RegExr:
   - text: the text on which to try the regular expression
-
+- Unicode: linkt to character description; give hex code as link text
 The filter also tries to include links starting with "file:" into PDFs
 generated from LaTeX documents as embedded files.  (Will not work in all
 PDF viewers, e.g. for me not in Evince.)
@@ -156,6 +156,10 @@ return {
         local query = loc_utils.urlencode(loc_utils.trim(utils.stringify(el)))
         el.target = base .. "?q=" .. query
         return el
+      elseif el.attributes["type"] == "Unicode" then
+        local base = "http://unicode.org/cldr/utility/character.jsp?a="
+        local char = loc_utils.trim(utils.stringify(el))
+        el.target = base .. string.gsub(char, "U%+", "")
       elseif el.attributes["type"] == "RegExr" then
         local base = "https://regexr.com/"
         local text = el.attributes["text"]
