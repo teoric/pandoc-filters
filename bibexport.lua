@@ -1,9 +1,17 @@
 -- from https://github.com/pandoc/lua-filters
 --
+-- This filter produces two files:
+-- - a YAML file `bibexport.yaml` with cite keys and bibliographies
+--   used in the document
+-- - a bib file containing the BibTeX entries
+-- Presupposed is that the bibliographies are BibTeX files.
+--
+-- Since forking:
 -- - added unlinking of `bibexport.bib` to prevent backups
+-- - added YAML file
 -- - used get_keys() to simplify code
 --
--- Last Changed: 2019-08-08, 17:45:10 (+02:00)
+-- Last Changed: 2019-08-10, 09:28:24 (+02:00)
 --
 -- local inspect = require('inspect')
 

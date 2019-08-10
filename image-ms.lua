@@ -17,7 +17,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2018-03-30
--- Last Changed: 2019-08-08, 17:15:00 (+02:00)
+-- Last Changed: 2019-08-10, 08:29:24 (CEST)
 --------------------------------------------------------------------------------
 --
 
@@ -142,7 +142,7 @@ return {
       elseif meta["use-small-caps"] == false then
         use_small_caps = "none"
       else
-        use_small_caps = (meta["use-small-caps"] ~= nil) and text.lower(meta["use-small-caps"][1].c)
+        use_small_caps = (meta["use-small-caps"] ~= nil) and text.lower(pandoc.utils.stringify(meta["use-small-caps"]))
       end
     end,
     Link = function (cit)
