@@ -4,8 +4,9 @@
   [MS](http://man7.org/linux/man-pages/man7/groff_ms.7.html) and
   [LaTeX](https://www.latex-project.org/) output
 - `beamer-queries.lua` – a filter for presentations, not only with
-  [Beamer](https://github.com/josephwright/beamer) for LaTeX which
-  generates links for queries to corpus search engines like
+  [Beamer](https://github.com/josephwright/beamer) for
+  [LaTeX](https://www.latex-project.org/), which generates links for
+  queries to corpus search engines like
   [ANNIS](https://corpus-tools.org/annis/) and
   [KorAP](http://korap.ids-mannheim.de), but also to
   [RegExr](http://www.regexr.com) and [Unicode](http://www.unicode.org)
