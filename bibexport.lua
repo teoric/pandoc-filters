@@ -10,8 +10,9 @@
 -- - added unlinking of `bibexport.bib` to prevent backups
 -- - added YAML file
 -- - used get_keys() to simplify code
+-- - document a bit
 --
--- Last Changed: 2019-08-10, 09:28:24 (+02:00)
+-- Last Changed: 2019-08-10, 14:25:28 (+02:00)
 --
 -- local inspect = require('inspect')
 
@@ -22,7 +23,7 @@ require(debug.getinfo(1, "S").source:sub(2):match("(.*[\\/])") .. "utils")
 
 local citation_id_set = {}
 
--- Collect all citation IDs.
+--- Collect all citation IDs from one citation
 function Cite (c)
   local cs = c.citations
   for i = 1, #cs do
@@ -30,8 +31,11 @@ function Cite (c)
   end
 end
 
+--- adjust file names of bibliographies
+-- @param bibliography meta data
 function bibdata (bibliography)
-  function bibname (bibitem)
+  --- adjust the file name of one bibliography
+  local function bibname (bibitem)
     if type(bibitem) == 'string' then
       return bibitem:gsub('%.bib$', '')
     else
@@ -45,6 +49,7 @@ function bibdata (bibliography)
   return bibs
 end
 
+--- write YAML lists of bibliographies and citations
 function yamlify(bibs, citations)
   local biby = io.open("bibexport.yaml", "w")
   biby:write("bibliographies:\n")
@@ -58,6 +63,8 @@ function yamlify(bibs, citations)
   biby:close()
 end
 
+-- aggregate aux content and bibliography
+-- @return aux content, bibs
 function aux_content(bibliography)
   local cites = get_keys(citation_id_set)
   table.sort(cites)
@@ -75,6 +82,8 @@ function aux_content(bibliography)
   ), bibs
 end
 
+--- write am aux file for processing with bibtool
+-- @return the aux file name, the name of the bibliography files
 function write_dummy_aux (bibliography, auxfile)
   local filename
   if type(auxfile) == 'string' then
@@ -93,6 +102,7 @@ function write_dummy_aux (bibliography, auxfile)
   return filename, bibs
 end
 
+--- when processing the document, process citations and write lists of citations
 function Pandoc (doc)
   local meta = doc.meta
   if not meta.bibliography then
@@ -100,7 +110,7 @@ function Pandoc (doc)
   else
     -- create a dummy .aux file
     local auxfile_name, bibs = write_dummy_aux(meta.bibliography, meta.auxfile)
-    os.remove('bibexport.bib')
+    os.remove('bibexport.bib') -- clean up old files
     -- os.execute('bibexport -t ' .. auxfile_name)
     comm = 'bibtool -q -x ' .. auxfile_name .. ' ' .. table.concat(bibs, ' ') .. "> bibexport.bib"
     io.stderr:write("Execute: " .. comm)
