@@ -89,7 +89,7 @@ end
 -- https://stackoverflow.com/questions/4990990/lua-check-if-a-file-exists
 function export.file_exists(name)
   -- file exists if it is readable
-  local f=io.open(name,"r")
+  local f = io.open(name, "r")
   if f ~= nil then
     io.close(f)
     return true

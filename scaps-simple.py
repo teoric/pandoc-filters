@@ -10,7 +10,8 @@ def upstr(key, value, fmt, _meta):
     if fmt == "ms":
         if key == 'Str':
             words = regex.finditer(
-                r'(?P<U>\p{Lu}*)(?P<L>\p{Ll}*)(?P<R>[^\p{Ll}\p{Lu}]*)', value)
+                r'(?P<U>\p{Lu}*)(?P<L>\p{Ll}*)(?P<R>[^\p{Ll}\p{Lu}]*)',
+                value)
             if words:
                 ret = [RawInline("ms", "\n")]
                 for w in words:

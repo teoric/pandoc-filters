@@ -14,10 +14,13 @@
 --               - make links breakable
 --               - scale references section down
 --
+-- Restrictions: - only treats height if width is given
+--               - no notion of "%"
+--
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2018-03-30
--- Last Changed: 2019-08-10, 16:27:34 (CEST)
+-- Last Changed: 2019-08-15, 11:57:33 (+02:00)
 --------------------------------------------------------------------------------
 --
 
@@ -44,7 +47,8 @@ local refsec = {
 
 local zero_space = "​"
 
-loc_utils = require(debug.getinfo(1, "S").source:sub(2):match("(.*[\\/])") .. "utils")
+loc_utils = require(debug.getinfo(1, "S").source:sub(2):match(
+  "(.*[\\/])") .. "utils")
 
 
 function convert_measurements(size)
@@ -247,7 +251,9 @@ return {
       --
       if FORMAT == "ms" then
         pat = keep_pattern
-        if text.lower(im.attributes.float) == "true" or im.attributes.float == "1" then
+        if im.attributes.float and
+           (text.lower(im.attributes.float) == "true" or
+            im.attributes.float == "1") then
           pat = pat .. " F"
         else
           pat = pat .. " S"
@@ -258,6 +264,8 @@ return {
           im.src = string.gsub(im.src, "%.[^.]+$", ".pdf")
         end
         if not loc_utils.file_exists(im.src) and loc_utils.file_exists(im_src_old) then
+          -- if this fails, check policies in /etc/ImageMagick-[67]/policy.xml
+          -- whether they forbid conversion of EPS, PDF etc.
           pandoc.pipe("convert", {im_src_old, im.src}, "")
         end
         pat = pat .. string.format(' "%s"', im.src)
@@ -268,16 +276,18 @@ return {
           if im.attributes.height ~= nil then
             im.attributes.height = convert_measurements(im.attributes.height)
           end
-          if im.attributes.width ~= nil then
-            pat = pat .. string.format(' "%s"', im.attributes.width)
+          size = pandoc.pipe('pdfinfo', {im.src}, "")
+          local w
+          local h
+          _, _, w, h = string.find(size, "Page size:%s+([%d.]+)%s+x%s+([%d.]+)")
+          local height = im.attributes.height or h and (h .. "p")
+          local width = im.attributes.width or w and (w .. "p") or nil
+          if width ~= nil then
+            pat = pat .. string.format(' "%s"', width)
             -- height only matters if width was given
-            if im.attributes.height ~= nil then
-              pat = pat .. string.format(' "%s"', im.attributes.height)
+            if height ~= nil then
+              pat = pat .. string.format(' "%s"', height)
             end
-          else
-            size = pandoc.pipe('pdfinfo', {im.src}, "")
-            _, _, w, h = string.find(size, "Page size:%s+([%d.]+)%s+x%s+([%d.]+)")
-            pat = pat .. string.format(" %sp %sp", w, h)
           end
         end
         return pandoc.RawInline("ms", pat)
@@ -294,7 +304,8 @@ return {
     Strong = embolden_emph,
     Emph = emphasize_bold,
     SmallCaps = function (elem)
-      -- use different macros for small caps – potentially better than size escapes
+      -- use different macros for small caps – potentially better than
+      -- size escapes
       if FORMAT == "ms" then
         if use_small_caps == "underline" then
           return List:new{
@@ -335,7 +346,8 @@ return {
 
     Str = function(str)
         -- Protect letters in `protected` against smartness
-        -- Protect U+2019 against https://github.com/jgm/pandoc/issues/4550
+        -- Protect U+2019 against
+        -- https://github.com/jgm/pandoc/issues/4550
       if FORMAT == "ms" then
         local s = str.c
         local substrings = List:new()

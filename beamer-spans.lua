@@ -19,7 +19,8 @@ List = require 'pandoc.List'
 utils = require 'pandoc.utils'
 -- io.stderr:write(FORMAT .. "\n")
 
-loc_utils = require(debug.getinfo(1, "S").source:sub(2):match("(.*[\\/])") .. "utils")
+loc_utils = require(debug.getinfo(1, "S").source:sub(2):match(
+  "(.*[\\/])") .. "utils")
 
 -- box types
 local boxes = {

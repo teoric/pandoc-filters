@@ -9,7 +9,8 @@ def upstr(key, value, fmt, _meta):
     """replace lower-case letters by macro-wrapped upper-case letters"""
     if fmt == "ms":
         if key == 'Str':
-            words = regex.finditer(r'(?P<U>\p{Lu}*)(?P<L>\P{Lu}*)', value)
+            words = regex.finditer(
+                r'(?P<U>\p{Lu}*)(?P<L>\P{Lu}*)', value)
             if words:
                 ret = []
                 for w in words:

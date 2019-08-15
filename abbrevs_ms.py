@@ -40,9 +40,9 @@ ABBREVS = {
 }
 
 PATTERN = regex.compile(
-    r'^[\p{Pi}\p{Ps}]?(?:' +
-    r'|'.join(a for l in ABBREVS for a in ABBREVS[l]) +
-    r')\.$'
+    r'^[\p{Pi}\p{Ps}]?(?:'
+    + r'|'.join(a for l in ABBREVS for a in ABBREVS[l])
+    + r')\.$'
 )
 MULTI_PATTERN = regex.compile(r'^(?:\p{L}+\.){2,}$')
 

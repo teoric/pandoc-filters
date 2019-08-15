@@ -21,7 +21,8 @@
 text = require 'text'
 List = require 'pandoc.List'
 
-loc_utils = require(debug.getinfo(1, "S").source:sub(2):match("(.*[\\/])") .. "utils")
+loc_utils = require(debug.getinfo(1, "S").source:sub(2):match(
+  "(.*[\\/])") .. "utils")
 
 
 -- convert SVG to PDF

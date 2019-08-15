@@ -4,7 +4,7 @@
 Pandoc filter to protect U+2019 from smartness."""
 
 from pandocfilters import toJSONFilter, Str, RawInline
-import regex  # allow unicode character properties
+import re
 
 
 def protect_quote(key, value, fmt, _meta):
