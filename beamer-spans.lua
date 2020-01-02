@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2019-08-10, 16:25:51 (CEST)
+-- Last Changed: 2019-08-21, 10:34:13 (CEST)
 --------------------------------------------------------------------------------
 --
 
@@ -44,7 +44,7 @@ return {
       if FORMAT == "beamer" then
         if span.classes:includes("nofooter") then
           span.content:extend({
-            pandoc.RawInline("beamer", "\\nofooter")
+            pandoc.RawInline(FORMAT, "\\nofooter")
           })
           return span
         end
@@ -74,16 +74,16 @@ return {
           finish = "}"
         end
         if start ~= nil then
-          local ret = List:new({pandoc.RawBlock("beamer", start)})
+          local ret = List:new({pandoc.RawBlock(FORMAT, start)})
           ret:extend(div.content)
-          ret:extend({pandoc.RawBlock("beamer", finish)})
+          ret:extend({pandoc.RawBlock(FORMAT, finish)})
           div.content = ret
           return div
         end
       end
     end,
     Span = function(span)
-      if FORMAT == "beamer" then
+      if FORMAT == "beamer" or FORMAT == "latex" then
         local start = nil
         local finish = nil
         if span.classes:includes("rechts") then
@@ -101,6 +101,10 @@ return {
         elseif span.classes:includes("uni") then
           start = "\\unitext{\\unemph{"
           finish = "}}"
+        elseif span.classes:includes("underline")
+          or span.classes:includes("ul") then
+          start = "\\underline{"
+          finish = "}"
         elseif span.classes:includes("unemph") then
           start = "\\unemph{"
           finish = "}"
@@ -112,9 +116,9 @@ return {
           finish = "}"
         end
         if start then
-          local ret = List:new({pandoc.RawInline("beamer", start)})
+          local ret = List:new({pandoc.RawInline(FORMAT, start)})
           ret:extend(span.content)
-          ret:extend({pandoc.RawInline("beamer", finish)})
+          ret:extend({pandoc.RawInline(FORMAT, finish)})
           return {
             pandoc.Span(ret, span.attr)
           }
