@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2019-08-21, 10:34:13 (CEST)
+-- Last Changed: 2020-03-15, 13:44:58 (+01:00)
 --------------------------------------------------------------------------------
 --
 
@@ -20,7 +20,7 @@ utils = require 'pandoc.utils'
 -- io.stderr:write(FORMAT .. "\n")
 
 loc_utils = require(debug.getinfo(1, "S").source:sub(2):match(
-  "(.*[\\/])") .. "utils")
+"(.*[\\/])") .. "utils")
 
 -- box types
 local boxes = {
@@ -80,6 +80,32 @@ return {
           div.content = ret
           return div
         end
+      else
+        if FORMAT == "latex" then
+          local start = nil
+          local finish = nil
+          -- wrap div in box containers
+          for i, b in pairs(boxes) do
+            if div.classes:includes(b) then
+              local title=div.attributes["title"]
+              -- io.stderr:write(title.."\n")
+              start = "\\begin{description}" ..
+              "\\item[".. title .. "] ~"
+              if div.attributes["rechts"] then
+                start = start .. "\\rechtsanm{" .. div.attributes["rechts"] .. "}"
+              end
+
+              finish = "\\end{description}"
+            end
+          end
+          if start ~= nil then
+            local ret = List:new({pandoc.RawBlock(FORMAT, start)})
+            ret:extend(div.content)
+            ret:extend({pandoc.RawBlock(FORMAT, finish)})
+            div.content = ret
+            return div
+          end
+        end
       end
     end,
     Span = function(span)
@@ -102,7 +128,7 @@ return {
           start = "\\unitext{\\unemph{"
           finish = "}}"
         elseif span.classes:includes("underline")
-          or span.classes:includes("ul") then
+        or span.classes:includes("ul") then
           start = "\\underline{"
           finish = "}"
         elseif span.classes:includes("unemph") then
