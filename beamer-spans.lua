@@ -80,31 +80,35 @@ return {
           div.content = ret
           return div
         end
-      else
-        if FORMAT == "latex" then
-          local start = nil
-          local finish = nil
-          -- wrap div in box containers
-          for i, b in pairs(boxes) do
-            if div.classes:includes(b) then
-              local title=div.attributes["title"]
-              -- io.stderr:write(title.."\n")
-              start = "\\begin{description}" ..
-              "\\item[".. title .. "] ~"
-              if div.attributes["rechts"] then
-                start = start .. "\\rechtsanm{" .. div.attributes["rechts"] .. "}"
-              end
+      elseif FORMAT == "latex" then
+      local start = nil
+      local finish = nil
+      -- wrap div in box containers
+      for i, b in pairs(boxes) do
+        if div.classes:includes(b) then
+          local title=div.attributes["title"]
+          -- io.stderr:write(title.."\n")
+          start = "\\begin{description}" ..
+          "\\item[".. title .. "] ~"
+          if div.attributes["rechts"] then
+            start = start .. "\\rechtsanm{" .. div.attributes["rechts"] .. "}"
+          end
 
-              finish = "\\end{description}"
-            end
-          end
-          if start ~= nil then
-            local ret = List:new({pandoc.RawBlock(FORMAT, start)})
-            ret:extend(div.content)
-            ret:extend({pandoc.RawBlock(FORMAT, finish)})
-            div.content = ret
-            return div
-          end
+          finish = "\\end{description}"
+        end
+        end
+        -- io.stderr:write(table.concat(div.classes, ";;"), "\n")
+        if start == nil and div.classes:includes("Frage") or div.classes:includes("Frage/Bewertung") or div.classes:includes("Bewertung/Frage") or div.classes:includes("Bewertung") then
+          start = "\\begin{addmargin}[1cm]{1cm}\\vskip1ex\\begingroup\\sffamily\\textbf{" .. table.concat(div.classes, ";;") .. "}"
+          finish = "\\endgroup\\vskip1ex\\end{addmargin}"
+        end
+
+        if start ~= nil then
+          local ret = List:new({pandoc.RawBlock(FORMAT, start)})
+          ret:extend(div.content)
+          ret:extend({pandoc.RawBlock(FORMAT, finish)})
+          div.content = ret
+          return div
         end
       end
     end,
