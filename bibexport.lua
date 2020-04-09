@@ -13,7 +13,7 @@
 -- - used get_keys() to simplify code
 -- - document a bit
 --
--- Last Changed: 2019-08-10, 17:03:10 (+02:00)
+-- Last Changed: 2020-04-09, 10:57:04 (+02:00)
 --
 -- local inspect = require('inspect')
 
@@ -24,6 +24,14 @@ loc_utils = require(debug.getinfo(1, "S").source:sub(2):match(
   "(.*[\\/])") .. "utils")
 
 local citation_id_set = {}
+
+local link_set = {}
+
+function Link (link)
+  if link.target ~= nil then
+    link_set[link.target] = true
+  end
+end
 
 --- Collect all citation IDs from one citation
 function Cite (c)
@@ -61,6 +69,10 @@ function yamlify(bibs, citations)
   biby:write("cite-keys:\n")
   for i, b in ipairs(citations) do
     biby:write(string.format("- %s\n", b))
+  end
+  biby:write("links:\n")
+  for k, v in pairs(link_set) do
+    biby:write(string.format("- %s\n", k))
   end
   biby:close()
 end
