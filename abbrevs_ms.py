@@ -49,14 +49,14 @@ MULTI_PATTERN = regex.compile(r'^(?:\p{L}+\.){2,}$')
 
 def abbrevs(key, value, fmt, _meta):
     """French-space guessed abbreviations."""
-    if fmt == "latex":
+    if fmt == "latex" or fmt == "beamer":
         if key == 'Str':
             n = MULTI_PATTERN.match(value)
             if n:
-                value = regex.sub(r'\p{L}+\.(?!$)', r'\g<0>\|', value)
+                value = regex.sub(r'\p{L}+\.(?!$)', r'\g<0>\kern 0.16667ex', value)
             m = PATTERN.match(value)
             if m or n:
-                return RawInline("ms", value + r'\ ')
+                return RawInline(fmt, value + r'\ ')
     if fmt == "ms":
         if key == 'Str':
             n = MULTI_PATTERN.match(value)
