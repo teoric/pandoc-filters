@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2020-03-15, 13:44:58 (+01:00)
+-- Last Changed: 2020-05-05, 09:21:38 (CEST)
 --------------------------------------------------------------------------------
 --
 
@@ -60,9 +60,11 @@ return {
             local title=div.attributes["title"]
             -- io.stderr:write(title.."\n")
             start = "\\begin{"..b.."}"..
-            "{"..
-            title..
-            "}"
+            "{"..  title
+            if div.attributes["rechts"] then
+              start = start .. "\\rechtsanm{" .. div.attributes["rechts"] .. "}"
+            end
+            start = start .. "}"
             finish = "\\end{"..b.."}"
           end
         end
