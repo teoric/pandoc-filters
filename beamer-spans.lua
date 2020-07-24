@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2020-05-05, 09:21:38 (CEST)
+-- Last Changed: 2020-05-18, 16:36:09 (CEST)
 --------------------------------------------------------------------------------
 --
 
@@ -101,7 +101,7 @@ return {
         end
         -- io.stderr:write(table.concat(div.classes, ";;"), "\n")
         if start == nil and div.classes:includes("Frage") or div.classes:includes("Frage/Bewertung") or div.classes:includes("Bewertung/Frage") or div.classes:includes("Bewertung") then
-          start = "\\begin{addmargin}[1cm]{1cm}\\vskip1ex\\begingroup\\sffamily\\textbf{" .. table.concat(div.classes, ";;") .. "}"
+          start = "\\begin{addmargin}[1cm]{1cm}\\color{blue}\\vskip1ex\\begingroup\\sffamily\\textbf{" .. table.concat(div.classes, ";;") .. "}"
           finish = "\\endgroup\\vskip1ex\\end{addmargin}"
         end
 
