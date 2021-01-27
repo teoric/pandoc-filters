@@ -9,11 +9,11 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2020-05-18, 16:36:09 (CEST)
+-- Last Changed: 2021-01-27, 12:09:43 (CET)
 --------------------------------------------------------------------------------
 --
 
--- local inspect = require('inspect')
+local inspect = require('inspect')
 text = require 'text'
 List = require 'pandoc.List'
 utils = require 'pandoc.utils'
@@ -33,23 +33,21 @@ local boxes = {
 
 local name_caps
 
+local sec_start = nil
+local sec_finish = nil
+local slide_level = 3
+
 return {
   {
     Meta = function(meta)
       name_caps = meta["name-small-caps"]
+      if (meta["slide-level"]) then
+        local meta_level = meta["slide-level"]
+        slide_level = tonumber(utils.stringify(meta_level)) + 1
+      end
     end
   },
   {
-    Header = function(span)
-      if FORMAT == "beamer" then
-        if span.classes:includes("nofooter") then
-          span.content:extend({
-            pandoc.RawInline(FORMAT, "\\nofooter")
-          })
-          return span
-        end
-      end
-    end,
     Div = function(div)
       if FORMAT == "beamer" then
         local start = nil
@@ -57,22 +55,27 @@ return {
         -- wrap div in box containers
         for i, b in pairs(boxes) do
           if div.classes:includes(b) then
-            local title=div.attributes["title"]
-            -- io.stderr:write(title.."\n")
-            start = "\\begin{"..b.."}"..
-            "{"..  title
+            local title = div.attributes["title"]
+            -- io.stderr:write(title .. "\n")
+            start = "\\begin{" .. b .. "}" ..
+            "{" .. title
             if div.attributes["rechts"] then
               start = start .. "\\rechtsanm{" .. div.attributes["rechts"] .. "}"
             end
             start = start .. "}"
-            finish = "\\end{"..b.."}"
+            finish = "\\end{" .. b .. "}"
           end
         end
         if div.classes:includes("only") then
-          local scope=div.attributes["scope"]
-          start = "\\only<"..
-          scope..
-          ">{"
+          local scope = div.attributes["scope"]
+          start = "\\only<" ..
+            scope ..
+            ">{"
+          finish = "}"
+        end
+        if div.classes:includes("on_next") then
+          local scope = div.attributes["scope"]
+          start = "\\only<+>{"
           finish = "}"
         end
         if start ~= nil then
@@ -89,7 +92,7 @@ return {
       for i, b in pairs(boxes) do
         if div.classes:includes(b) then
           local title=div.attributes["title"]
-          -- io.stderr:write(title.."\n")
+          -- io.stderr:write(title .. "\n")
           start = "\\begin{description}" ..
           "\\item[".. title .. "] ~"
           if div.attributes["rechts"] then
@@ -100,7 +103,7 @@ return {
         end
         end
         -- io.stderr:write(table.concat(div.classes, ";;"), "\n")
-        if start == nil and div.classes:includes("Frage") or div.classes:includes("Frage/Bewertung") or div.classes:includes("Bewertung/Frage") or div.classes:includes("Bewertung") then
+        if start == nil and div.classes:includes("Frage") or div.classes:includes("Frage/Bewertung") or div.classes:includes("Bewertung/Frage") or div.classes:includes("Bewertung") or div.classes:includes("Anmerkung") then
           start = "\\begin{addmargin}[1cm]{1cm}\\color{blue}\\vskip1ex\\begingroup\\sffamily\\textbf{" .. table.concat(div.classes, ";;") .. "}"
           finish = "\\endgroup\\vskip1ex\\end{addmargin}"
         end
