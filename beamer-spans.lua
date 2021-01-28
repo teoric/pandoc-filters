@@ -31,16 +31,54 @@ local boxes = {
   "exbox", "exxbox"
 }
 
+local comments = {
+  "Bemerkung",
+  "Bewertung",
+  "Kommentar",
+  "Erläuterung",
+  "Beispiel"
+}
+
+local remarks = {
+  "Anmerkung",
+  "Frage",
+  "Antwort",
+  "Frage/Bewertung",
+  "Bewertung/Frage"
+}
+
 local name_caps
 
 local sec_start = nil
 local sec_finish = nil
 local slide_level = 3
 
+local remark_color = "\\color{blue}\\sffamily"
+
+function check_comment(div)
+  return check_classes(div, comments)
+end
+
+function check_remark(div)
+  return check_classes(div, remarks)
+end
+
+function check_classes(div, classes)
+  local ret = false
+  for i, typ in pairs(classes) do
+    if div.classes:includes(typ) then
+      ret = true
+      break
+    end
+  end
+  return ret
+end
+
 return {
   {
     Meta = function(meta)
       name_caps = meta["name-small-caps"]
+      color_comments = meta["color-remarks"]
       if (meta["slide-level"]) then
         local meta_level = meta["slide-level"]
         slide_level = tonumber(utils.stringify(meta_level)) + 1
@@ -98,13 +136,22 @@ return {
           if div.attributes["rechts"] then
             start = start .. "\\rechtsanm{" .. div.attributes["rechts"] .. "}"
           end
-
           finish = "\\end{description}"
         end
         end
+        local is_remark = check_remark(div)
+        local is_comment = check_comment(div)
         -- io.stderr:write(table.concat(div.classes, ";;"), "\n")
-        if start == nil and div.classes:includes("Frage") or div.classes:includes("Frage/Bewertung") or div.classes:includes("Bewertung/Frage") or div.classes:includes("Bewertung") or div.classes:includes("Anmerkung") then
-          start = "\\begin{addmargin}[1cm]{1cm}\\color{blue}\\vskip1ex\\begingroup\\sffamily\\textbf{" .. table.concat(div.classes, ";;") .. "}"
+        if div.attributes["resolved"] then
+          return List:new()
+        elseif start == nil and (is_remark or is_comment) then
+          local color = ""
+          if is_comment and color_comments then
+            color = remark_color
+          elseif is_remark then
+            color = remark_color
+          end
+          start = "\\medskip\\begin{addmargin}[1cm]{1cm}" .. color .."\\vskip1ex\\begingroup\\textbf{" .. table.concat(div.classes, ";;") .. "}"
           finish = "\\endgroup\\vskip1ex\\end{addmargin}"
         end
 
