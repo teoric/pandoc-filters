@@ -44,6 +44,7 @@ local remarks = {
   "Frage",
   "Antwort",
   "Frage/Bewertung",
+  "Frage/Anregung",
   "Bewertung/Frage"
 }
 

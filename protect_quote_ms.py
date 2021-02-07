@@ -11,8 +11,8 @@ def protect_quote(key, value, fmt, _meta):
     """Protect U+2019 against https://github.com/jgm/pandoc/issues/4550"""
     if fmt == "ms":
         if key == 'Str':
-            if regex.search(r'[’]', value):
-                strs = regex.split(r'[’]', value)
+            if re.search(r'[’]', value):
+                strs = re.split(r'[’]', value)
                 ret = [Str(strs[0])]
                 for s in strs[1:]:
                     ret += [RawInline("ms", "’"), Str(s)]
