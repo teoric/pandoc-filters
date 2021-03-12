@@ -17,7 +17,7 @@
 --
 -- local inspect = require('inspect')
 
-local utils = require 'pandoc.utils'
+-- local utils = require 'pandoc.utils'
 local List = require 'pandoc.List'
 
 loc_utils = require(debug.getinfo(1, "S").source:sub(2):match(
