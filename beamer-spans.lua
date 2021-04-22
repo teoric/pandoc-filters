@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2021-01-27, 12:09:43 (CET)
+-- Last Changed: 2021-04-22, 17:07:10 (CEST)
 --------------------------------------------------------------------------------
 --
 
@@ -19,8 +19,8 @@ List = require 'pandoc.List'
 -- utils = require 'pandoc.utils'
 -- io.stderr:write(FORMAT .. "\n")
 
-loc_utils = require(debug.getinfo(1, "S").source:sub(2):match(
-"(.*[\\/])") .. "utils")
+-- loc_utils = require(debug.getinfo(1, "S").source:sub(2):match(
+-- "(.*[\\/])") .. "utils")
 
 -- box types
 local boxes = {
