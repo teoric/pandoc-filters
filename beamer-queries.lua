@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2019-08-10, 18:03:50 (+02:00)
+-- Last Changed: 2021-05-05, 15:50:45 (CEST)
 --------------------------------------------------------------------------------
 --[[
 
@@ -33,14 +33,20 @@ PDF viewers, e.g. for me not in Evince.)
 
 --]]
 
-local inspect = require('inspect')
+-- local inspect = require('inspect')
 text = require 'text'
 List = require 'pandoc.List'
 -- utils = require 'pandoc.utils'
 -- io.stderr:write(FORMAT .. "\n")
+local utilPath = string.match(PANDOC_SCRIPT_FILE, '.*[/\\]')
+if PANDOC_VERSION >= {2,12} then
+  local path = require 'pandoc.path'
+  utilPath = path.directory(PANDOC_SCRIPT_FILE) .. path.separator
+end
+local loc_utils = dofile ((utilPath or '') .. 'utils.lua')
+-- does not work anymore!
+-- local loc_utils = require(debug.getinfo(1, "S").source:sub(2):match( "(.*[\\/])") .. "utils")
 
-loc_utils = require(debug.getinfo(1, "S").source:sub(2):match(
-  "(.*[\\/])") .. "utils")
 
 -- https://stackoverflow.com/questions/6380820/get-containing-path-of-lua-file
 

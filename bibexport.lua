@@ -13,15 +13,20 @@
 -- - used get_keys() to simplify code
 -- - document a bit
 --
--- Last Changed: 2020-04-09, 10:57:04 (+02:00)
+-- Last Changed: 2021-05-05, 15:51:31 (CEST)
 --
 -- local inspect = require('inspect')
 
 -- local utils = require 'pandoc.utils'
 local List = require 'pandoc.List'
+local utils = require "pandoc.utils"
 
-loc_utils = require(debug.getinfo(1, "S").source:sub(2):match(
-  "(.*[\\/])") .. "utils")
+local utilPath = string.match(PANDOC_SCRIPT_FILE, '.*[/\\]')
+if PANDOC_VERSION >= {2,12} then
+  local path = require 'pandoc.path'
+  utilPath = path.directory(PANDOC_SCRIPT_FILE) .. path.separator
+end
+local loc_utils = dofile ((utilPath or '') .. 'utils.lua')
 
 local citation_id_set = {}
 

@@ -9,11 +9,11 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2021-04-22, 17:07:10 (CEST)
+-- Last Changed: 2021-05-05, 13:53:43 (CEST)
 --------------------------------------------------------------------------------
 --
 
-local inspect = require('inspect')
+-- local inspect = require('inspect')
 text = require 'text'
 List = require 'pandoc.List'
 -- utils = require 'pandoc.utils'
