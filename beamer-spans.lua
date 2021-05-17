@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2021-05-05, 13:53:43 (CEST)
+-- Last Changed: 2021-05-17, 13:16:44 (CEST)
 --------------------------------------------------------------------------------
 --
 
@@ -152,7 +152,8 @@ return {
           elseif is_remark then
             color = remark_color
           end
-          start = "\\medskip\\begin{addmargin}[1cm]{1cm}" .. color .."\\vskip1ex\\begingroup\\textbf{" .. table.concat(div.classes, ";;") .. "}"
+          start = "\\begin{addmargin}[1cm]{1cm}" .. color .."\\vskip1ex\\begingroup\\textbf{" .. table.concat(div.classes, ";;") .. "}"
+          -- start = "\\medskip\\begin{addmargin}[1cm]{1cm}" .. color .."\\vskip1ex\\begingroup\\textbf{" .. table.concat(div.classes, ";;") .. "}"
           finish = "\\endgroup\\vskip1ex\\end{addmargin}"
         end
 
