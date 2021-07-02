@@ -9,18 +9,21 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2021-05-17, 13:16:44 (CEST)
+-- Last Changed: 2021-07-02, 14:10:59 (CEST)
 --------------------------------------------------------------------------------
 --
 
 -- local inspect = require('inspect')
-text = require 'text'
-List = require 'pandoc.List'
--- utils = require 'pandoc.utils'
--- io.stderr:write(FORMAT .. "\n")
+local text = require 'text'
+local List = require 'pandoc.List'
+local utils = require 'pandoc.utils'
 
--- loc_utils = require(debug.getinfo(1, "S").source:sub(2):match(
--- "(.*[\\/])") .. "utils")
+local utilPath = string.match(PANDOC_SCRIPT_FILE, '.*[/\\]')
+if PANDOC_VERSION >= {2,12} then
+  local path = require 'pandoc.path'
+  utilPath = path.directory(PANDOC_SCRIPT_FILE) .. path.separator
+end
+local loc_utils = dofile ((utilPath or '') .. 'utils.lua')
 
 -- box types
 local boxes = {
@@ -83,6 +86,64 @@ return {
       if (meta["slide-level"]) then
         local meta_level = meta["slide-level"]
         slide_level = tonumber(utils.stringify(meta_level)) + 1
+      end
+    end
+  },
+  {
+    Link = function(el)
+      local typ = el.attributes["type"]
+      if typ ~= nil then
+      local typ = text.lower(typ)
+      end
+      -- print(typ)
+      if el.attributes["type"] == "doi" then
+        local base = "http://dx.doi.org/"
+        local hdl = loc_utils.trim(utils.stringify(el))
+        el.target = base .. hdl
+        return el
+      elseif el.attributes["type"] == "hdl" then
+        local base = "http://hdl.handle.net/"
+        local hdl = loc_utils.trim(utils.stringify(el))
+        el.target = base .. hdl
+        return el
+      elseif el.attributes["type"] == "konde" then
+        local base = "https://gams.uni-graz.at/"
+        local hdl = loc_utils.trim(utils.stringify(el))
+        el.target = base .. hdl
+        return el
+      end
+    end
+  },
+  {
+    Span = function(el)
+      color = el.attributes['color']
+      -- if no color attribute, return unchanged -- redundant!
+      if color == nil then return el end
+      -- transform to <span style="color: red;"></span>
+      if FORMAT:match 'html' then
+        -- remove color attributes
+        el.attributes['color'] = nil
+        -- use style attribute instead
+        el.attributes['style'] = 'color: ' .. color .. ';'
+        -- return full span element
+        return el
+      elseif FORMAT:match 'latex' then
+        -- remove color attributes
+        el.attributes['color'] = nil
+        -- encapsulate in latex code
+        table.insert(
+        el.content, 1,
+        pandoc.RawInline('latex', '\\textcolor{'..color..'}{')
+        )
+        table.insert(
+        el.content,
+        pandoc.RawInline('latex', '}')
+        )
+        -- returns only span content
+        return el.content
+      else
+        -- for other format return unchanged
+        return el
       end
     end
   },

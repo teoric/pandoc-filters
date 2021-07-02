@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2021-05-05, 15:50:45 (CEST)
+-- Last Changed: 2021-07-02, 14:11:21 (CEST)
 --------------------------------------------------------------------------------
 --[[
 
@@ -167,6 +167,7 @@ return {
         local base = "http://unicode.org/cldr/utility/character.jsp?a="
         local char = loc_utils.trim(utils.stringify(el))
         el.target = base .. string.gsub(char, "U%+", "")
+        return el
       elseif el.attributes["type"] == "RegExr" then
         local base = "https://regexr.com/"
         local text = el.attributes["text"]
