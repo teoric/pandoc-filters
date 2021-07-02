@@ -132,12 +132,12 @@ return {
         el.attributes['color'] = nil
         -- encapsulate in latex code
         table.insert(
-        el.content, 1,
-        pandoc.RawInline('latex', '\\textcolor{'..color..'}{')
+          el.content, 1,
+          pandoc.RawInline('latex', '\\textcolor{'..color..'}{')
         )
         table.insert(
-        el.content,
-        pandoc.RawInline('latex', '}')
+          el.content,
+          pandoc.RawInline('latex', '}')
         )
         -- returns only span content
         return el.content
