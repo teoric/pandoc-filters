@@ -95,9 +95,10 @@ return {
       if typ ~= nil then
       local typ = text.lower(typ)
       end
+      -- print (utils.stringify(el.content))
       -- print(typ)
       if el.attributes["type"] == "doi" then
-        local base = "http://dx.doi.org/"
+        local base = "http://doi.org/"
         local hdl = loc_utils.trim(utils.stringify(el))
         el.target = base .. hdl
         return el
@@ -111,6 +112,13 @@ return {
         local hdl = loc_utils.trim(utils.stringify(el))
         el.target = base .. hdl
         return el
+      elseif string.find(utils.stringify(el.content), "doi.org") then
+        local target = el.target.gsub("http[^:]+//")
+        target = target:gsub("^%w%.", "")
+        el.content = target
+        local ret = List:new({pandoc.RawInline(FORMAT, "DOI:")})
+        ret:extend(el)
+        return ret
       end
     end
   },
