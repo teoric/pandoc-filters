@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2021-07-19, 11:26:10 (CEST)
+-- Last Changed: 2021-07-19, 12:58:02 (CEST)
 --------------------------------------------------------------------------------
 --[[
 
@@ -141,7 +141,7 @@ return {
         if not(loc_utils.endswith(base, "/")) then
           base = base .. "/"
         end
-        local corpus = get_value("ANNIS", el, server, "base")
+        local corpus = get_value("ANNIS", el, server, "corpus")
         -- io.stderr:write(utils.stringify(el) .. "\n")
         el.target =  base ..
         "#_q=" .. loc_utils.base64(loc_utils.trim(utils.stringify(el))) ..
