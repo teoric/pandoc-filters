@@ -13,7 +13,7 @@
 -- - used get_keys() to simplify code
 -- - document a bit
 --
--- Last Changed: 2021-05-05, 15:51:31 (CEST)
+-- Last Changed: 2021-07-19, 12:33:42 (CEST)
 --
 -- local inspect = require('inspect')
 
@@ -55,7 +55,7 @@ function bibdata (bibliography)
       return bibitem:gsub('%.bib$', '')
     else
       -- bibitem is assumed to be a list of inlines
-      return utils.stringify(pandoc.Span(bibitem)):gsub('%.bib$', '')
+      return utils.stringify(bibitem):gsub('%.bib$', '')
     end
   end
   local bibs = bibliography.t == 'MetaList'

@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2021-07-02, 14:11:21 (CEST)
+-- Last Changed: 2021-07-19, 11:26:10 (CEST)
 --------------------------------------------------------------------------------
 --[[
 
@@ -36,7 +36,7 @@ PDF viewers, e.g. for me not in Evince.)
 -- local inspect = require('inspect')
 text = require 'text'
 List = require 'pandoc.List'
--- utils = require 'pandoc.utils'
+utils = require 'pandoc.utils'
 -- io.stderr:write(FORMAT .. "\n")
 local utilPath = string.match(PANDOC_SCRIPT_FILE, '.*[/\\]')
 if PANDOC_VERSION >= {2,12} then

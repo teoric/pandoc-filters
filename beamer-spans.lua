@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2021-07-02, 14:10:59 (CEST)
+-- Last Changed: 2021-07-14, 15:20:47 (CEST)
 --------------------------------------------------------------------------------
 --
 
@@ -128,7 +128,7 @@ return {
       -- if no color attribute, return unchanged -- redundant!
       if color == nil then return el end
       -- transform to <span style="color: red;"></span>
-      if FORMAT:match 'html' then
+      if FORMAT:match 'html' or FORMAT:match 'html5' then
         -- remove color attributes
         el.attributes['color'] = nil
         -- use style attribute instead
