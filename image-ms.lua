@@ -20,13 +20,14 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2018-03-30
--- Last Changed: 2020-03-13, 18:46:24 (CET)
+-- Last Changed: 2021-07-22, 19:04:43 (CEST)
 --------------------------------------------------------------------------------
 --
 
 -- local inspect = require('inspect')
-text = require 'text'
-List = require 'pandoc.List'
+local text = require 'text'
+local List = require 'pandoc.List'
+local utils = require 'pandoc.utils'
 
 -- pattern for keep macro:
 local keep_pattern = ".ANYPIC"
@@ -47,8 +48,13 @@ local refsec = {
 
 local zero_space = "​"
 
-loc_utils = require(debug.getinfo(1, "S").source:sub(2):match(
-  "(.*[\\/])") .. "utils")
+local utilPath = string.match(PANDOC_SCRIPT_FILE, '.*[/\\]')
+if PANDOC_VERSION >= {2,12} then
+  local path = require 'pandoc.path'
+  utilPath = path.directory(PANDOC_SCRIPT_FILE) .. path.separator
+end
+local loc_utils = dofile ((utilPath or '') .. 'utils.lua')
+
 
 
 function convert_measurements(size)
@@ -146,7 +152,7 @@ return {
       elseif meta["use-small-caps"] == false then
         use_small_caps = "none"
       else
-        use_small_caps = (meta["use-small-caps"] ~= nil) and text.lower(pandoc.utils.stringify(meta["use-small-caps"]))
+        use_small_caps = (meta["use-small-caps"] ~= nil) and text.lower(utils.stringify(meta["use-small-caps"]))
       end
     end,
     Link = function (cit)
@@ -174,7 +180,7 @@ return {
       -- .TABLEEND
       if FORMAT == "ms" then
         cap = pandoc.Plain(table.clone(tab.caption))
-        -- cap = pandoc.utils.stringify(tab.caption) or ""
+        -- cap = utils.stringify(tab.caption) or ""
         tab.caption = {} -- delete old caption
         local ret = List:new{
           pandoc.RawBlock("ms", ".TABLESTART\n"),
@@ -258,7 +264,7 @@ return {
         else
           pat = pat .. " S"
         end
-        pat = pat .. string.format(' "%s"', pandoc.utils.stringify(im.caption))
+        pat = pat .. string.format(' "%s"', utils.stringify(im.caption))
         local im_src_old = im.src
         if not loc_utils.endswith(text.lower(im.src), ".pdf") then
           im.src = string.gsub(im.src, "%.[^.]+$", ".pdf")
@@ -310,12 +316,12 @@ return {
         if use_small_caps == "underline" then
           return List:new{
             pandoc.RawInline("ms",
-                             string.format('\\c\n.UL "%s"\\c\n', pandoc.utils.stringify(elem.c)))
+                             string.format('\\c\n.UL "%s"\\c\n', utils.stringify(elem.c)))
           }
         elseif use_small_caps == "space-out" then
           return List:new{
             pandoc.RawInline("ms",
-                             string.format('\\c\n.SPERR "%s"\n', pandoc.utils.stringify(elem.c)))
+                             string.format('\\c\n.SPERR "%s"\n', utils.stringify(elem.c)))
           }
         elseif use_small_caps == "small-caps" then
           local ret = List:new{
@@ -386,7 +392,7 @@ return {
   {
     Header = function (h)
       if FORMAT == "ms" then
-        if refsec[pandoc.utils.stringify(h)] then
+        if refsec[utils.stringify(h)] then
           return {pandoc.RawBlock("ms", ".REF_SIZE"), h}
         else
           return {pandoc.RawBlock("ms", ".RESTORE_SIZE"), h}
