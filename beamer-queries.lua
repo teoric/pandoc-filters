@@ -81,6 +81,18 @@ function get_server(el, typ)
   return server
 end
 
+-- get file concatenates
+function read_file(file_name, limit)
+  local file = assert(io.open(file_name, "r"))
+  if limit == nil then
+    limit = "*all"
+  end
+  local content = file:read(limit)
+  file:close()
+  return content
+end
+
+
 --- get a value, relying on defaults
 -- @param typ The type of query
 -- @param el The Pandoc element
@@ -127,10 +139,10 @@ return {
         if loc_utils.file_exists(file) then
           io.stderr:write(string.format("will include %s\n", file))
           return pandoc.RawInline(
-          "beamer",
-          string.format("\\textattachfile{%s}{%s}",
-          file,
-          utils.stringify(el)))
+            "beamer",
+            string.format("\\textattachfile{%s}{%s}",
+            file,
+            utils.stringify(el)))
         else
           io.stderr:write("cannot attach '" .. file .. "' (does not exist).")
         end
@@ -171,8 +183,13 @@ return {
       elseif el.attributes["type"] == "RegExr" then
         local base = "https://regexr.com/"
         local text = el.attributes["text"]
+        local file = el.attributes["file"]
         if text == nil then
-          text = "Please enter some text to test the RegEx!"
+          if file == nil then
+            text = "Please enter some text to test the RegEx!"
+          else
+            text = read_file(file, 1978)
+          end
         end
         -- io.stderr:write(utils.stringify(el) .. "\n")
         el.target =  base ..
