@@ -108,4 +108,12 @@ function export.get_keys(tab)
   return keys
 end
 
+function export.listify(listee)
+  if type(listee) == 'table' then
+    return pandoc.List:new(listee)
+  else
+    return pandoc.List:new({listee})
+  end
+end
+
 return export

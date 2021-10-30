@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2021-10-06, 15:59:47 (CEST)
+-- Last Changed: 2021-10-30, 06:49:00 (CEST)
 --------------------------------------------------------------------------------
 --
 
@@ -83,6 +83,10 @@ return {
     Meta = function(meta)
       name_caps = meta["name-small-caps"]
       color_comments = meta["color-remarks"]
+      local omitted = meta["omit"]
+      to_omit = loc_utils.listify(omitted):map(function(o)
+        return utils.stringify(o)
+      end)
       if (meta["slide-level"]) then
         local meta_level = meta["slide-level"]
         slide_level = tonumber(utils.stringify(meta_level)) + 1
@@ -156,6 +160,11 @@ return {
   },
   {
     Div = function(div)
+      for i, class in ipairs(div.classes) do
+        if to_omit:includes(class) then
+          return pandoc.List:new()
+        end
+      end
       if FORMAT == "beamer" then
         local start = nil
         local finish = nil
