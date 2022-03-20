@@ -18,18 +18,18 @@
 --------------------------------------------------------------------------------
 --
 -- local inspect = require('inspect')
-text = require 'text'
-List = require 'pandoc.List'
+local text = require 'text'
+local list = require 'pandoc.List'
 
-loc_utils = require(debug.getinfo(1, "S").source:sub(2):match(
+Loc_utils = require(debug.getinfo(1, "S").source:sub(2):match(
   "(.*[\\/])") .. "utils")
 
 
 -- convert SVG to PDF
 function convert_to_svg(im)
   local img_orig = im.src
-  if loc_utils.endswith(text.lower(im.src), ".pdf")
-      or loc_utils.endswith(text.lower(im.src), ".eps") then
+  if Loc_utils.endswith(text.lower(im.src), ".pdf")
+      or Loc_utils.endswith(text.lower(im.src), ".eps") then
     im.src = string.gsub(im.src, "%.[^.]+$", ".svg")
     -- if not loc_utils.file_exists(img_svg) then
     pandoc.pipe("pdf2svg", {img_orig, img.src}, "")
@@ -42,17 +42,17 @@ end
 function convert_to_emf(im)
   local img_orig = im.src
   im = convert_to_svg(im)
-  if loc_utils.endswith(text.lower(im.src), ".svg") then
+  if Loc_utils.endswith(text.lower(im.src), ".svg") then
     im.src = string.gsub(im.src, "%.[^.]+$", ".emf")
     pandoc.pipe("inkscape", {img_orig, "--export-emf", im.src}, "")
   elseif (
-    not loc_utils.endswith(text.lower(im.src), ".emf") and
+    not Loc_utils.endswith(text.lower(im.src), ".emf") and
     not (
-      loc_utils.endswith(text.lower(im.src), ".png")
+      Loc_utils.endswith(text.lower(im.src), ".png")
       or
-      loc_utils.endswith(text.lower(im.src), ".jpg")
+      Loc_utils.endswith(text.lower(im.src), ".jpg")
       or
-      loc_utils.endswith(text.lower(im.src), ".jpeg")
+      Loc_utils.endswith(text.lower(im.src), ".jpeg")
     )) then
     -- let's try our best
     im.src = string.gsub(im.src, "%.[^.]+$", ".emf")
@@ -69,8 +69,8 @@ return {
       image_no = image_no + 1
       local image_orig = im.src
       if FORMAT:find("html") or FORMAT:find("epub") then
-        if loc_utils.endswith(text.lower(im.src), ".pdf") or
-          loc_utils.endswith(text.lower(im.src), ".eps") then
+        if Loc_utils.endswith(text.lower(im.src), ".pdf") or
+          Loc_utils.endswith(text.lower(im.src), ".eps") then
             im = convert_to_svg(im)
           end
       elseif FORMAT == "docx" or FORMAT == "rtf" then

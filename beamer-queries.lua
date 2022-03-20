@@ -34,9 +34,9 @@ PDF viewers, e.g. for me not in Evince.)
 --]]
 
 -- local inspect = require('inspect')
-text = require 'text'
-List = require 'pandoc.List'
-utils = require 'pandoc.utils'
+local text = require 'text'
+local list = require 'pandoc.List'
+local utils = require 'pandoc.utils'
 -- io.stderr:write(FORMAT .. "\n")
 local utilPath = string.match(PANDOC_SCRIPT_FILE, '.*[/\\]')
 if PANDOC_VERSION >= {2,12} then

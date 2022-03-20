@@ -14,13 +14,13 @@
 --
 
 -- local inspect = require('inspect')
-text = require 'text'
-List = require 'pandoc.List'
+local text = require 'text'
+local list = require 'pandoc.List'
 -- io.stderr:write(FORMAT .. "\n")
 return {{
-  BulletList = function(list)
+  BulletList = function(list_arg)
     if FORMAT == "revealjs" then
-      return pandoc.walk_block(list, {
+      return pandoc.walk_block(list_arg, {
         Plain = function(p)
           return pandoc.Para(p.c)
         end

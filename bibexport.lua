@@ -131,7 +131,7 @@ function Pandoc (doc)
     local auxfile_name, bibs = write_dummy_aux(meta.bibliography, meta.auxfile)
     os.remove('bibexport.bib') -- clean up old files
     -- os.execute('bibexport -t ' .. auxfile_name)
-    comm = 'bibtool -q -x ' .. auxfile_name .. ' ' .. table.concat(bibs, ' ') .. "> bibexport.bib"
+    local comm = 'bibtool -q -x ' .. auxfile_name .. ' ' .. table.concat(bibs, ' ') .. "> bibexport.bib"
     io.stderr:write("Execute: " .. comm)
     os.execute(comm)
     io.stderr:write('Output written to bibexport.bib\n')
