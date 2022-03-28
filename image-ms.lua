@@ -355,7 +355,7 @@ return {
         -- Protect U+2019 against
         -- https://github.com/jgm/pandoc/issues/4550
       if FORMAT == "ms" then
-        local s = str.c
+        local s = str.text
         local substrings = List:new()
         local i = 1
         while i <= text.len(s) do
