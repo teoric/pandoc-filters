@@ -1,5 +1,6 @@
 -- from https://stackoverflow.com/questions/66600105/pandoc-citing-a-full-source
 -- extended by adding the citation prefix and suffix.
+-- not perfect in case of punctuation etc.
 
 local refs = {}
 
@@ -17,10 +18,15 @@ local function replace_cite (cite)
     local ret = pandoc.utils.blocks_to_inlines(refs[citation.id])
     if pandoc.utils.stringify(citation.prefix) ~= "" then
       ret:insert(1, " ")
-      ret:insert(1, pandoc.Span(citation.prefix))
+      for key, value in pairs(citation.prefix) do
+        ret:insert(key, value)
+      end
     end
     if pandoc.utils.stringify(citation.suffix) ~= nil then
-      ret:extend({" ", pandoc.Span(citation.suffix)})
+      if string.sub(pandoc.utils.stringify(refs[citation.id]), -1) ~= " " then
+        ret:insert(" ")
+      end
+      ret:extend(citation.suffix)
     end
     return ret
   end
