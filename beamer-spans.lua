@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2021-10-30, 06:49:00 (CEST)
+-- Last Changed: 2022-05-02, 22:31:14 (CEST)
 --------------------------------------------------------------------------------
 --
 
@@ -118,7 +118,7 @@ return {
         return el
       elseif string.find(utils.stringify(el.content), "doi.org") then
         local target = el.target:gsub("^http[^:]*://[^/]+/", "")
-        print(target)
+        -- print(target)
         el.content = target
         local ret = List:new({pandoc.RawInline(FORMAT, "DOI: "), pandoc.Link(target, "https://doi.org/" .. target)})
         return ret

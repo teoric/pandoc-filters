@@ -20,7 +20,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2018-03-30
--- Last Changed: 2021-07-22, 19:04:43 (CEST)
+-- Last Changed: 2022-07-08, 09:44:06 (CEST)
 --------------------------------------------------------------------------------
 --
 
@@ -159,41 +159,42 @@ return {
       -- hangs if in last filter
       function space(el)
         -- allow line breaking of links
-        if el.t == "Str" then
-          el.c = string.gsub(el.c, "/", "/" .. zero_space)
-          el.c = string.gsub(el.c, "%.", "." .. zero_space)
-          el.c = string.gsub(el.c, "_", "_" .. zero_space)
+        if el.t == "Str" and el.content then
+          el.content = string.gsub(el.c, "/", "/" .. zero_space)
+          el.content = string.gsub(el.c, "%.", "." .. zero_space)
+          el.content = string.gsub(el.c, "_", "_" .. zero_space)
         end
       end
-      cit.c[2]:map(space)
+      cit.content:map(space)
       return cit
     end,
   },
   {
-    Table = function (tab)
-      -- wrap tables in macros and a caption macro
-      -- RESULT:
-      -- .TABLESTART
-      -- .\" (table)
-      -- .TABLELABLE \" if caption
-      -- .\" caption if given
-      -- .TABLEEND
-      if FORMAT == "ms" then
-        cap = pandoc.Plain(table.clone(tab.caption))
-        -- cap = utils.stringify(tab.caption) or ""
-        tab.caption = {} -- delete old caption
-        local ret = List:new{
-          pandoc.RawBlock("ms", ".TABLESTART\n"),
-          tab,
-        }
-        if cap ~= nil then
-          ret:extend({pandoc.RawBlock("ms", string.format('.TABLELABLE')),
-                      cap})
-        end
-        ret:extend({pandoc.RawBlock("ms", string.format('.TABLEEND'))})
-        return ret
-      end
-    end,
+    -- -- broken / unused now (2.18ff?)
+    -- SimpleTable = function (tab)
+    --   -- wrap tables in macros and a caption macro
+    --   -- RESULT:
+    --   -- .TABLESTART
+    --   -- .\" (table)
+    --   -- .TABLELABLE \" if caption
+    --   -- .\" caption if given
+    --   -- .TABLEEND
+    --   if FORMAT == "ms" then
+    --     cap = pandoc.Plain(table.clone(tab.caption))
+    --     -- cap = utils.stringify(tab.caption) or ""
+    --     tab.caption = {} -- delete old caption
+    --     local ret = List:new{
+    --       pandoc.RawBlock("ms", ".TABLESTART\n"),
+    --       tab,
+    --     }
+    --     if cap ~= nil then
+    --       ret:extend({pandoc.RawBlock("ms", string.format('.TABLELABLE')),
+    --                   cap})
+    --     end
+    --     ret:extend({pandoc.RawBlock("ms", string.format('.TABLEEND'))})
+    --     return ret
+    --   end
+    -- end,
 
     Cite = function (cit)
       -- sanitize cite id
@@ -210,8 +211,8 @@ return {
       -- sanitize div id
       -- this is not used, anyway!?
       if FORMAT == "ms" then
-        if string.find(div.c[1][1], "^ref-.*/") then
-          div.c[1][1] = string.gsub(div.c[1][1], '/', '+')
+        if string.find(div.identifier, "^ref-.*/") then
+          div.identifier = string.gsub(div.identifier, '/', '+')
         end
       end
     end,
@@ -230,12 +231,13 @@ return {
       end
     end,
 
+    -- broken now (2.18ff?)
     Link = function (cit)
       -- sanitize Link ID
       -- protect against https://github.com/jgm/pandoc/issues/4515
       if FORMAT == "ms" then
-        if string.sub(cit.c[3][1], 1, 1) == "#" then
-          cit.c[3][1] = string.gsub(cit.c[3][1], '/', "+")
+        if string.sub(cit.target, 1, 1) == "#" then
+          cit.target = string.gsub(cit.target, '/', "+")
         end
         return cit
       end
