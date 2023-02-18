@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2022-05-02, 22:31:14 (CEST)
+-- Last Changed: 2023-02-18, 17:26:20 (CET)
 --------------------------------------------------------------------------------
 --
 
@@ -59,6 +59,10 @@ local slide_level = 3
 
 local remark_color = "\\color{blue}\\sffamily"
 
+local color_comments
+local to_omit
+local to_highlight
+
 function check_comment(div)
   return check_classes(div, comments)
 end
@@ -77,14 +81,17 @@ function check_classes(div, classes)
   end
   return ret
 end
-
 return {
   {
     Meta = function(meta)
       name_caps = meta["name-small-caps"]
       color_comments = meta["color-remarks"]
       local omitted = meta["omit"]
+      local highlighted = meta["highlight"]
       to_omit = loc_utils.listify(omitted):map(function(o)
+        return utils.stringify(o)
+      end)
+      to_highlight = loc_utils.listify(highlighted):map(function(o)
         return utils.stringify(o)
       end)
       if (meta["slide-level"]) then
@@ -164,6 +171,17 @@ return {
         if to_omit:includes(class) then
           return pandoc.List:new()
         end
+        if to_highlight:includes(class) then
+          table.insert(
+            div.content, 1,
+            pandoc.Para(pandoc.Strong("⇓ " .. text.upper(class) .. " ⇓"))
+          )
+          table.insert(
+            div.content,
+            pandoc.Para(pandoc.Strong("⇑ " .. text.upper(class) .. " ⇑"))
+          )
+        end
+        -- return div
       end
       if FORMAT == "beamer" then
         local start = nil
@@ -199,8 +217,8 @@ return {
           ret:extend(div.content)
           ret:extend({pandoc.RawBlock(FORMAT, finish)})
           div.content = ret
-          return div
         end
+        return div
       elseif FORMAT == "latex" then
       local start = nil
       local finish = nil
