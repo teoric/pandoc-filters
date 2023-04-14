@@ -184,35 +184,36 @@ return {
         -- return div
       end
       if FORMAT == "beamer" then
-        local start = nil
-        local finish = nil
+        local start = ""
+        local finish = ""
         -- wrap div in box containers
+        if div.classes:includes("only") then
+          local scope = div.attributes["scope"]
+          start = start .. "\\only<" ..
+            scope ..
+            ">{"
+          finish =  "}" .. finish
+        end
+        if div.classes:includes("on_next") then
+          local scope = div.attributes["scope"]
+          start = start .. "\\only<+>{"
+          finish = "}" .. finish
+        end
         for i, b in pairs(boxes) do
           if div.classes:includes(b) then
             local title = div.attributes["title"]
             -- io.stderr:write(title .. "\n")
-            start = "\\begin{" .. b .. "}" ..
+            start = start .. "\\begin{" .. b .. "}" ..
             "{" .. title
             if div.attributes["rechts"] then
               start = start .. "\\rechtsanm{" .. div.attributes["rechts"] .. "}"
             end
             start = start .. "}"
-            finish = "\\end{" .. b .. "}"
+            finish = "\\end{" .. b .. "}" .. finish
+            -- break -- allow only first box!
           end
         end
-        if div.classes:includes("only") then
-          local scope = div.attributes["scope"]
-          start = "\\only<" ..
-            scope ..
-            ">{"
-          finish = "}"
-        end
-        if div.classes:includes("on_next") then
-          local scope = div.attributes["scope"]
-          start = "\\only<+>{"
-          finish = "}"
-        end
-        if start ~= nil then
+        if start ~= "" then
           local ret = List:new({pandoc.RawBlock(FORMAT, start)})
           ret:extend(div.content)
           ret:extend({pandoc.RawBlock(FORMAT, finish)})
@@ -277,6 +278,9 @@ return {
         elseif span.classes:includes("icon") then
           start = "\\icontext{"
           finish = "}"
+        elseif span.classes:includes("lig") then
+          start = "\\ligtext{\\unemph{"
+          finish = "}}"
         elseif span.classes:includes("uni") then
           start = "\\unitext{\\unemph{"
           finish = "}}"
