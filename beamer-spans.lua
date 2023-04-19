@@ -188,15 +188,22 @@ return {
         local finish = ""
         -- wrap div in box containers
         if div.classes:includes("only") then
-          local scope = div.attributes["scope"]
+          local scope = div.attributes["scope"] or "+-"
           start = start .. "\\only<" ..
             scope ..
             ">{"
           finish =  "}" .. finish
         end
+        if div.classes:includes("uncover") then
+          local scope = div.attributes["scope"] or "+"
+          start = start .. "\\uncover<" ..
+            scope ..
+            ">{"
+          finish =  "}" .. finish
+        end
         if div.classes:includes("on_next") then
-          local scope = div.attributes["scope"]
-          start = start .. "\\only<+>{"
+          local scope = div.attributes["scope"] or "+"
+          start = start .. "\\only<" .. scope .. ">{"
           finish = "}" .. finish
         end
         for i, b in pairs(boxes) do
