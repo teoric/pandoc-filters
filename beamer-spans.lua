@@ -291,6 +291,9 @@ return {
         elseif span.classes:includes("uni") then
           start = "\\unitext{\\unemph{"
           finish = "}}"
+        elseif span.classes:includes("emoji") then
+          start = "\\emojiText{"
+          finish = "}"
         elseif span.classes:includes("underline")
         or span.classes:includes("ul") then
           start = "\\underline{"
@@ -303,6 +306,9 @@ return {
           finish = "}"
         elseif span.classes:includes("transl") then
           start = "\\transl{"
+          finish = "}"
+        elseif span.classes:includes("kbd") then
+          start = "\\fbox{\\small{}\\bfseries{}"
           finish = "}"
         end
         if start then
