@@ -1,4 +1,4 @@
---
+  --
 --------------------------------------------------------------------------------
 --         File: beamer-spans.lua
 --
@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2023-02-18, 17:26:20 (CET)
+-- Last Changed: 2023-04-27
 --------------------------------------------------------------------------------
 --
 
@@ -32,6 +32,10 @@ local boxes = {
   "claimbox",
   "yellowbox", "bluebox",
   "exbox", "exxbox"
+}
+
+local boxes_optional = {
+  "definition", "theorem", "claim", "remark"
 }
 
 local comments = {
@@ -195,7 +199,7 @@ return {
           finish =  "}" .. finish
         end
         if div.classes:includes("uncover") then
-          local scope = div.attributes["scope"] or "+"
+          local scope = div.attributes["scope"] or "+-"
           start = start .. "\\uncover<" ..
             scope ..
             ">{"
@@ -216,6 +220,20 @@ return {
               start = start .. "\\rechtsanm{" .. div.attributes["rechts"] .. "}"
             end
             start = start .. "}"
+            finish = "\\end{" .. b .. "}" .. finish
+            -- break -- allow only first box!
+          end
+        end
+        for i, b in pairs(boxes_optional) do
+          if div.classes:includes(b) then
+            local title = div.attributes["title"]
+            -- io.stderr:write(title .. "\n")
+            start = start .. "\\begin{" .. b .. "}" ..
+            "[" .. title
+            if div.attributes["rechts"] then
+              start = start .. "\\rechtsanm{" .. div.attributes["rechts"] .. "}"
+            end
+            start = start .. "]"
             finish = "\\end{" .. b .. "}" .. finish
             -- break -- allow only first box!
           end
