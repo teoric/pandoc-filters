@@ -105,6 +105,40 @@ return {
     end
   },
   {
+    Header = function(el)
+      if FORMAT:match 'latex' then
+        if utils.stringify(el) == "Anlagen" then
+          local ret = pandoc.RawBlock(FORMAT, "\\Anlagen{}")
+          return ret
+        elseif utils.stringify(el) == "Unterschriften" then
+          local ret = pandoc.RawBlock(FORMAT, "\\bigskip\\unterschrift{Torsten Zesch}{r}{Annemarie Friedrich}{}")
+          return ret
+        else
+          -- local typ = el.attributes["type"]
+
+          if loc_utils.startswith(el.identifier, "anlage:") then
+            local scale = (el.attributes["scale"] ~= nil) and ("[".. el.attributes["scale"] .. "]") or ""
+            local file = el.attributes["file"]
+            if file == nil then
+              if el.level == 2 then
+              local ret = List:new({pandoc.RawInline(FORMAT, "\\secanlage{" .. utils.stringify(el.content) .. "}{"
+              .. el.identifier .. "}")})
+              return ret
+              else error(string.format("No file for %s [#%s]", utils.stringify(el), el.identifier))
+              end
+            else
+              local subtype = (el.level > 2) and "sub" or ""
+              local ret = List:new({pandoc.RawInline(FORMAT, "\\".. subtype .. "anlage" .. scale .. "{".. utils.stringify(el.content) .. "}{"
+              .. el.identifier .. "}{" .. file .. "}"
+              )})
+              return ret
+            end
+          end
+        end
+      end
+    end
+  },
+  {
     Link = function(el)
       local typ = el.attributes["type"]
       if typ ~= nil then
@@ -134,39 +168,81 @@ return {
         local ret = List:new({pandoc.RawInline(FORMAT, "DOI: "), pandoc.Link(target, "https://doi.org/" .. target)})
         return ret
       end
+      if FORMAT:match 'latex' then
+        if el.attributes["type"] == "anlage" then
+          local ret = pandoc.RawInline(FORMAT, "\\emnameref{anlage:".. utils.stringify(el) .. "}")
+          return ret
+        end
+      end
     end
   },
   {
     Span = function(el)
-      color = el.attributes['color']
+      local color = el.attributes['color']
       -- if no color attribute, return unchanged -- redundant!
-      if color == nil then return el end
-      -- transform to <span style="color: red;"></span>
-      if FORMAT:match 'html' or FORMAT:match 'html5' then
-        -- remove color attributes
-        el.attributes['color'] = nil
-        -- use style attribute instead
-        el.attributes['style'] = 'color: ' .. color .. ';'
-        -- return full span element
-        return el
-      elseif FORMAT:match 'latex' then
-        -- remove color attributes
-        el.attributes['color'] = nil
-        -- encapsulate in latex code
-        table.insert(
-          el.content, 1,
-          pandoc.RawInline('latex', '\\textcolor{'..color..'}{')
-        )
-        table.insert(
-          el.content,
-          pandoc.RawInline('latex', '}')
-        )
-        -- returns only span content
-        return el.content
-      else
-        -- for other format return unchanged
-        return el
+      if color ~= nil then
+        -- transform to <span style="color: red;"></span>
+        if FORMAT:match 'html' or FORMAT:match 'html5' then
+          -- remove color attributes
+          el.attributes['color'] = nil
+          -- use style attribute instead
+          el.attributes['style'] = 'color: ' .. color .. ';'
+          -- return full span element
+          -- return el
+        elseif FORMAT:match 'latex' or FORMAT:match 'beamer' then
+          -- remove color attributes
+          el.attributes['color'] = nil
+          -- encapsulate in latex code
+          table.insert(
+            el.content, 1,
+            pandoc.RawInline('latex', '\\textcolor{'..color..'}{')
+          )
+          table.insert(
+            el.content,
+            pandoc.RawInline('latex', '}')
+          )
+          -- returns only span content
+          -- return el.content
+        else
+          -- for other format return unchanged
+          -- return el
+        end
       end
+      if el.classes:includes("menu") then
+        if FORMAT:match 'latex' or FORMAT:match 'beamer' then
+          table.insert(
+            el.content, 1,
+            pandoc.RawInline('latex', '\\textsf{\\bfseries{}')
+          )
+          table.insert(
+            el.content,
+            pandoc.RawInline('latex', '}')
+          )
+          -- returns only span content
+          -- return el.content
+        else
+          -- for other format return unchanged
+          -- return el
+        end
+      end
+      if el.classes:includes("serif") then
+        if FORMAT:match 'latex' or FORMAT:match 'beamer' then
+          table.insert(
+            el.content, 1,
+            pandoc.RawInline('latex', '\\textrm{')
+          )
+          table.insert(
+            el.content,
+            pandoc.RawInline('latex', '}')
+          )
+          -- returns only span content
+          -- return el.content
+        else
+          -- for other format return unchanged
+          -- return el
+        end
+      end
+      return el
     end
   },
   {
@@ -246,20 +322,20 @@ return {
         end
         return div
       elseif FORMAT == "latex" then
-      local start = nil
-      local finish = nil
-      -- wrap div in box containers
-      for i, b in pairs(boxes) do
-        if div.classes:includes(b) then
-          local title=div.attributes["title"]
-          -- io.stderr:write(title .. "\n")
-          start = "\\begin{description}" ..
-          "\\item[".. title .. "] ~"
-          if div.attributes["rechts"] then
-            start = start .. "\\rechtsanm{" .. div.attributes["rechts"] .. "}"
+        local start = ""
+        local finish = ""
+        -- wrap div in box containers
+        for i, b in pairs(boxes) do
+          if div.classes:includes(b) then
+            local title=div.attributes["title"]
+            -- io.stderr:write(title .. "\n")
+            start = "\\begin{description}" ..
+            "\\item[".. title .. "] ~"
+            if div.attributes["rechts"] then
+              start = start .. "\\rechtsanm{" .. div.attributes["rechts"] .. "}"
+            end
+            finish = "\\end{description}"
           end
-          finish = "\\end{description}"
-        end
         end
         local is_remark = check_remark(div)
         local is_comment = check_comment(div)
@@ -277,8 +353,16 @@ return {
           -- start = "\\medskip\\begin{addmargin}[1cm]{1cm}" .. color .."\\vskip1ex\\begingroup\\textbf{" .. table.concat(div.classes, ";;") .. "}"
           finish = "\\endgroup\\vskip1ex\\end{addmargin}"
         end
+        if div.classes:includes("xml") then
+          start = "\\paragraph{XML}\\begingroup\\sffamily{}".. start
+          finish = finish .. "\\endgroup{}"
+        end
+        if div.classes:includes("xml_details") then
+          start = "\\begin{addmargin}{1em}\\sffamily{}\\relsize{-1}\\color{darkgray}".. start
+          finish = finish .. "\\end{addmargin}"
+        end
 
-        if start ~= nil then
+        if start ~= nil and start ~= "" then
           local ret = List:new({pandoc.RawBlock(FORMAT, start)})
           ret:extend(div.content)
           ret:extend({pandoc.RawBlock(FORMAT, finish)})
