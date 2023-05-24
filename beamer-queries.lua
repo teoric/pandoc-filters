@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2021-10-30, 06:49:53 (CEST)
+-- Last Changed: 2023-05-24, 08:02:58 (+02:00)
 --------------------------------------------------------------------------------
 --[[
 
@@ -71,7 +71,7 @@ local server_defaults = {} -- will be filled from document metadata
 --- get the server for a query, including defaults
 -- @param el The Pandoc element
 -- @param typ The type of query
-function get_server(el, typ)
+local function get_server(el, typ)
   local server = el.attributes["server"]
   if server == nil then
     local _
@@ -82,7 +82,7 @@ function get_server(el, typ)
 end
 
 -- get file concatenates
-function read_file(file_name, limit)
+local function read_file(file_name, limit)
   local file = assert(io.open(file_name, "r"))
   if limit == nil then
     limit = "*all"
@@ -98,7 +98,7 @@ end
 -- @param el The Pandoc element
 -- @param server The server for looking up defaults
 -- @param feat The feature for which to get a value
-function get_value(typ, el, server, feat)
+local function get_value(typ, el, server, feat)
   local val = el.attributes[feat]
   if not val and server then
     val = server_defaults[typ][server][feat]

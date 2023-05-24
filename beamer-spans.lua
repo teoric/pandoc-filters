@@ -1,4 +1,4 @@
-  --
+--
 --------------------------------------------------------------------------------
 --         File: beamer-spans.lua
 --
@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2023-04-27
+-- Last Changed: 2023-05-24, 08:03:20 (+02:00)
 --------------------------------------------------------------------------------
 --
 
@@ -375,7 +375,10 @@ return {
       if FORMAT == "beamer" or FORMAT == "latex" then
         local start = nil
         local finish = nil
-        if span.classes:includes("rechts") then
+        if span.classes:includes("key") then
+          start = "\\fbox{\\small{}"
+          finish = "}"
+        elseif span.classes:includes("rechts") then
           start = "\\rechts{"
           finish = "}"
         elseif span.classes:includes("rkomment") then

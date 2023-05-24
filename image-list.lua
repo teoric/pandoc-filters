@@ -14,7 +14,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-03-17
--- Last Changed: 2019-08-10, 16:27:49 (CEST)
+-- Last Changed: 2023-05-24, 08:03:54 (+02:00)
 --------------------------------------------------------------------------------
 --
 -- local inspect = require('inspect')
@@ -26,7 +26,7 @@ Loc_utils = require(debug.getinfo(1, "S").source:sub(2):match(
 
 
 -- convert SVG to PDF
-function convert_to_svg(im)
+local function convert_to_svg(im)
   local img_orig = im.src
   if Loc_utils.endswith(text.lower(im.src), ".pdf")
       or Loc_utils.endswith(text.lower(im.src), ".eps") then
@@ -39,7 +39,7 @@ function convert_to_svg(im)
 end
 
 -- convert to EMF for inclusion into Word
-function convert_to_emf(im)
+local function convert_to_emf(im)
   local img_orig = im.src
   im = convert_to_svg(im)
   if Loc_utils.endswith(text.lower(im.src), ".svg") then
