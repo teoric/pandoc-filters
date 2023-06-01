@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2023-05-24, 08:03:20 (+02:00)
+-- Last Changed: 2023-06-01 15:29:11 (+02:00)
 --------------------------------------------------------------------------------
 --
 
@@ -289,8 +289,14 @@ return {
         for i, b in pairs(boxes) do
           if div.classes:includes(b) then
             local title = div.attributes["title"]
+            local scope = div.attributes["scope"]
+            if scope ~= nil then
+              scope = "<" .. scope .. ">"
+            else
+              scope = ""
+            end
             -- io.stderr:write(title .. "\n")
-            start = start .. "\\begin{" .. b .. "}" ..
+            start = start .. "\\begin{" .. b .. "}" .. scope ..
             "{" .. title
             if div.attributes["rechts"] then
               start = start .. "\\rechtsanm{" .. div.attributes["rechts"] .. "}"
