@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2023-06-01 15:29:11 (+02:00)
+-- Last Changed: 2023-09-13, 09:31:11 (CEST)
 --------------------------------------------------------------------------------
 --
 
@@ -391,7 +391,8 @@ return {
           start = "\\rechts{\\emph{"
           finish = "}}"
         elseif span.classes:includes("emph") then
-          start = "\\oldemph{"
+          -- start = "\\oldemph{"
+          start = "\\emph{"
           finish = "}"
         elseif span.classes:includes("icon") then
           start = "\\icontext{"
@@ -412,8 +413,11 @@ return {
         elseif span.classes:includes("unemph") then
           start = "\\unemph{"
           finish = "}"
+        elseif span.classes:includes("fnhd_text") then
+          start = "{\\normalfont\\unifont{}"
+          finish = "}"
         elseif span.classes:includes("name") then
-          start = "\\texsc{"
+          start = "\\textsc{"
           finish = "}"
         elseif span.classes:includes("transl") then
           start = "\\transl{"
