@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2023-09-13, 09:31:11 (CEST)
+-- Last Changed: 2023-10-26 13:46:19 (+02:00)
 --------------------------------------------------------------------------------
 --
 
@@ -290,7 +290,7 @@ return {
           if div.classes:includes(b) then
             local title = div.attributes["title"]
             local scope = div.attributes["scope"]
-            if scope ~= nil then
+            if scope ~= nil and not(div.classes:includes("uncover")) and not(div.classes:includes("only")) and not(div.classes:includes("on_next")) then
               scope = "<" .. scope .. ">"
             else
               scope = ""
