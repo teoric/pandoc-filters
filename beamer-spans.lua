@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2023-10-26 13:46:19 (+02:00)
+-- Last Changed: 2023-11-29 18:52:16 (+01:00)
 --------------------------------------------------------------------------------
 --
 
@@ -425,6 +425,10 @@ return {
         elseif span.classes:includes("kbd") then
           start = "\\fbox{\\small{}\\bfseries{}"
           finish = "}"
+        elseif span.classes:includes("comment") then
+          io.stderr:write(span.attributes["text"] .. "\n")
+          start = "\\pdfmarkupcomment[markup=Highlight,color=yellow]{"
+          finish = "}{".. span.attributes["text"] .."}"
         end
         if start then
           local ret = List:new({pandoc.RawInline(FORMAT, start)})
