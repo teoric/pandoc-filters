@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2023-11-29 18:52:16 (+01:00)
+-- Last Changed: 2023-12-04 09:43:36 (+01:00)
 --------------------------------------------------------------------------------
 --
 
@@ -427,7 +427,15 @@ return {
           finish = "}"
         elseif span.classes:includes("comment") then
           io.stderr:write(span.attributes["text"] .. "\n")
-          start = "\\pdfmarkupcomment[markup=Highlight,color=yellow]{"
+          local typ = "Highlight"
+          if span.attributes["type"] ~= nil then
+            typ = span.attributes["type"]
+          end
+          start = "\\pdfmarkupcomment[markup=".. typ .. ",color=yellow]{"
+          finish = "}{".. span.attributes["text"] .."}"
+        elseif span.classes:includes("margincomment") then
+          io.stderr:write(span.attributes["text"] .. "\n")
+          start = "\\pdfmargincomment[markup=".. typ .. ",color=yellow]{"
           finish = "}{".. span.attributes["text"] .."}"
         end
         if start then
