@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2023-12-04 09:46:24 (+01:00)
+-- Last Changed: 2023-12-06 16:42:13 (+01:00)
 --------------------------------------------------------------------------------
 --
 
@@ -366,6 +366,10 @@ return {
         if div.classes:includes("xml_details") then
           start = "\\begin{addmargin}{1em}\\sffamily{}\\relsize{-1}\\color{darkgray}".. start
           finish = finish .. "\\end{addmargin}"
+        end
+        if div.classes:includes("references") then
+          start = "\\begin{aeetreferences}".. start
+          finish = finish .. "\\end{aeetreferences}"
         end
 
         if start ~= nil and start ~= "" then
