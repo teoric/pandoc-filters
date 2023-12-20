@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2023-12-06 16:42:13 (+01:00)
+-- Last Changed: 2023-12-20 10:48:11 (+01:00)
 --------------------------------------------------------------------------------
 --
 
@@ -85,9 +85,25 @@ function check_classes(div, classes)
   end
   return ret
 end
+
+local remove_break = {
+  LineBreak = function()
+    return pandoc.Space()
+  end
+}
+
 return {
   {
     Meta = function(meta)
+      if meta.title ~= nil then
+        meta["title-lined"] = meta.title:walk(remove_break)
+      end
+      if meta.subtitle ~= nil then
+        meta["subtitle-lined"] = meta.subtitle:walk(remove_break)
+      end
+      if meta.subsubtitle ~= nil then
+        meta["subsubtitle-lined"] = meta.subsubtitle:walk(remove_break)
+      end
       name_caps = meta["name-small-caps"]
       color_comments = meta["color-remarks"]
       local omitted = meta["omit"]
@@ -102,6 +118,7 @@ return {
         local meta_level = meta["slide-level"]
         slide_level = tonumber(utils.stringify(meta_level)) + 1
       end
+      return meta
     end
   },
   {
