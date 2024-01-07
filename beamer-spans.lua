@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2023-12-20 10:48:11 (+01:00)
+-- Last Changed: 2023-12-20 16:58:59 (+01:00)
 --------------------------------------------------------------------------------
 --
 
@@ -387,6 +387,10 @@ return {
         if div.classes:includes("references") then
           start = "\\begin{aeetreferences}".. start
           finish = finish .. "\\end{aeetreferences}"
+        end
+        if div.classes:includes("figure_text") then
+          start = "\\begin{figureText}".. start
+          finish = finish .. "\\end{figureText}"
         end
 
         if start ~= nil and start ~= "" then
