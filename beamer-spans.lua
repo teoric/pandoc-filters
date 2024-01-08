@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2023-12-20 16:58:59 (+01:00)
+-- Last Changed: 2024-01-08 11:08:50 (+01:00)
 --------------------------------------------------------------------------------
 --
 
@@ -95,6 +95,9 @@ local remove_break = {
 return {
   {
     Meta = function(meta)
+      if meta.supertitle ~= nil then
+        meta["supertitle-lined"] = meta.supertitle:walk(remove_break)
+      end
       if meta.title ~= nil then
         meta["title-lined"] = meta.title:walk(remove_break)
       end
