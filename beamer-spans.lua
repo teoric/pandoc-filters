@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2024-01-08 11:08:50 (+01:00)
+-- Last Changed: 2024-01-17 14:02:05 (+01:00)
 --------------------------------------------------------------------------------
 --
 
@@ -185,7 +185,7 @@ return {
         local target = el.target:gsub("^http[^:]*://[^/]+/", "")
         -- print(target)
         el.content = target
-        local ret = List:new({pandoc.RawInline(FORMAT, "DOI: "), pandoc.Link(target, "https://doi.org/" .. target)})
+        local ret = List:new({pandoc.RawInline(FORMAT, "\\textsc{doi}: "), pandoc.Link(target, "https://doi.org/" .. target)})
         return ret
       end
       if FORMAT:match 'latex' then
