@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2024-01-17 14:02:05 (+01:00)
+-- Last Changed: 2024-01-17 14:44:53 (+01:00)
 --------------------------------------------------------------------------------
 --
 
@@ -181,6 +181,17 @@ return {
         local hdl = loc_utils.trim(utils.stringify(el))
         el.target = base .. hdl
         return el
+      elseif el.attributes["type"] == "urn" then
+        local base = "https://mdz-nbn-resolving.de/"
+        local hdl = loc_utils.trim(utils.stringify(el))
+        el.target = base .. hdl
+        return el
+      elseif string.find(utils.stringify(el.content), "mdz.nbn.resolving.de") then
+        local target = el.target:gsub("^http[^:]*://[^/]+/", "")
+        -- print(target)
+        el.content = target
+        local ret = List:new({pandoc.RawInline(FORMAT, "\\textsc{urn}: "), pandoc.Link(target, "https://mdz-nbn-resolving.de/" .. target)})
+        return ret
       elseif string.find(utils.stringify(el.content), "doi.org") then
         local target = el.target:gsub("^http[^:]*://[^/]+/", "")
         -- print(target)
