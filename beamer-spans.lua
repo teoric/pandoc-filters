@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2024-01-17 14:44:53 (+01:00)
+-- Last Changed: 2024-01-17 22:32:13 (+01:00)
 --------------------------------------------------------------------------------
 --
 
@@ -406,7 +406,6 @@ return {
           start = "\\begin{figureText}".. start
           finish = finish .. "\\end{figureText}"
         end
-
         if start ~= nil and start ~= "" then
           local ret = List:new({pandoc.RawBlock(FORMAT, start)})
           ret:extend(div.content)
@@ -418,62 +417,67 @@ return {
     end,
     Span = function(span)
       if FORMAT == "beamer" or FORMAT == "latex" then
-        local start = nil
-        local finish = nil
+        local start = ""
+        local finish = ""
         if span.classes:includes("key") then
-          start = "\\fbox{\\small{}"
-          finish = "}"
+          start = "\\fbox{\\small{}" .. start
+          finish = finish .. "}"
         elseif span.classes:includes("rechts") then
-          start = "\\rechts{"
-          finish = "}"
+          if FORMAT == "beamer" then
+            start = "\\rechts{" .. start
+            finish = "}"
+          else 
+            start = "\\begin{flushright}" .. start
+            finish = finish .. "\\end{flushright}"
+          end
         elseif span.classes:includes("rkomment") then
-          start = "\\rechts{\\emph{"
-          finish = "}}"
+          start = "\\rechts{\\emph{" .. start
+          finish = finish .. "}}"
         elseif span.classes:includes("emph") then
           -- start = "\\oldemph{"
-          start = "\\emph{"
-          finish = "}"
+          start = "\\emph{" .. start
+          finish = finish .. "}"
         elseif span.classes:includes("icon") then
-          start = "\\icontext{"
-          finish = "}"
+          start = "\\icontext{" .. start
+          finish = finish .. "}"
         elseif span.classes:includes("lig") then
-          start = "\\ligtext{\\unemph{"
-          finish = "}}"
+          start = "\\ligtext{\\unemph{" .. start
+          finish = finish .. "}}"
         elseif span.classes:includes("uni") then
-          start = "\\unitext{\\unemph{"
-          finish = "}}"
+          start = "\\unitext{\\unemph{" .. start
+          finish = finish .. "}}"
         elseif span.classes:includes("emoji") then
-          start = "\\emojiText{"
-          finish = "}"
+          start = "\\emojiText{" .. start
+          finish = finish .. "}"
         elseif span.classes:includes("underline")
         or span.classes:includes("ul") then
-          start = "\\underline{"
-          finish = "}"
+          start = "\\underline{" .. start
+          finish = finish .. "}"
         elseif span.classes:includes("unemph") then
-          start = "\\unemph{"
-          finish = "}"
+          start = "\\unemph{" .. start
+          finish = finish .. "}"
         elseif span.classes:includes("fnhd_text") then
-          start = "{\\normalfont\\unifont{}"
-          finish = "}"
+          start = "{\\normalfont\\unifont{}" .. start
+          finish = finish .. "}"
         elseif span.classes:includes("name") then
-          start = "\\textsc{"
-          finish = "}"
+          start = "\\textsc{" .. start
+          finish = finish .. "}"
         elseif span.classes:includes("transl") then
-          start = "\\transl{"
-          finish = "}"
+          start = "\\transl{" .. start
+          finish = finish .. "}"
         elseif span.classes:includes("kbd") then
-          start = "\\fbox{\\small{}\\bfseries{}"
-          finish = "}"
+          start = "\\fbox{\\small{}\\bfseries{}" .. start
+          finish = finish .. "}"
         elseif span.classes:includes("comment") then
           local typ = "Highlight"
           if span.attributes["type"] ~= nil then
             typ = span.attributes["type"]
           end
-          start = "\\pdfmarkupcomment[markup=".. typ .. ",color=yellow]{"
-          finish = "}{".. span.attributes["text"] .."}"
+          start = "\\pdfmarkupcomment[markup=".. typ .. ",color=yellow]{" .. start
+          finish = finish .. "}{".. span.attributes["text"] .."}"
         elseif span.classes:includes("margincomment") then
-          start = "\\pdfmargincomment[markup=".. typ .. ",color=yellow]{"
-          finish = "}{".. span.attributes["text"] .."}"
+          start = "\\pdfmargincomment[markup=".. typ .. ",color=yellow]{" .. start
+          finish = finish .. "}{".. span.attributes["text"] .."}"
         end
         if start then
           local ret = List:new({pandoc.RawInline(FORMAT, start)})
