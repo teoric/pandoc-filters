@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 from pandocfilters import walk, toJSONFilter, RawInline, Str
 import regex  # allow unicode character properties
 
