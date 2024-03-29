@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2024-01-17 22:32:13 (+01:00)
+-- Last Changed: 2024-03-29 10:27:23 (+01:00)
 --------------------------------------------------------------------------------
 --
 
@@ -120,6 +120,10 @@ return {
       if (meta["slide-level"]) then
         local meta_level = meta["slide-level"]
         slide_level = tonumber(utils.stringify(meta_level)) + 1
+      end
+      -- force different default document class
+      if FORMAT:match 'latex' and meta.documentclass ~= article then
+        meta["documentclass"] = "scrartcl"
       end
       return meta
     end
