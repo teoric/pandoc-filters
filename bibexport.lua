@@ -58,7 +58,7 @@ function bibdata (bibliography)
       return utils.stringify(bibitem):gsub('%.bib$', '')
     end
   end
-  local bibs = bibliography.t == 'MetaList'
+  local bibs = type(bibliography) == "table" -- bibliography.t == 'MetaList'
     and List.map(bibliography, bibname)
     or List:new({bibliography})
   return bibs
