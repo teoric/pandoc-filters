@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2024-03-29 10:27:23 (+01:00)
+-- Last Changed: 2024-04-13 12:20:37 (+02:00)
 --------------------------------------------------------------------------------
 --
 
@@ -39,6 +39,7 @@ local boxes_optional = {
 }
 
 local comments = {
+  "comment",
   "Bemerkung",
   "Bewertung",
   "Kommentar",
@@ -47,6 +48,7 @@ local comments = {
 }
 
 local remarks = {
+  "comment",
   "Anmerkung",
   "Frage",
   "Antwort",
@@ -383,16 +385,16 @@ return {
         -- io.stderr:write(table.concat(div.classes, ";;"), "\n")
         if div.attributes["resolved"] then
           return List:new()
-        elseif start == nil and (is_remark or is_comment) then
+        elseif (is_remark or is_comment) then
           local color = ""
           if is_comment and color_comments then
             color = remark_color
           elseif is_remark then
             color = remark_color
           end
-          start = "\\begin{addmargin}[1cm]{1cm}" .. color .."\\vskip1ex\\begingroup\\textbf{" .. table.concat(div.classes, ";;") .. "}"
+          start = "\\begin{addmargin}[1cm]{1cm}" .. color .."\\vskip1ex\\begingroup\\textbf{" .. table.concat(div.classes, ";;") .. "}" .. start
           -- start = "\\medskip\\begin{addmargin}[1cm]{1cm}" .. color .."\\vskip1ex\\begingroup\\textbf{" .. table.concat(div.classes, ";;") .. "}"
-          finish = "\\endgroup\\vskip1ex\\end{addmargin}"
+          finish = finish .. "\\endgroup\\vskip1ex\\end{addmargin}"
         end
         if div.classes:includes("xml") then
           start = "\\paragraph{XML}\\begingroup\\sffamily{}".. start
