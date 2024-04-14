@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2024-04-13 12:20:37 (+02:00)
+-- Last Changed: 2024-04-14 09:57:00 (+02:00)
 --------------------------------------------------------------------------------
 --
 
@@ -39,6 +39,7 @@ local boxes_optional = {
 }
 
 local comments = {
+  "Comment",
   "comment",
   "Bemerkung",
   "Bewertung",
@@ -48,7 +49,7 @@ local comments = {
 }
 
 local remarks = {
-  "comment",
+  "Remark",
   "Anmerkung",
   "Frage",
   "Antwort",
