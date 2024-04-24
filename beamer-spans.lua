@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2024-04-24 09:43:09 (+02:00)
+-- Last Changed: 2024-04-24 09:44:53 (+02:00)
 --------------------------------------------------------------------------------
 --
 
@@ -437,7 +437,7 @@ return {
           finish = '\\egroup{}' .. finish
         end
         if div.attributes["bgcolor"] then
-          start = '\\begin{tcolorbox}[colback='.. div.attributes["bgcolor"] ..'!20, colframe=' .. div.attributes["bgcolor"] .. ']' .. start
+          start = '\\begin{tcolorbox}[colback='.. div.attributes["bgcolor"] ..'!20, colframe=' .. div.attributes["bgcolor"] .. '!80!black]' .. start
           finish = finish .. '\\end{tcolorbox}'
         end
         if div.classes:includes("xml") then
