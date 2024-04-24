@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2024-04-14 09:57:00 (+02:00)
+-- Last Changed: 2024-04-24 09:34:21 (+02:00)
 --------------------------------------------------------------------------------
 --
 
@@ -57,6 +57,10 @@ local remarks = {
   "Frage/Anregung",
   "Bewertung/Frage"
 }
+
+local skips = pandoc.List({
+  "big", "med", "small"
+})
 
 local name_caps
 
@@ -217,27 +221,47 @@ return {
   {
     Span = function(el)
       local color = el.attributes['color']
+      local bgcolor = el.attributes['bgcolor']
+      if color ~= nil or bgcolor ~= nil then
       -- if no color attribute, return unchanged -- redundant!
-      if color ~= nil then
         -- transform to <span style="color: red;"></span>
         if FORMAT:match 'html' or FORMAT:match 'html5' then
           -- remove color attributes
-          el.attributes['color'] = nil
-          -- use style attribute instead
-          el.attributes['style'] = 'color: ' .. color .. ';'
+          if color ~= nil then
+            el.attributes['color'] = nil
+            -- use style attribute instead
+            el.attributes['style'] = 'color: ' .. color .. ';'
+          end
+          if bgcolor ~= nil then
+            el.attributes['bgcolor'] = nil
+            -- use style attribute instead
+            el.attributes['style'] = 'background-color: ' .. color .. ';'
+          end
           -- return full span element
           -- return el
         elseif FORMAT:match 'latex' or FORMAT:match 'beamer' then
-          -- remove color attributes
-          el.attributes['color'] = nil
+          local start = ""
+          local finish = ""
+          if color ~= nil then
+            -- remove color attributes
+            el.attributes['color'] = nil
+            start = start .. '\\textcolor{'..color..'}{'
+            finish = "}" .. finish
+          end
+          if bgcolor ~= nil then
+            -- remove color attributes
+            el.attributes['bgcolor'] = nil
+            start = start .. '\\colorbox{'..bgcolor..'}{'
+            finish = "}" .. finish
+          end
           -- encapsulate in latex code
           table.insert(
             el.content, 1,
-            pandoc.RawInline('latex', '\\textcolor{'..color..'}{')
+            pandoc.RawInline('latex', start)
           )
           table.insert(
             el.content,
-            pandoc.RawInline('latex', '}')
+            pandoc.RawInline('latex', finish)
           )
           -- returns only span content
           -- return el.content
@@ -358,6 +382,11 @@ return {
             -- break -- allow only first box!
           end
         end
+        -- same code below for LATEX
+        local skip = div.attributes["skip"]
+        if skip ~= nil and skips:includes(skip) then
+          start = '\\' .. skip .. "skip{}" .. start
+        end
         if start ~= "" then
           local ret = List:new({pandoc.RawBlock(FORMAT, start)})
           ret:extend(div.content)
@@ -384,6 +413,9 @@ return {
         local is_remark = check_remark(div)
         local is_comment = check_comment(div)
         -- io.stderr:write(table.concat(div.classes, ";;"), "\n")
+        if div.attributes["color"] ~= nil then
+          color = '\\color{'.. div.attributes["color"] ..'}'
+        end
         if div.attributes["resolved"] then
           return List:new()
         elseif (is_remark or is_comment) then
@@ -396,6 +428,17 @@ return {
           start = "\\begin{addmargin}[1cm]{1cm}" .. color .."\\vskip1ex\\begingroup\\textbf{" .. table.concat(div.classes, ";;") .. "}" .. start
           -- start = "\\medskip\\begin{addmargin}[1cm]{1cm}" .. color .."\\vskip1ex\\begingroup\\textbf{" .. table.concat(div.classes, ";;") .. "}"
           finish = finish .. "\\endgroup\\vskip1ex\\end{addmargin}"
+        elseif (color ~= nil) then
+          start = '{' .. color .. start
+          finish = finish .. '}'
+        end
+        if div.attributes["linestretch"] then
+          start = '\\bgroup\\setstretch{' .. div.attributes["linestretch"] ..'}' .. start
+          finish = '\\egroup{}' .. finish
+        end
+        if div.attributes["bgcolor"] then
+          start = '\\begin{tcolorbox}[colback='.. div.attributes["bgcolor"] ..']' .. start
+          finish = finish .. '\\end{tcolorbox}'
         end
         if div.classes:includes("xml") then
           start = "\\paragraph{XML}\\begingroup\\sffamily{}".. start
@@ -412,6 +455,10 @@ return {
         if div.classes:includes("figure_text") then
           start = "\\begin{figureText}".. start
           finish = finish .. "\\end{figureText}"
+        end
+        local skip = div.attributes["skip"]
+        if skip ~= nil and skips:includes(skip) then
+          start = '\\' .. skip .. "skip{}" .. start
         end
         if start ~= nil and start ~= "" then
           local ret = List:new({pandoc.RawBlock(FORMAT, start)})
