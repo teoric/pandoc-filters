@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2024-04-24 09:44:53 (+02:00)
+-- Last Changed: 2024-04-25, 17:33:13 (CEST)
 --------------------------------------------------------------------------------
 --
 
@@ -91,6 +91,14 @@ function check_classes(div, classes)
     end
   end
   return ret
+end
+
+function add_style(el, style, value)
+  if el.attributes['style'] == nil then
+    el.attributes['style'] = ""
+  end
+  -- TODO: proof against missing semicolon?
+  el.attributes['style'] = el.attributes['style'] .. style .. ': ' .. value .. ';'
 end
 
 local remove_break = {
@@ -230,12 +238,13 @@ return {
           if color ~= nil then
             el.attributes['color'] = nil
             -- use style attribute instead
-            el.attributes['style'] = 'color: ' .. color .. ';'
+            add_style(el, "color", color)
           end
           if bgcolor ~= nil then
             el.attributes['bgcolor'] = nil
             -- use style attribute instead
-            el.attributes['style'] = 'background-color: ' .. color .. ';'
+            add_style(el, "background-color", bgcolor)
+            add_style(el, "padding", ".5ex")
           end
           -- return full span element
           -- return el
@@ -325,7 +334,25 @@ return {
         end
         -- return div
       end
-      if FORMAT == "beamer" then
+      local color = div.attributes['color']
+      local bgcolor = div.attributes['bgcolor']
+      if color ~= nil or bgcolor ~= nil then
+      -- if no color attribute, return unchanged -- redundant!
+        -- transform to <span style="color: red;"></span>
+        if FORMAT:match 'html' or FORMAT:match 'html5' then
+          -- remove color attributes
+          if color ~= nil then
+            div.attributes['color'] = nil
+            -- use style attribute instead
+            add_style(div, "color", color)
+          end
+          if bgcolor ~= nil then
+            div.attributes['bgcolor'] = nil
+            -- use style attribute instead
+            add_style(div, "background-color", bgcolor)
+          end
+        end
+      elseif FORMAT == "beamer" then
         local start = ""
         local finish = ""
         -- wrap div in box containers
