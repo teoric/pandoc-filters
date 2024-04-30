@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2024-04-25, 17:33:13 (CEST)
+-- Last Changed: 2024-04-30, 09:11:13 (CEST)
 --------------------------------------------------------------------------------
 --
 
@@ -377,7 +377,7 @@ return {
         end
         for i, b in pairs(boxes) do
           if div.classes:includes(b) then
-            local title = div.attributes["title"]
+            local title = div.attributes["title"] or ""
             local scope = div.attributes["scope"]
             if scope ~= nil and not(div.classes:includes("uncover")) and not(div.classes:includes("only")) and not(div.classes:includes("on_next")) then
               scope = "<" .. scope .. ">"
@@ -397,7 +397,7 @@ return {
         end
         for i, b in pairs(boxes_optional) do
           if div.classes:includes(b) then
-            local title = div.attributes["title"]
+            local title = div.attributes["title"] or ""
             -- io.stderr:write(title .. "\n")
             start = start .. "\\begin{" .. b .. "}" ..
             "[" .. title
