@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2024-04-30, 09:11:13 (CEST)
+-- Last Changed: 2024-05-01, 21:09:38 (CEST)
 --------------------------------------------------------------------------------
 --
 
@@ -427,7 +427,7 @@ return {
         -- wrap div in box containers
         for i, b in pairs(boxes) do
           if div.classes:includes(b) then
-            local title=div.attributes["title"]
+            local title=div.attributes["title"] or ""
             -- io.stderr:write(title .. "\n")
             start = "\\begin{description}" ..
             "\\item[".. title .. "] ~"
