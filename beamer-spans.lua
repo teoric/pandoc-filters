@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2024-05-01, 21:09:38 (CEST)
+-- Last Changed: 2024-05-03 14:30:17 (+02:00)
 --------------------------------------------------------------------------------
 --
 
@@ -137,7 +137,7 @@ return {
         slide_level = tonumber(utils.stringify(meta_level)) + 1
       end
       -- force different default document class
-      if FORMAT:match 'latex' and meta.documentclass ~= article then
+      if FORMAT:match 'latex' and meta.documentclass ~= "article" then
         meta["documentclass"] = "scrartcl"
       end
       return meta
@@ -504,13 +504,14 @@ return {
           start = "\\fbox{\\small{}" .. start
           finish = finish .. "}"
         elseif span.classes:includes("rechts") then
-          if FORMAT == "beamer" then
+          -- if FORMAT == "beamer" then
             start = "\\rechts{" .. start
             finish = "}"
-          else 
-            start = "\\begin{flushright}" .. start
-            finish = finish .. "\\end{flushright}"
-          end
+          -- nonsens: only for paragraphs!
+          -- else 
+          --   start = "\\begin{flushright}" .. start
+          --   finish = finish .. "\\end{flushright}"
+          -- end
         elseif span.classes:includes("rkomment") then
           start = "\\rechts{\\emph{" .. start
           finish = finish .. "}}"
