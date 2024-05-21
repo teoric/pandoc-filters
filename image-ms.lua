@@ -20,7 +20,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2018-03-30
--- Last Changed: 2022-07-08, 09:44:06 (CEST)
+-- Last Changed: 2024-05-16, 09:36:54 (CEST)
 --------------------------------------------------------------------------------
 --
 
@@ -395,9 +395,9 @@ return {
     Header = function (h)
       if FORMAT == "ms" then
         if refsec[utils.stringify(h)] then
-          return {pandoc.RawBlock("ms", ".REF_SIZE"), h}
+          return {pandoc.RawBlock("ms", ".HANG"), pandoc.RawBlock("ms", ".REF_SIZE"), h}
         else
-          return {pandoc.RawBlock("ms", ".RESTORE_SIZE"), h}
+          return {pandoc.RawBlock("ms", ".RESTORE_SIZE"), pandoc.RawBlock("ms", ".UNHANG"), h}
         end
       end
     end,

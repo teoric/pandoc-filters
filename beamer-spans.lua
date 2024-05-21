@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2024-05-03 14:30:17 (+02:00)
+-- Last Changed: 2024-05-21, 11:14:59 (CEST)
 --------------------------------------------------------------------------------
 --
 
@@ -125,6 +125,10 @@ return {
       name_caps = meta["name-small-caps"]
       color_comments = meta["color-remarks"]
       local omitted = meta["omit"]
+      if (meta["classoption"] ~= nil and meta["classoptions"] ~= nil) then
+          meta["classoption"] = loc_utils.listify(meta["classoption"])
+          meta["classoption"]:extend(loc_utils.listify(meta["classoptions"]))
+      end
       local highlighted = meta["highlight"]
       to_omit = loc_utils.listify(omitted):map(function(o)
         return utils.stringify(o)
