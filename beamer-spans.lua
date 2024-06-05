@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2024-05-21, 11:14:59 (CEST)
+-- Last Changed: 2024-06-05, 19:39:32 (CEST)
 --------------------------------------------------------------------------------
 --
 
@@ -362,22 +362,20 @@ return {
         -- wrap div in box containers
         if div.classes:includes("only") then
           local scope = div.attributes["scope"] or "+-"
-          start = start .. "\\only<" ..
-            scope ..
+          start = "\\only<" ..  scope .. start ..
             ">{"
           finish =  "}" .. finish
         end
         if div.classes:includes("uncover") then
           local scope = div.attributes["scope"] or "+-"
-          start = start .. "\\uncover<" ..
-            scope ..
+          start = "\\uncover<" ..  scope .. start ..
             ">{"
           finish =  "}" .. finish
         end
         if div.classes:includes("on_next") then
           local scope = div.attributes["scope"] or "+"
-          start = start .. "\\only<" .. scope .. ">{"
-          finish = "}" .. finish
+          start = "\\only<" .. scope .. start .. ">{"
+          finish = finish .. "}"
         end
         for i, b in pairs(boxes) do
           if div.classes:includes(b) then
@@ -412,6 +410,12 @@ return {
             finish = "\\end{" .. b .. "}" .. finish
             -- break -- allow only first box!
           end
+        end
+        if div.classes:includes("verse") then
+          -- io.stderr:write(title .. "\n")
+          start = start .. "\\begin{verse}"
+          finish = "\\end{verse}" .. finish
+          -- break -- allow only first box!
         end
         -- same code below for LATEX
         local skip = div.attributes["skip"]
@@ -487,6 +491,12 @@ return {
           start = "\\begin{figureText}".. start
           finish = finish .. "\\end{figureText}"
         end
+        if div.classes:includes("verse") then
+          -- io.stderr:write(title .. "\n")
+          start = start .. "\\begin{poem}"
+          finish = "\\\\-\\end{poem}" .. finish
+          -- break -- allow only first box!
+        end
         local skip = div.attributes["skip"]
         if skip ~= nil and skips:includes(skip) then
           start = '\\' .. skip .. "skip{}" .. start
@@ -511,8 +521,8 @@ return {
           -- if FORMAT == "beamer" then
             start = "\\rechts{" .. start
             finish = "}"
-          -- nonsens: only for paragraphs!
-          -- else 
+          -- nonsense: only for paragraphs!
+          -- else
           --   start = "\\begin{flushright}" .. start
           --   finish = finish .. "\\end{flushright}"
           -- end
