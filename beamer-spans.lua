@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2024-06-05, 19:39:32 (CEST)
+-- Last Changed: 2024-06-06 20:00:25 (+02:00)
 --------------------------------------------------------------------------------
 --
 
@@ -526,54 +526,79 @@ return {
           --   start = "\\begin{flushright}" .. start
           --   finish = finish .. "\\end{flushright}"
           -- end
-        elseif span.classes:includes("rkomment") then
+        end
+        if span.classes:includes("rkomment") then
           start = "\\rechts{\\emph{" .. start
           finish = finish .. "}}"
-        elseif span.classes:includes("emph") then
+        end
+        if span.classes:includes("emph") then
           -- start = "\\oldemph{"
           start = "\\emph{" .. start
           finish = finish .. "}"
-        elseif span.classes:includes("icon") then
+        end
+        if span.classes:includes("icon") then
           start = "\\icontext{" .. start
           finish = finish .. "}"
-        elseif span.classes:includes("lig") then
+        end
+        if span.classes:includes("lig") then
           start = "\\ligtext{\\unemph{" .. start
           finish = finish .. "}}"
-        elseif span.classes:includes("uni") then
+        end
+        if span.classes:includes("uni") then
           start = "\\unitext{\\unemph{" .. start
           finish = finish .. "}}"
-        elseif span.classes:includes("emoji") then
+        end
+        if span.classes:includes("emoji") then
           start = "\\emojiText{" .. start
           finish = finish .. "}"
-        elseif span.classes:includes("underline")
+        end
+        if span.classes:includes("underline")
         or span.classes:includes("ul") then
           start = "\\underline{" .. start
           finish = finish .. "}"
-        elseif span.classes:includes("unemph") then
+        end
+        if span.classes:includes("unemph") then
           start = "\\unemph{" .. start
           finish = finish .. "}"
-        elseif span.classes:includes("fnhd_text") then
+        end
+        if span.classes:includes("fnhd_text") then
           start = "{\\normalfont\\unifont{}" .. start
           finish = finish .. "}"
-        elseif span.classes:includes("name") then
+        end
+        if span.classes:includes("so") or span.classes:includes("ls") or span.classes:includes("gesperrt") then
+          start = "\\textso{" .. start
+          finish = finish .. "}"
+        end
+        if span.classes:includes("name") then
           start = "\\textsc{" .. start
           finish = finish .. "}"
-        elseif span.classes:includes("transl") then
+        end
+        if span.classes:includes("sl") or span.classes:includes("slanted") or span.classes:includes("schraeg") then
+          start = "\\textsl{" .. start
+          finish = finish .. "}"
+        end
+        if span.classes:includes("transl") then
           start = "\\transl{" .. start
           finish = finish .. "}"
-        elseif span.classes:includes("kbd") then
+        end
+        if span.classes:includes("kbd") then
           start = "\\fbox{\\small{}\\bfseries{}" .. start
           finish = finish .. "}"
-        elseif span.classes:includes("comment") then
+        end
+        if span.classes:includes("comment") then
           local typ = "Highlight"
           if span.attributes["type"] ~= nil then
             typ = span.attributes["type"]
           end
           start = "\\pdfmarkupcomment[markup=".. typ .. ",color=yellow]{" .. start
           finish = finish .. "}{".. span.attributes["text"] .."}"
-        elseif span.classes:includes("margincomment") then
+        end
+        if span.classes:includes("margincomment") then
           start = "\\pdfmargincomment[markup=".. typ .. ",color=yellow]{" .. start
           finish = finish .. "}{".. span.attributes["text"] .."}"
+        end
+        if span.classes:includes("endstanza") then
+          finish = "\\\\!"
         end
         if start then
           local ret = List:new({pandoc.RawInline(FORMAT, start)})
