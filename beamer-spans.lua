@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2024-06-06 20:00:25 (+02:00)
+-- Last Changed: 2024-06-17 19:40:25 (+02:00)
 --------------------------------------------------------------------------------
 --
 
@@ -35,7 +35,7 @@ local boxes = {
 }
 
 local boxes_optional = {
-  "definition", "theorem", "claim", "remark"
+  "definition", "theorem", "claim", "remark", "anm"
 }
 
 local comments = {
