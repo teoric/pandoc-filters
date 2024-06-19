@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2024-06-17 19:40:25 (+02:00)
+-- Last Changed: 2024-06-19 19:30:11 (+02:00)
 --------------------------------------------------------------------------------
 --
 
@@ -362,19 +362,19 @@ return {
         -- wrap div in box containers
         if div.classes:includes("only") then
           local scope = div.attributes["scope"] or "+-"
-          start = "\\only<" ..  scope .. start ..
-            ">{"
+          start = "\\only<" .. scope ..
+          ">{" .. start 
           finish =  "}" .. finish
         end
         if div.classes:includes("uncover") then
           local scope = div.attributes["scope"] or "+-"
-          start = "\\uncover<" ..  scope .. start ..
-            ">{"
+          start = "\\uncover<" .. scope ..
+            ">{" .. start
           finish =  "}" .. finish
         end
         if div.classes:includes("on_next") then
           local scope = div.attributes["scope"] or "+"
-          start = "\\only<" .. scope .. start .. ">{"
+          start = "\\only<" .. scope .. ">{" .. start
           finish = finish .. "}"
         end
         for i, b in pairs(boxes) do
@@ -432,6 +432,11 @@ return {
       elseif FORMAT == "latex" then
         local start = ""
         local finish = ""
+        if div.classes:includes("multicols") then
+          local number = div.attributes["columns"] or "2"
+          start = "\\begin{multicols}{" .. number .. "}" .. start 
+          finish = finish .. "\\end{multicols}"
+        end
         -- wrap div in box containers
         for i, b in pairs(boxes) do
           if div.classes:includes(b) then
