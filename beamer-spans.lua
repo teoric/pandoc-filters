@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2024-06-20 08:55:28 (+02:00)
+-- Last Changed: 2024-06-20 14:09:54 (+02:00)
 --------------------------------------------------------------------------------
 --
 
@@ -501,14 +501,15 @@ return {
           start = start .. "\\begin{poem}"
           local title = div.attributes["title"]
           local author = div.attributes["author"]
+          local prefix = div.attributes["prefix"] or ""
           if title ~= nil then
             if author ~= nil then
-              start = start .. "\\titleauthorpoem{" .. title .. "}{" .. author .."}"
+              start = start .. "\\titleauthorpoem[" .. prefix .."]{" .. title .. "}{" .. author .."}"
             else
               start = start .. "\\titlepoem{" .. title .. "}"
             end
           elseif author ~= nil then
-            start = start .. "\\titleauthorpoem{\\poemblanktitle}{" .. author .."}"
+            start = start .. "\\titleauthorpoem[" .. prefix .."]{\\poemblanktitle}{" .. author .."}"
           end
           finish = "\\\\-\\end{poem}" .. finish
           -- break -- allow only first box!
