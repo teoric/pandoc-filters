@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2024-06-20 14:09:54 (+02:00)
+-- Last Changed: 2024-07-01 10:41:47 (+02:00)
 --------------------------------------------------------------------------------
 --
 
@@ -357,6 +357,9 @@ return {
           end
         end
       elseif FORMAT == "beamer" then
+        -- TODO: make start and finish lists of RawBlock, RawInline and others
+        -- local start = List:new({})
+        -- local finish = List:new({})
         local start = ""
         local finish = ""
         -- wrap div in box containers
