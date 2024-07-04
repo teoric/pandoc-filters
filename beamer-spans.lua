@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2024-07-01 10:41:47 (+02:00)
+-- Last Changed: 2024-07-02 22:14:09 (+02:00)
 --------------------------------------------------------------------------------
 --
 
@@ -618,9 +618,9 @@ return {
           finish = finish .. "}{".. span.attributes["text"] .."}"
         end
         if span.classes:includes("endstanza") then
-          finish = "\\\\!"
+          finish = finish .. "\\\\!"
         end
-        if start then
+        if start or finish then
           local ret = List:new({pandoc.RawInline(FORMAT, start)})
           ret:extend(span.content)
           ret:extend({pandoc.RawInline(FORMAT, finish)})
