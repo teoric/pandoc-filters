@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2024-07-09 22:01:37 (+02:00)
+-- Last Changed: 2024-07-09 22:54:23 (+02:00)
 --------------------------------------------------------------------------------
 --
 
@@ -391,6 +391,7 @@ return {
         end
       elseif FORMAT == "beamer" then
         -- TODO: make start and finish lists of RawBlock, pandoc.RawInline and others
+        -- like vocnote above
         -- local start = List:new({})
         -- local finish = List:new({})
         local start = ""
