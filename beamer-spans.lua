@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2024-07-09 22:58:45 (+02:00)
+-- Last Changed: 2024-07-10 11:05:51 (+02:00)
 --------------------------------------------------------------------------------
 --
 
@@ -101,6 +101,11 @@ function add_style(el, style, value)
   el.attributes['style'] = el.attributes['style'] .. style .. ': ' .. value .. ';'
 end
 
+function eval_md(code)
+  local md_text = pandoc.read(code, "markdown")
+  return md_text.blocks[1].c
+end
+
 local remove_break = {
   LineBreak = function()
     return pandoc.Space()
@@ -190,7 +195,8 @@ return {
           if el.attributes["remark"] ~= nil then
             -- optional remark
             table.insert(ret, pandoc.RawInline(FORMAT, "["))
-            table.insert(ret, pandoc.Span({el.attributes["remark"]}))
+            
+            table.insert(ret, pandoc.Span(eval_md(el.attributes["remark"])))
             table.insert(ret, pandoc.RawInline(FORMAT, "]"))
           end
           table.insert(ret, pandoc.RawInline(FORMAT, "{"))
@@ -200,14 +206,14 @@ return {
           local meaning = nil
           -- insert lemma
           if el.attributes["lemma"] ~= nil then
-            table.insert(ret, el.attributes["lemma"])
+            table.insert(ret, eval_md(el.attributes["lemma"]))
           else
             table.insert(ret, pandoc.Span(el.c))
           end
 
           -- insert meaning
           if el.attributes["meaning"] ~= nil then
-            table.insert(ret, pandoc.Span({el.attributes["meaning"]}))
+            table.insert(ret, pandoc.Span(eval_md(el.attributes["meaning"])))
           else
             table.insert(ret, pandoc.RawInline(FORMAT, "{}"))
           end
