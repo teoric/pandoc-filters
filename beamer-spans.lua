@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2024-07-10 11:05:51 (+02:00)
+-- Last Changed: 2024-07-10 15:36:02 (+02:00)
 --------------------------------------------------------------------------------
 --
 
@@ -189,6 +189,34 @@ return {
  {
     Span = function(el)
       if FORMAT:match 'latex' or FORMAT:match 'beamer' then
+        if el.classes:includes("voccom") then
+          local ret = List:new()
+          table.insert(ret, pandoc.RawInline(FORMAT, "\\voclemCom"))
+          if el.attributes["remark"] ~= nil then
+            -- optional remark
+            table.insert(ret, pandoc.RawInline(FORMAT, "["))
+            
+            table.insert(ret, pandoc.Span(eval_md(el.attributes["remark"])))
+            table.insert(ret, pandoc.RawInline(FORMAT, "]"))
+          end
+          table.insert(ret, pandoc.RawInline(FORMAT, "{"))
+          table.insert(ret, pandoc.Span(el.c, el.attr))
+          table.insert(ret, pandoc.RawInline(FORMAT, "}"))
+          -- insert lemma
+          if el.attributes["lemma"] ~= nil then
+            table.insert(ret, eval_md(el.attributes["lemma"]))
+          else
+            table.insert(ret, pandoc.Span(el.c))
+          end
+
+          -- insert meaning
+          if el.attributes["comment"] ~= nil then
+            table.insert(ret, pandoc.Span(eval_md(el.attributes["comment"])))
+          else
+            table.insert(ret, pandoc.RawInline(FORMAT, "{}"))
+          end
+          return ret
+        end
         if el.classes:includes("vocnote") then
           local ret = List:new()
           table.insert(ret, pandoc.RawInline(FORMAT, "\\voclemnote"))
@@ -202,8 +230,6 @@ return {
           table.insert(ret, pandoc.RawInline(FORMAT, "{"))
           table.insert(ret, pandoc.Span(el.c, el.attr))
           table.insert(ret, pandoc.RawInline(FORMAT, "}"))
-          local lemma
-          local meaning = nil
           -- insert lemma
           if el.attributes["lemma"] ~= nil then
             table.insert(ret, eval_md(el.attributes["lemma"]))
@@ -456,6 +482,13 @@ return {
             -- break -- allow only first box!
           end
         end
+        if div.classes:includes("lineno") then
+          -- io.stderr:write(title .. "\n")
+          local start_no = div.attributes["start"] or "1"
+          start = start .. "\\begin{linenumbers}[" .. start_no .. "]"
+          finish = "\\end{linenumbers}" .. finish
+          -- break -- allow only first box!
+        end
         if div.classes:includes("verse") then
           -- io.stderr:write(title .. "\n")
           start = start .. "\\begin{verse}"
@@ -540,6 +573,13 @@ return {
         if div.classes:includes("figure_text") then
           start = "\\begin{figureText}".. start
           finish = finish .. "\\end{figureText}"
+        end
+        if div.classes:includes("lineno") then
+          -- io.stderr:write(title .. "\n")
+          local start_no = div.attributes["start"] or "1"
+          start = start .. "\\begin{linenumbers}[" .. start_no .. "]"
+          finish = "\\end{linenumbers}" .. finish
+          -- break -- allow only first box!
         end
         if div.classes:includes("verse") then
           -- io.stderr:write(title .. "\n")
