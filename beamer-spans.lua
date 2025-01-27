@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2024-07-10 15:36:02 (+02:00)
+-- Last Changed: 2025-01-27 09:09:07 (+01:00)
 --------------------------------------------------------------------------------
 --
 
@@ -489,6 +489,12 @@ return {
           finish = "\\end{linenumbers}" .. finish
           -- break -- allow only first box!
         end
+        if div.classes:includes("sideways") then
+          -- io.stderr:write(title .. "\n")
+          start = start .. "\\begin{sideways}"
+          finish = "\\end{sideways}" .. finish
+          -- break -- allow only first box!
+        end
         if div.classes:includes("verse") then
           -- io.stderr:write(title .. "\n")
           start = start .. "\\begin{verse}"
@@ -692,12 +698,14 @@ return {
           if span.attributes["type"] ~= nil then
             typ = span.attributes["type"]
           end
-          start = "\\pdfmarkupcomment[markup=".. typ .. ",color=yellow]{" .. start
+          -- start = "\\pdftooltip[markup=".. typ .. ",color=Yellow]{" .. "\\pdfmarkupcomment[markup=".. typ .. ",color=Yellow]{" .. start
+          -- finish = finish .. "}{".. span.attributes["text"] .."}" .. "}{".. span.attributes["text"] .."}"
+          start = "\\pdfmarkupcomment[markup=".. typ .. ",color=Yellow]{" .. start
           finish = finish .. "}{".. span.attributes["text"] .."}"
         end
         if span.classes:includes("margincomment") then
-          start = "\\pdfmargincomment[markup=".. typ .. ",color=yellow]{" .. start
-          finish = finish .. "}{".. span.attributes["text"] .."}"
+          start = "\\pdfmargincomment[color=Yellow]{" .. span.attributes["text"] .. "}" .. start
+          print("START: ".. start)
         end
         if span.classes:includes("endstanza") then
           finish = finish .. "\\\\!"
