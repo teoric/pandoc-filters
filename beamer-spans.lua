@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2025-01-27 09:09:07 (+01:00)
+-- Last Changed: 2025-02-06, 11:06:53 (CET)
 --------------------------------------------------------------------------------
 --
 
@@ -448,6 +448,12 @@ return {
           start = "\\only<" .. scope .. ">{" .. start
           finish = finish .. "}"
         end
+        if div.classes:includes("sideways") then
+          -- io.stderr:write(title .. "\n")
+          start = start .. "\\begin{sideways}"
+          finish = "\\end{sideways}" .. finish
+          -- break -- allow only first box!
+        end
         for i, b in pairs(boxes) do
           if div.classes:includes(b) then
             local title = div.attributes["title"] or ""
@@ -489,12 +495,6 @@ return {
           finish = "\\end{linenumbers}" .. finish
           -- break -- allow only first box!
         end
-        if div.classes:includes("sideways") then
-          -- io.stderr:write(title .. "\n")
-          start = start .. "\\begin{sideways}"
-          finish = "\\end{sideways}" .. finish
-          -- break -- allow only first box!
-        end
         if div.classes:includes("verse") then
           -- io.stderr:write(title .. "\n")
           start = start .. "\\begin{verse}"
@@ -516,6 +516,12 @@ return {
       elseif FORMAT == "latex" then
         local start = ""
         local finish = ""
+        if div.classes:includes("sideways") then
+          -- io.stderr:write(title .. "\n")
+          start = start .. "\\begin{sideways}"
+          finish = "\\end{sideways}" .. finish
+          -- break -- allow only first box!
+        end
         if div.classes:includes("multicols") then
           local number = div.attributes["columns"] or "2"
           start = "\\begin{multicols}{" .. number .. "}" .. start 
@@ -571,6 +577,10 @@ return {
         if div.classes:includes("xml_details") then
           start = "\\begin{addmargin}{1em}\\sffamily{}\\relsize{-1}\\color{darkgray}".. start
           finish = finish .. "\\end{addmargin}"
+        end
+        if div.classes:includes("transcription") then
+          start = "\\begin{aeettranscription}".. start
+          finish = finish .. "\\end{aeettranscription}"
         end
         if div.classes:includes("references") then
           start = "\\begin{aeetreferences}".. start
