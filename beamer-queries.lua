@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2025-05-28, 12:37:54 (CEST)
+-- Last Changed: 2025-05-29 15:44:27 (+02:00)
 --------------------------------------------------------------------------------
 --[[
 
@@ -75,7 +75,12 @@ local function get_server(el, typ)
   local server = el.attributes["server"]
   if server == nil then
     local _
-    server, _ = next(server_defaults[typ])
+    for key, value in pairs(server_defaults[typ]) do
+      if value ~= nil then
+        return key
+      end
+    end
+    -- server, _ = next(server_defaults[typ])
     -- io.stderr:write(string.format("determined %s server: %s\n", typ, server or "NONE"))
   end
   return server
