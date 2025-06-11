@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2025-02-06, 11:06:53 (CET)
+-- Last Changed: 2025-06-11 15:37:24 (+02:00)
 --------------------------------------------------------------------------------
 --
 
@@ -532,12 +532,21 @@ return {
           if div.classes:includes(b) then
             local title=div.attributes["title"] or ""
             -- io.stderr:write(title .. "\n")
-            start = "\\begin{description}" ..
-            "\\item[".. title .. "] ~"
+            start = "\\begin{tcolorbox}["
+            if div.classes:includes("breakable") then
+              start = start .. "breakable"
+            end
+            if title ~= nil and title ~= "" then
+              if start:match("[^%]]$") then
+                start = start .. ","
+              end
+              start = start .. "title={" .. title .. "}"
+            end
+            start = start .. "]"
             if div.attributes["rechts"] then
               start = start .. "\\rechtsanm{" .. div.attributes["rechts"] .. "}"
             end
-            finish = "\\end{description}"
+            finish = "\\end{tcolorbox}"
           end
         end
         local is_remark = check_remark(div)
