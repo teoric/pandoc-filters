@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2025-06-11 15:37:24 (+02:00)
+-- Last Changed: 2025-06-19 12:19:07 (+02:00)
 --------------------------------------------------------------------------------
 --
 
@@ -45,7 +45,8 @@ local comments = {
   "Bewertung",
   "Kommentar",
   "Erläuterung",
-  "Beispiel"
+  "Beispiel",
+  "Lösung"
 }
 
 local remarks = {
@@ -564,9 +565,10 @@ return {
           elseif is_remark then
             color = remark_color
           end
-          start = "\\begin{addmargin}[1cm]{1cm}" .. color .."\\vskip1ex\\begingroup\\textbf{" .. table.concat(div.classes, ";;") .. "}" .. start
-          -- start = "\\medskip\\begin{addmargin}[1cm]{1cm}" .. color .."\\vskip1ex\\begingroup\\textbf{" .. table.concat(div.classes, ";;") .. "}"
-          finish = finish .. "\\endgroup\\vskip1ex\\end{addmargin}"
+          start = "\\begin{tcolorbox}[title=" .. table.concat(div.classes, ";;") .. "]" .. start
+          finish = finish .. "\\end{tcolorbox}"
+          -- start = "\\begin{addmargin}[1cm]{1cm}" .. color .."\\vskip1ex\\begingroup\\textbf{" .. table.concat(div.classes, ";;") .. "}" .. start
+          -- finish = finish .. "\\endgroup\\vskip1ex\\end{addmargin}"
         elseif (color ~= nil) then
           start = '{' .. color .. start
           finish = finish .. '}'
@@ -627,6 +629,10 @@ return {
         local skip = div.attributes["skip"]
         if skip ~= nil and skips:includes(skip) then
           start = '\\' .. skip .. "skip{}" .. start
+        end
+        local break_after = div.attributes["break-after"]
+        if break_after ~= nil and break_after ~= "" then
+          finish = finish .. "\\newpage"
         end
         if start ~= nil and start ~= "" then
           local ret = List:new({pandoc.RawBlock(FORMAT, start)})
