@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2025-06-19 12:19:07 (+02:00)
+-- Last Changed: 2025-06-19, 13:04:32 (CEST)
 --------------------------------------------------------------------------------
 --
 
@@ -116,6 +116,11 @@ local remove_break = {
 return {
   {
     Meta = function(meta)
+      -- not to helpful, as pandoc-crossref does not search for files in
+      -- common directories:
+      if meta.lang ~= nil and string.match(utils.stringify(meta.lang), "^[Dd][eE]") then
+        meta["crossrefYaml"] = "pandoc-crossref-de.yaml"
+      end
       if meta.supertitle ~= nil then
         meta["supertitle-lined"] = meta.supertitle:walk(remove_break)
       end
