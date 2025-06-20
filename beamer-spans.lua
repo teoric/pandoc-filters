@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2025-06-19, 13:04:32 (CEST)
+-- Last Changed: 2025-06-20 08:29:39 (+02:00)
 --------------------------------------------------------------------------------
 --
 
@@ -24,6 +24,7 @@ if PANDOC_VERSION >= {2,12} then
   utilPath = path.directory(PANDOC_SCRIPT_FILE) .. path.separator
 end
 local loc_utils = dofile ((utilPath or '') .. 'utils.lua')
+
 
 -- box types
 local boxes = {
@@ -113,13 +114,45 @@ local remove_break = {
   end
 }
 
+local search_dirs = {
+  PANDOC_STATE.user_data_dir .. "/templates",
+  PANDOC_STATE.user_data_dir,
+  -- maybe not the best location, but why not:
+  PANDOC_STATE.user_data_dir .. "/filters"
+
+}
+
+function get_and_search(filename)
+  -- check if file exists locally or in user data directory
+  local path = nil
+  -- local file first
+  if loc_utils.file_exists(filename) then
+    path = filename
+  end
+  if path == nil then
+    local candidate_path = PANDOC_STATE.user_data_dir .. "/" .. filename
+    for k, dir in ipairs(search_dirs) do
+      candidate_path = dir .. "/" .. filename
+      if loc_utils.file_exists(candidate_path) then
+        path = candidate_path
+        break
+      end
+    end
+  end
+  if path == nil then
+    io.stderr:write("File " .. filename .. " does not exist.\n")
+  end
+  return path
+end
+
 return {
   {
     Meta = function(meta)
-      -- not to helpful, as pandoc-crossref does not search for files in
-      -- common directories:
+      -- apply pandoc-crossref localization
       if meta.lang ~= nil and string.match(utils.stringify(meta.lang), "^[Dd][eE]") then
-        meta["crossrefYaml"] = "pandoc-crossref-de.yaml"
+        local crossref = "pandoc-crossref-de.yaml"
+        local got_file = get_and_search(crossref)
+        meta["crossrefYaml"] = got_file or crossref
       end
       if meta.supertitle ~= nil then
         meta["supertitle-lined"] = meta.supertitle:walk(remove_break)
