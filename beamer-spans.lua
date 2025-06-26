@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2025-06-26 14:11:07 (+02:00)
+-- Last Changed: 2025-06-26 17:33:31 (+02:00)
 --------------------------------------------------------------------------------
 --
 
@@ -756,6 +756,10 @@ return {
           start = "\\fbox{\\small{}\\bfseries{}" .. start
           finish = finish .. "}"
         end
+        if span.classes:includes("number") then
+          start = "\\mbox{\\small{}\\bfseries{}" .. start
+          finish = finish .. ".}"
+        end
         if span.classes:includes("comment") then
           local typ = "Highlight"
           if span.attributes["type"] ~= nil then
@@ -771,6 +775,7 @@ return {
           print("START: ".. start)
         end
         -- weird hack
+    
         if span.classes:includes("endstanza") then
           finish = finish .. "\\\\!\\advance\\poemlineno by1"
         end

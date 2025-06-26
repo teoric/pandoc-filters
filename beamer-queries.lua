@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2025-05-29 15:44:27 (+02:00)
+-- Last Changed: 2025-06-26 17:43:48 (+02:00)
 --------------------------------------------------------------------------------
 --[[
 
