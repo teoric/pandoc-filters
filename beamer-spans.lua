@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2025-06-20 08:29:39 (+02:00)
+-- Last Changed: 2025-06-26 14:11:07 (+02:00)
 --------------------------------------------------------------------------------
 --
 
@@ -770,8 +770,9 @@ return {
           start = "\\pdfmargincomment[color=Yellow]{" .. span.attributes["text"] .. "}" .. start
           print("START: ".. start)
         end
+        -- weird hack
         if span.classes:includes("endstanza") then
-          finish = finish .. "\\\\!"
+          finish = finish .. "\\\\!\\advance\\poemlineno by1"
         end
         if start or finish then
           local ret = List:new({pandoc.RawInline(FORMAT, start)})
