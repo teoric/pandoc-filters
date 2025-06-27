@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2025-06-26 17:51:33 (+02:00)
+-- Last Changed: 2025-06-27 10:26:25 (+02:00)
 --------------------------------------------------------------------------------
 --
 
@@ -105,7 +105,7 @@ end
 
 function eval_md(code)
   local md_text = pandoc.read(code, "markdown")
-  return md_text.blocks[1].c
+  return pandoc.Span(md_text.blocks[1].c)
 end
 
 local remove_break = {
