@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2025-06-27 10:26:25 (+02:00)
+-- Last Changed: 2025-07-03, 08:24:45 (CEST)
 --------------------------------------------------------------------------------
 --
 
@@ -33,6 +33,18 @@ local boxes = {
   "claimbox",
   "yellowbox", "bluebox",
   "exbox", "exxbox"
+}
+local fontsizes = {
+  "tiny",
+  "scriptsize",
+  "footnotesize",
+  "small",
+  "normalsize",
+  "large",
+  "Large",
+  "LARGE",
+  "huge",
+  "Huge"
 }
 
 local boxes_optional = {
@@ -421,6 +433,25 @@ return {
         else
           -- for other format return unchanged
           -- return el
+        end
+      end
+      for i, b in pairs(fontsizes) do
+        if el.classes:includes(b) then
+          if FORMAT:match 'latex' or FORMAT:match 'beamer' then
+            table.insert(
+              el.content, 1,
+              pandoc.RawInline('latex', '\\begingroup\\' .. b .. '{}')
+            )
+            table.insert(
+              el.content,
+              pandoc.RawInline('latex', '\\endgroup')
+            )
+            -- returns only span content
+            -- return el.content
+          else
+            -- for other format return unchanged
+            -- return el
+          end
         end
       end
       return el
