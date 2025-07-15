@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2025-07-03, 08:24:45 (CEST)
+-- Last Changed: 2025-07-14, 20:37:13 (CEST)
 --------------------------------------------------------------------------------
 --
 
@@ -699,7 +699,9 @@ return {
         if skip ~= nil and skips:includes(skip) then
           start = '\\' .. skip .. "skip{}" .. start
         end
-        local break_after = div.attributes["break-after"] or div.classes:includes("break_after")        if break_after ~= nil and break_after ~= "" then
+        local break_after = div.attributes["break-after"] or div.classes:includes("break_after")
+        if break_after ~= nil and break_after ~= false and break_after ~= "" then
+          print(break_after)
           finish = finish .. "\\newpage"
         end
         if start ~= nil and start ~= "" then
