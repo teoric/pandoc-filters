@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2025-07-14, 20:37:13 (CEST)
+-- Last Changed: 2025-08-27, 08:44:51 (CEST)
 --------------------------------------------------------------------------------
 --
 
@@ -733,6 +733,11 @@ return {
         if span.classes:includes("rkomment") then
           start = "\\rechts{\\emph{" .. start
           finish = finish .. "}}"
+        end
+        if span.classes:includes("sans") or span.classes:includes("sf") then
+          -- start = "\\oldemph{"
+          start = "\\textsf{" .. start
+          finish = finish .. "}"
         end
         if span.classes:includes("emph") then
           -- start = "\\oldemph{"
