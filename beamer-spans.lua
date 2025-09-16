@@ -1,4 +1,4 @@
---
+
 --------------------------------------------------------------------------------
 --         File: beamer-spans.lua
 --
@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2025-08-27, 08:44:51 (CEST)
+-- Last Changed: 2025-09-16, 09:48:54 (CEST)
 --------------------------------------------------------------------------------
 --
 
@@ -371,29 +371,20 @@ return {
           -- return full span element
           -- return el
         elseif FORMAT:match 'latex' or FORMAT:match 'beamer' then
-          local start = ""
-          local finish = ""
+          local start = List:new()
+          local finish = List:new()
           if color ~= nil then
             -- remove color attributes
             el.attributes['color'] = nil
-            start = start .. '\\textcolor{'..color..'}{'
-            finish = "}" .. finish
+            table.insert(el.content, 1, pandoc.RawInline(FORMAT, '\\textcolor{'..color..'}{'))
+            table.insert(el.content, pandoc.RawInline(FORMAT, "}"))
           end
           if bgcolor ~= nil then
             -- remove color attributes
             el.attributes['bgcolor'] = nil
-            start = start .. '\\colorbox{'..bgcolor..'}{'
-            finish = "}" .. finish
+            table.insert(el.content, 1, pandoc.RawInline(FORMAT, '\\colorbox{'..bgcolor..'}{'))
+            table.insert(el.content, pandoc.RawInline(FORMAT, "}"))
           end
-          -- encapsulate in latex code
-          table.insert(
-            el.content, 1,
-            pandoc.RawInline('latex', start)
-          )
-          table.insert(
-            el.content,
-            pandoc.RawInline('latex', finish)
-          )
           -- returns only span content
           -- return el.content
         else
@@ -496,10 +487,10 @@ return {
       elseif FORMAT == "beamer" then
         -- TODO: make start and finish lists of RawBlock, pandoc.RawInline and others
         -- like vocnote above
-        -- local start = List:new({})
+        -- local start = List:new({
         -- local finish = List:new({})
-        local start = ""
-        local finish = ""
+        local start = List:new()
+        local finish = List:new()
         -- wrap div in box containers
         if div.classes:includes("only") then
           local scope = div.attributes["scope"] or "+-"
@@ -515,8 +506,8 @@ return {
         end
         if div.classes:includes("on_next") then
           local scope = div.attributes["scope"] or "+"
-          start = "\\only<" .. scope .. ">{" .. start
-          finish = finish .. "}"
+          table.insert(start, pandoc.RawInline(FORMAT, "\\only<" .. scope .. ">{"))
+          table.insert(finish, 1, pandoc.RawInline(FORMAT, "}"))
         end
         if div.classes:includes("sideways") then
           -- io.stderr:write(title .. "\n")
@@ -534,13 +525,14 @@ return {
               scope = ""
             end
             -- io.stderr:write(title .. "\n")
-            start = start .. "\\begin{" .. b .. "}" .. scope ..
-            "{" .. title
+            table.insert(start, pandoc.RawInline(FORMAT, "\\begin{" .. b .. "}" .. scope ..  "{" .. title))
             if div.attributes["rechts"] then
-              start = start .. "\\rechtsanm{" .. div.attributes["rechts"] .. "}"
+              table.insert(start, pandoc.RawInline(FORMAT, "\\rechtsanm{"))
+              table.insert(start, eval_md(div.attributes["rechts"]))
+              table.insert(start, pandoc.RawInline(FORMAT, "}"))
             end
-            start = start .. "}"
-            finish = "\\end{" .. b .. "}" .. finish
+            table.insert(start, pandoc.RawInline(FORMAT, "}"))
+            table.insert(finish, 1, pandoc.RawInline(FORMAT, "\\end{" .. b .. "}"))
             -- break -- allow only first box!
           end
         end
@@ -548,20 +540,21 @@ return {
           if div.classes:includes(b) then
             local title = div.attributes["title"] or ""
             -- io.stderr:write(title .. "\n")
-            start = start .. "\\begin{" .. b .. "}" ..
-            "[" .. title
+            table.insert(start, pandoc.RawInline(FORMAT, start .. "\\begin{" .. b .. "}" ..  "[" .. title))
             if div.attributes["rechts"] then
-              start = start .. "\\rechtsanm{" .. div.attributes["rechts"] .. "}"
+              table.insert(start, pandoc.RawInline(FORMAT, "\\rechtsanm{"))
+              table.insert(start, eval_md(div.attributes["rechts"]))
+              table.insert(start, pandoc.RawInline(FORMAT, "}"))
             end
-            start = start .. "]"
-            finish = "\\end{" .. b .. "}" .. finish
+            table.insert(start, pandoc.RawInline(FORMAT, "}"))
+            table.insert(finish, 1, pandoc.RawInline(FORMAT, "\\end{" .. b .. "}"))
             -- break -- allow only first box!
           end
         end
         if div.classes:includes("lineno") then
           -- io.stderr:write(title .. "\n")
           local start_no = div.attributes["start"] or "1"
-          start = start .. "\\begin{linenumbers}[" .. start_no .. "]"
+          table.insert(start, pandoc.RawInline(FORMAT, "\\begin{linenumbers}[" .. start_no .. "]"))
           finish = "\\end{linenumbers}" .. finish
           -- break -- allow only first box!
         end
@@ -574,18 +567,18 @@ return {
         -- same code below for LATEX
         local skip = div.attributes["skip"]
         if skip ~= nil and skips:includes(skip) then
-          start = '\\' .. skip .. "skip{}" .. start
+          table.insert(start, pandoc.RawInline(FORMAT, '\\' .. skip .. "skip{}"))
         end
         if start ~= "" then
-          local ret = List:new({pandoc.RawBlock(FORMAT, start)})
+          local ret = start
           ret:extend(div.content)
-          ret:extend({pandoc.RawBlock(FORMAT, finish)})
+          ret:extend(finish)
           div.content = ret
         end
         return div
       elseif FORMAT == "latex" then
-        local start = ""
-        local finish = ""
+        local start = List:new()
+        local finish = List:new()
         if div.classes:includes("sideways") then
           -- io.stderr:write(title .. "\n")
           start = start .. "\\begin{sideways}"
@@ -594,8 +587,8 @@ return {
         end
         if div.classes:includes("multicols") then
           local number = div.attributes["columns"] or "2"
-          start = "\\begin{multicols}{" .. number .. "}" .. start 
-          finish = finish .. "\\end{multicols}"
+          table.insert(start, pandoc.RawInline(FORMAT, "\\begin{multicols}{" .. number .. "}")) 
+          table.insert(pandoc.RawInline(FORMAT, finish), 1, "\\end{multicols}")
         end
         -- wrap div in box containers
         for i, b in pairs(boxes) do
@@ -634,46 +627,46 @@ return {
           elseif is_remark then
             color = remark_color
           end
-          start = "\\begin{tcolorbox}[title=" .. table.concat(div.classes, ";;") .. "]" .. start
-          finish = finish .. "\\end{tcolorbox}"
-          -- start = "\\begin{addmargin}[1cm]{1cm}" .. color .."\\vskip1ex\\begingroup\\textbf{" .. table.concat(div.classes, ";;") .. "}" .. start
-          -- finish = finish .. "\\endgroup\\vskip1ex\\end{addmargin}"
+          table.insert(start, pandoc.RawInline(FORMAT, "\\begin{tcolorbox}[title=" .. table.concat(div.classes, ";;") .. "]"))
+          table.insert(pandoc.RawInline(FORMAT, finish), 1, "\\end{tcolorbox}")
+          -- table.insert(start, pandoc.RawInline(FORMAT, "\\begin{addmargin}[1cm]{1cm}" .. color .."\\vskip1ex\\begingroup\\textbf{" .. table.concat(div.classes, ";;") .. "}"))
+          -- table.insert(pandoc.RawInline(FORMAT, finish), 1, "\\endgroup\\vskip1ex\\end{addmargin}")
         elseif (color ~= nil) then
-          start = '{' .. color .. start
-          finish = finish .. '}'
+          table.insert(start, pandoc.RawInline(FORMAT, '{' .. color))
+          table.insert(pandoc.RawInline(FORMAT, finish), 1, '}')
         end
         if div.attributes["linestretch"] then
-          start = '\\bgroup\\setstretch{' .. div.attributes["linestretch"] ..'}' .. start
+          table.insert(start, pandoc.RawInline(FORMAT, '\\bgroup\\setstretch{' .. div.attributes["linestretch"] ..'}'))
           finish = '\\egroup{}' .. finish
         end
         if div.attributes["bgcolor"] then
-          start = '\\begin{tcolorbox}[colback='.. div.attributes["bgcolor"] ..'!20, colframe=' .. div.attributes["bgcolor"] .. '!80!black]' .. start
-          finish = finish .. '\\end{tcolorbox}'
+          table.insert(start, pandoc.RawInline(FORMAT, '\\begin{tcolorbox}[colback='.. div.attributes["bgcolor"] ..'!20, colframe=' .. div.attributes["bgcolor"] .. '!80!black]'))
+          table.insert(pandoc.RawInline(FORMAT, finish), 1, '\\end{tcolorbox}')
         end
         if div.classes:includes("xml") then
-          start = "\\paragraph{XML}\\begingroup\\sffamily{}".. start
-          finish = finish .. "\\endgroup{}"
+          table.insert(start, pandoc.RawInline(FORMAT, "\\paragraph{XML}\\begingroup\\sffamily{}"))
+          table.insert(pandoc.RawInline(FORMAT, finish), 1, "\\endgroup{}")
         end
         if div.classes:includes("xml_details") then
-          start = "\\begin{addmargin}{1em}\\sffamily{}\\relsize{-1}\\color{darkgray}".. start
-          finish = finish .. "\\end{addmargin}"
+          table.insert(start, pandoc.RawInline(FORMAT, "\\begin{addmargin}{1em}\\sffamily{}\\relsize{-1}\\color{darkgray}"))
+          table.insert(pandoc.RawInline(FORMAT, finish), 1, "\\end{addmargin}")
         end
         if div.classes:includes("transcription") then
-          start = "\\begin{aeettranscription}".. start
-          finish = finish .. "\\end{aeettranscription}"
+          table.insert(start, pandoc.RawInline(FORMAT, "\\begin{aeettranscription}"))
+          table.insert(pandoc.RawInline(FORMAT, finish), 1, "\\end{aeettranscription}")
         end
         if div.classes:includes("references") then
-          start = "\\begin{aeetreferences}".. start
-          finish = finish .. "\\end{aeetreferences}"
+          table.insert(start, pandoc.RawInline(FORMAT, "\\begin{aeetreferences}"))
+          table.insert(pandoc.RawInline(FORMAT, finish), 1, "\\end{aeetreferences}")
         end
         if div.classes:includes("figure_text") then
-          start = "\\begin{figureText}".. start
-          finish = finish .. "\\end{figureText}"
+          table.insert(start, pandoc.RawInline(FORMAT, "\\begin{figureText}"))
+          table.insert(pandoc.RawInline(FORMAT, finish), 1, "\\end{figureText}")
         end
         if div.classes:includes("lineno") then
           -- io.stderr:write(title .. "\n")
           local start_no = div.attributes["start"] or "1"
-          start = start .. "\\begin{linenumbers}[" .. start_no .. "]"
+          table.insert(start, pandoc.RawInline(FORMAT, "\\begin{linenumbers}[" .. start_no .. "]"))
           finish = "\\end{linenumbers}" .. finish
           -- break -- allow only first box!
         end
@@ -697,12 +690,12 @@ return {
         end
         local skip = div.attributes["skip"]
         if skip ~= nil and skips:includes(skip) then
-          start = '\\' .. skip .. "skip{}" .. start
+          table.insert(start, pandoc.RawInline(FORMAT, '\\' .. skip .. "skip{}"))
         end
         local break_after = div.attributes["break-after"] or div.classes:includes("break_after")
         if break_after ~= nil and break_after ~= false and break_after ~= "" then
           print(break_after)
-          finish = finish .. "\\newpage"
+          table.insert(pandoc.RawInline(FORMAT, finish), 1, "\\newpage")
         end
         if start ~= nil and start ~= "" then
           local ret = List:new({pandoc.RawBlock(FORMAT, start)})
@@ -715,111 +708,111 @@ return {
     end,
     Span = function(span)
       if FORMAT == "beamer" or FORMAT == "latex" then
-        local start = ""
-        local finish = ""
+        local start = List:new()
+        local finish = List:new()
         if span.classes:includes("key") then
-          start = "\\fbox{\\small{}" .. start
-          finish = finish .. "}"
+          table.insert(start, pandoc.RawInline(FORMAT, "\\fbox{\\small{}"))
+          table.insert(pandoc.RawInline(FORMAT, finish), 1, "}")
         elseif span.classes:includes("rechts") then
           -- if FORMAT == "beamer" then
-            start = "\\rechts{" .. start
+            table.insert(start, pandoc.RawInline(FORMAT, "\\rechts{"))
             finish = "}"
           -- nonsense: only for paragraphs!
           -- else
-          --   start = "\\begin{flushright}" .. start
-          --   finish = finish .. "\\end{flushright}"
+          --   table.insert(start, pandoc.RawInline(FORMAT, "\\begin{flushright}"))
+          --   table.insert(pandoc.RawInline(FORMAT, finish), 1, "\\end{flushright}")
           -- end
         end
         if span.classes:includes("rkomment") then
-          start = "\\rechts{\\emph{" .. start
-          finish = finish .. "}}"
+          table.insert(start, pandoc.RawInline(FORMAT, "\\rechts{\\emph{"))
+          table.insert(pandoc.RawInline(FORMAT, finish), 1, "}}")
         end
         if span.classes:includes("sans") or span.classes:includes("sf") then
           -- start = "\\oldemph{"
-          start = "\\textsf{" .. start
-          finish = finish .. "}"
+          table.insert(start, pandoc.RawInline(FORMAT, "\\textsf{"))
+          table.insert(pandoc.RawInline(FORMAT, finish), 1, "}")
         end
         if span.classes:includes("emph") then
           -- start = "\\oldemph{"
-          start = "\\emph{" .. start
-          finish = finish .. "}"
+          table.insert(start, pandoc.RawInline(FORMAT, "\\emph{"))
+          table.insert(pandoc.RawInline(FORMAT, finish), 1, "}")
         end
         if span.classes:includes("icon") then
-          start = "\\icontext{" .. start
-          finish = finish .. "}"
+          table.insert(start, pandoc.RawInline(FORMAT, "\\icontext{"))
+          table.insert(pandoc.RawInline(FORMAT, finish), 1, "}")
         end
         if span.classes:includes("lig") then
-          start = "\\ligtext{\\unemph{" .. start
-          finish = finish .. "}}"
+          table.insert(start, pandoc.RawInline(FORMAT, "\\ligtext{\\unemph{"))
+          table.insert(pandoc.RawInline(FORMAT, finish), 1, "}}")
         end
         if span.classes:includes("uni") then
-          start = "\\unitext{\\unemph{" .. start
-          finish = finish .. "}}"
+          table.insert(start, pandoc.RawInline(FORMAT, "\\unitext{\\unemph{"))
+          table.insert(pandoc.RawInline(FORMAT, finish), 1, "}}")
         end
         if span.classes:includes("emoji") then
-          start = "\\emojiText{" .. start
-          finish = finish .. "}"
+          table.insert(start, pandoc.RawInline(FORMAT, "\\emojiText{"))
+          table.insert(pandoc.RawInline(FORMAT, finish), 1, "}")
         end
         if span.classes:includes("underline")
         or span.classes:includes("ul") then
-          start = "\\underline{" .. start
-          finish = finish .. "}"
+          table.insert(start, pandoc.RawInline(FORMAT, "\\underline{"))
+          table.insert(pandoc.RawInline(FORMAT, finish), 1, "}")
         end
         if span.classes:includes("unemph") then
-          start = "\\unemph{" .. start
-          finish = finish .. "}"
+          table.insert(start, pandoc.RawInline(FORMAT, "\\unemph{"))
+          table.insert(pandoc.RawInline(FORMAT, finish), 1, "}")
         end
         if span.classes:includes("fnhd_text") then
-          start = "{\\normalfont\\unifont{}" .. start
-          finish = finish .. "}"
+          table.insert(start, pandoc.RawInline(FORMAT, "{\\normalfont\\unifont{}"))
+          table.insert(pandoc.RawInline(FORMAT, finish), 1, "}")
         end
         if span.classes:includes("so") or span.classes:includes("ls") or span.classes:includes("gesperrt") then
-          start = "\\textso{" .. start
-          finish = finish .. "}"
+          table.insert(start, pandoc.RawInline(FORMAT, "\\textso{"))
+          table.insert(pandoc.RawInline(FORMAT, finish), 1, "}")
         end
         if span.classes:includes("name") then
-          start = "\\textsc{" .. start
-          finish = finish .. "}"
+          table.insert(start, pandoc.RawInline(FORMAT, "\\textsc{"))
+          table.insert(pandoc.RawInline(FORMAT, finish), 1, "}")
         end
         if span.classes:includes("sl") or span.classes:includes("slanted") or span.classes:includes("schraeg") then
-          start = "\\textsl{" .. start
-          finish = finish .. "}"
+          table.insert(start, pandoc.RawInline(FORMAT, "\\textsl{"))
+          table.insert(pandoc.RawInline(FORMAT, finish), 1, "}")
         end
         if span.classes:includes("transl") then
-          start = "\\transl{" .. start
-          finish = finish .. "}"
+          table.insert(start, pandoc.RawInline(FORMAT, "\\transl{"))
+          table.insert(pandoc.RawInline(FORMAT, finish), 1, "}")
         end
         if span.classes:includes("kbd") then
-          start = "\\fbox{\\small{}\\bfseries{}" .. start
-          finish = finish .. "}"
+          table.insert(start, pandoc.RawInline(FORMAT, "\\fbox{\\small{}\\bfseries{}"))
+          table.insert(pandoc.RawInline(FORMAT, finish), 1, "}")
         end
         if span.classes:includes("number") then
-          start = "\\mbox{\\small{}\\bfseries{}" .. start
-          finish = finish .. ".}"
+          table.insert(start, pandoc.RawInline(FORMAT, "\\mbox{\\small{}\\bfseries{}"))
+          table.insert(pandoc.RawInline(FORMAT, finish), 1, ".}")
         end
         if span.classes:includes("comment") then
           local typ = "Highlight"
           if span.attributes["type"] ~= nil then
             typ = span.attributes["type"]
           end
-          -- start = "\\pdftooltip[markup=".. typ .. ",color=Yellow]{" .. "\\pdfmarkupcomment[markup=".. typ .. ",color=Yellow]{" .. start
-          -- finish = finish .. "}{".. span.attributes["text"] .."}" .. "}{".. span.attributes["text"] .."}"
-          start = "\\pdfmarkupcomment[markup=".. typ .. ",color=Yellow]{" .. start
-          finish = finish .. "}{".. span.attributes["text"] .."}"
+          -- table.insert(start, pandoc.RawInline(FORMAT, "\\pdftooltip[markup=".. typ .. ",color=Yellow]{" .. "\\pdfmarkupcomment[markup=".. typ .. ",color=Yellow]{"))
+          -- table.insert(pandoc.RawInline(FORMAT, finish), 1, "}{".. span.attributes["text"] .."}" .. "}{".. span.attributes["text"] .."}")
+          table.insert(start, pandoc.RawInline(FORMAT, "\\pdfmarkupcomment[markup=".. typ .. ",color=Yellow]{"))
+          table.insert(pandoc.RawInline(FORMAT, finish), 1, "}{".. span.attributes["text"] .."}")
         end
         if span.classes:includes("margincomment") then
-          start = "\\pdfmargincomment[color=Yellow]{" .. span.attributes["text"] .. "}" .. start
+          table.insert(start, pandoc.RawInline(FORMAT, "\\pdfmargincomment[color=Yellow]{" .. span.attributes["text"] .. "}"))
           print("START: ".. start)
         end
         -- weird hack
     
         if span.classes:includes("endstanza") then
-          finish = finish .. "\\\\!\\advance\\poemlineno by1"
+          table.insert(pandoc.RawInline(FORMAT, finish), 1, "\\\\!\\advance\\poemlineno by1")
         end
         if start or finish then
-          local ret = List:new({pandoc.RawInline(FORMAT, start)})
+          local ret = List:new(start)
           ret:extend(span.content)
-          ret:extend({pandoc.RawInline(FORMAT, finish)})
+          ret:extend(finish)
           return {
             pandoc.Span(ret, span.attr)
           }
