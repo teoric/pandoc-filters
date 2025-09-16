@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2025-09-16 10:26:50 (+02:00)
+-- Last Changed: 2025-09-16 15:36:48 (+02:00)
 --------------------------------------------------------------------------------
 --
 
@@ -494,20 +494,20 @@ return {
         -- wrap div in box containers
         if div.classes:includes("only") then
           local scope = div.attributes["scope"] or "+-"
-          start = "\\only<" .. scope ..
-          ">{" .. start 
-          finish =  "}" .. finish
+          table.insert(start, 1, pandoc.RawInline(FORMAT, "\\only<" .. scope ..
+          ">{"))
+          table.insert(finish, pandoc.RawInline(FORMAT, "}"))
         end
         if div.classes:includes("uncover") then
           local scope = div.attributes["scope"] or "+-"
-          start = "\\uncover<" .. scope ..
-            ">{" .. start
-          finish =  "}" .. finish
+          table.insert(start, 1, pandoc.RawInline(FORMAT, "\\uncover<" .. scope ..
+          ">{"))
+          table.insert(finish, pandoc.RawInline(FORMAT, "}"))
         end
         if div.classes:includes("on_next") then
           local scope = div.attributes["scope"] or "+"
-          table.insert(start, pandoc.RawInline(FORMAT, "\\only<" .. scope .. ">{"))
-          table.insert(finish, 1, pandoc.RawInline(FORMAT, "}"))
+          table.insert(start, 1, pandoc.RawInline(FORMAT, "\\only<" .. scope .. ">{"))
+          table.insert(finish, pandoc.RawInline(FORMAT, "}"))
         end
         if div.classes:includes("sideways") then
           -- io.stderr:write(title .. "\n")
@@ -725,7 +725,7 @@ return {
         elseif span.classes:includes("rechts") then
           -- if FORMAT == "beamer" then
             table.insert(start, pandoc.RawInline(FORMAT, "\\rechts{"))
-            finish = "}"
+            table.insert(finish, 1, pandoc.RawInline(FORMAT, "}"))
           -- nonsense: only for paragraphs!
           -- else
           --   table.insert(start, pandoc.RawInline(FORMAT, "\\begin{flushright}"))
