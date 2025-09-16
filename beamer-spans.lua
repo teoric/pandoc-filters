@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2025-09-16 09:53:53 (+02:00)
+-- Last Changed: 2025-09-16 10:26:50 (+02:00)
 --------------------------------------------------------------------------------
 --
 
@@ -525,11 +525,14 @@ return {
               scope = ""
             end
             -- io.stderr:write(title .. "\n")
-            table.insert(start, pandoc.RawInline(FORMAT, "\\begin{" .. b .. "}" .. scope ..  "{" .. title))
+            table.insert(start, pandoc.RawInline(FORMAT, "\\begin{" .. b .. "}" .. scope ..  "{"))
+            local title_span = pandoc.Span( title)
+            table.insert(start,  title_span)
             if div.attributes["rechts"] then
-              table.insert(start, pandoc.RawInline(FORMAT, "\\rechtsanm{"))
-              table.insert(start, eval_md(div.attributes["rechts"]))
-              table.insert(start, pandoc.RawInline(FORMAT, "}"))
+              table.insert(title_span.c, pandoc.Span(
+                {pandoc.RawInline(FORMAT, "\\rechtsanm{"),
+                eval_md(div.attributes["rechts"]),
+                pandoc.RawInline(FORMAT, "}")}))
             end
             table.insert(start, pandoc.RawInline(FORMAT, "}"))
             table.insert(finish, 1, pandoc.RawInline(FORMAT, "\\end{" .. b .. "}"))
@@ -540,11 +543,14 @@ return {
           if div.classes:includes(b) then
             local title = div.attributes["title"] or ""
             -- io.stderr:write(title .. "\n")
-            table.insert(start, pandoc.RawInline(FORMAT, start .. "\\begin{" .. b .. "}" ..  "[" .. title))
+            table.insert(start, pandoc.RawInline(FORMAT, start .. "\\begin{" .. b .. "}" ..  "["))
+            local title_span = pandoc.Span(eval_md(title))
+            table.insert(start,  title_span)
             if div.attributes["rechts"] then
-              table.insert(start, pandoc.RawInline(FORMAT, "\\rechtsanm{"))
-              table.insert(start, eval_md(div.attributes["rechts"]))
-              table.insert(start, pandoc.RawInline(FORMAT, "}"))
+              table.extend(title_span.c, 
+                {pandoc.RawInline(FORMAT, "\\rechtsanm{"),
+                eval_md(div.attributes["rechts"]),
+                pandoc.RawInline(FORMAT, "}")})
             end
             table.insert(start, pandoc.RawInline(FORMAT, "}"))
             table.insert(finish, 1, pandoc.RawInline(FORMAT, "\\end{" .. b .. "}"))
@@ -595,23 +601,24 @@ return {
           if div.classes:includes(b) then
             local title=div.attributes["title"] or ""
             -- io.stderr:write(title .. "\n")
-            start = "\\begin{tcolorbox}["
+            table.insert(start, pandoc.RawInline(FORMAT, "\\begin{tcolorbox}["))
             if div.classes:includes("breakable") then
-              start = start .. "breakable"
+              table.insert(start, pandoc.RawInline(FORMAT, "breakable"))
             end
             if title ~= nil and title ~= "" then
               if start:match("[^%]]$") then
-                start = start .. ","
+                table.insert(start, pandoc.RawInline(FORMAT, ","))
               end
-              start = start .. "title={" .. title .. "}"
+              table.extend(start, {pandoc.RawInline(FORMAT, "title={"), eval_md(title), pandoc.RawInline(FORMAT, "}")})
             end
-            start = start .. "]"
+            table.insert(start, pandoc.RawInline(FORMAT, "]"))
             if div.attributes["rechts"] then
-              table.insert(start, pandoc.RawInline(FORMAT, "\\rechtsanm{"))
-              table.insert(start, eval_md(div.attributes["rechts"]))
-              table.insert(start, pandoc.RawInline(FORMAT, "}"))
+              table.extend(start,
+                {pandoc.RawInline(FORMAT, "\\rechtsanm{"),
+                eval_md(div.attributes["rechts"]),
+                pandoc.RawInline(FORMAT, "}")})
             end
-            finish = "\\end{tcolorbox}"
+            table.insert(finish, 1, pandoc.RawInline(FORMAT, "\\end{tcolorbox}"))
           end
         end
         local is_remark = check_remark(div)
