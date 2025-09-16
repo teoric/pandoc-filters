@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2025-09-16, 09:48:54 (CEST)
+-- Last Changed: 2025-09-16 09:53:53 (+02:00)
 --------------------------------------------------------------------------------
 --
 
@@ -607,7 +607,9 @@ return {
             end
             start = start .. "]"
             if div.attributes["rechts"] then
-              start = start .. "\\rechtsanm{" .. div.attributes["rechts"] .. "}"
+              table.insert(start, pandoc.RawInline(FORMAT, "\\rechtsanm{"))
+              table.insert(start, eval_md(div.attributes["rechts"]))
+              table.insert(start, pandoc.RawInline(FORMAT, "}"))
             end
             finish = "\\end{tcolorbox}"
           end
