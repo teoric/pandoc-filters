@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2025-09-16 15:36:48 (+02:00)
+-- Last Changed: 2025-09-24 12:53:37 (+02:00)
 --------------------------------------------------------------------------------
 --
 
@@ -46,6 +46,13 @@ local fontsizes = {
   "huge",
   "Huge"
 }
+
+local markup_types = pandoc.List:new({
+  "Highlight",
+  "Underline",
+  "Squiggly",
+  "StrikeOut"
+})
 
 local boxes_optional = {
   "definition", "theorem", "claim", "remark", "anm"
@@ -116,6 +123,9 @@ function add_style(el, style, value)
 end
 
 function eval_md(code)
+  if code:match("^%s*$") then
+    return pandoc.Span("")
+  end
   local md_text = pandoc.read(code, "markdown")
   return pandoc.Span(md_text.blocks[1].c)
 end
@@ -526,7 +536,7 @@ return {
             end
             -- io.stderr:write(title .. "\n")
             table.insert(start, pandoc.RawInline(FORMAT, "\\begin{" .. b .. "}" .. scope ..  "{"))
-            local title_span = pandoc.Span( title)
+            local title_span = pandoc.Span(eval_md(title))
             table.insert(start,  title_span)
             if div.attributes["rechts"] then
               table.insert(title_span.c, pandoc.Span(
@@ -801,16 +811,28 @@ return {
         end
         if span.classes:includes("comment") then
           local typ = "Highlight"
+          local color = "Yellow"
+          local text = ""
+          if not markup_types:includes(typ) then
+            io.stderr:write(string.format("Unknown markup type %s in comment span, replacing by 'Highlight'\n", typ))
+            typ = "Highlight"
+          end            
+          if span.attributes["text"] ~= nil then
+            text = span.attributes["text"]
+          end
           if span.attributes["type"] ~= nil then
             typ = span.attributes["type"]
           end
+          if span.attributes["hl-color"] ~= nil then
+            color = span.attributes["hl-color"]
+          end
           -- table.insert(start, pandoc.RawInline(FORMAT, "\\pdftooltip[markup=".. typ .. ",color=Yellow]{" .. "\\pdfmarkupcomment[markup=".. typ .. ",color=Yellow]{"))
           -- table.insert(pandoc.RawInline(FORMAT, finish), 1, "}{".. span.attributes["text"] .."}" .. "}{".. span.attributes["text"] .."}")
-          table.insert(start, pandoc.RawInline(FORMAT, "\\pdfmarkupcomment[markup=".. typ .. ",color=Yellow]{"))
-          table.insert(pandoc.RawInline(FORMAT, finish), 1, "}{".. span.attributes["text"] .."}")
+          table.insert(start, pandoc.RawInline(FORMAT, "\\pdfmarkupcomment[markup=".. typ .. ",color=" .. color .. "]{"))
+          table.insert(finish, 1, pandoc.RawInline(FORMAT, "}{".. text .."}"))
         end
         if span.classes:includes("margincomment") then
-          table.insert(start, pandoc.RawInline(FORMAT, "\\pdfmargincomment[color=Yellow]{" .. span.attributes["text"] .. "}"))
+          table.insert(start, pandoc.RawInline(FORMAT, "\\pdfmargincomment[color=Yellow]{" .. text .. "}"))
           print("START: ".. start)
         end
         -- weird hack
