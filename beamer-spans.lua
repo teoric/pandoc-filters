@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2025-09-24 12:53:37 (+02:00)
+-- Last Changed: 2025-09-26, 16:02:04 (CEST)
 --------------------------------------------------------------------------------
 --
 
@@ -256,7 +256,7 @@ return {
           if el.attributes["remark"] ~= nil then
             -- optional remark
             table.insert(ret, pandoc.RawInline(FORMAT, "["))
-            
+
             table.insert(ret, pandoc.Span(eval_md(el.attributes["remark"])))
             table.insert(ret, pandoc.RawInline(FORMAT, "]"))
           end
@@ -284,7 +284,7 @@ return {
           if el.attributes["remark"] ~= nil then
             -- optional remark
             table.insert(ret, pandoc.RawInline(FORMAT, "["))
-            
+
             table.insert(ret, pandoc.Span(eval_md(el.attributes["remark"])))
             table.insert(ret, pandoc.RawInline(FORMAT, "]"))
           end
@@ -557,7 +557,7 @@ return {
             local title_span = pandoc.Span(eval_md(title))
             table.insert(start,  title_span)
             if div.attributes["rechts"] then
-              table.extend(title_span.c, 
+              table.extend(title_span.c,
                 {pandoc.RawInline(FORMAT, "\\rechtsanm{"),
                 eval_md(div.attributes["rechts"]),
                 pandoc.RawInline(FORMAT, "}")})
@@ -603,7 +603,7 @@ return {
         end
         if div.classes:includes("multicols") then
           local number = div.attributes["columns"] or "2"
-          table.insert(start, pandoc.RawInline(FORMAT, "\\begin{multicols}{" .. number .. "}")) 
+          table.insert(start, pandoc.RawInline(FORMAT, "\\begin{multicols}{" .. number .. "}"))
           table.insert(pandoc.RawInline(FORMAT, finish), 1, "\\end{multicols}")
         end
         -- wrap div in box containers
@@ -726,7 +726,32 @@ return {
       end
     end,
     Span = function(span)
-      if FORMAT == "beamer" or FORMAT == "latex" then
+      if FORMAT:match 'html' or FORMAT:match 'html5' then
+        if span.classes:includes("comment") then
+          local typ = "Highlight"
+          local color = "Yellow"
+          local text = ""
+          if not markup_types:includes(typ) then
+            io.stderr:write(string.format("Unknown markup type %s in comment span, replacing by 'Highlight'\n", typ))
+            typ = "Highlight"
+          end
+          if span.attributes["text"] ~= nil then
+            text = span.attributes["text"]
+          end
+          if span.attributes["type"] ~= nil then
+            typ = span.attributes["type"]
+          end
+          if span.attributes["hl-color"] ~= nil then
+            color = span.attributes["hl-color"]
+            span.attributes["style"] = "background-color: " .. color .. ";"
+          end
+          span.classes:insert("mark")
+          if text ~= "" then
+            span.attributes["title"] = text
+          end
+          return span
+        end
+      elseif FORMAT == "beamer" or FORMAT == "latex" then
         local start = List:new()
         local finish = List:new()
         if span.classes:includes("key") then
@@ -816,7 +841,7 @@ return {
           if not markup_types:includes(typ) then
             io.stderr:write(string.format("Unknown markup type %s in comment span, replacing by 'Highlight'\n", typ))
             typ = "Highlight"
-          end            
+          end
           if span.attributes["text"] ~= nil then
             text = span.attributes["text"]
           end
@@ -836,7 +861,7 @@ return {
           print("START: ".. start)
         end
         -- weird hack
-    
+
         if span.classes:includes("endstanza") then
           table.insert(pandoc.RawInline(FORMAT, finish), 1, "\\\\!\\advance\\poemlineno by1")
         end
