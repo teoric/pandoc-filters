@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2025-09-26, 16:02:04 (CEST)
+-- Last Changed: 2025-09-28 10:22:09 (+02:00)
 --------------------------------------------------------------------------------
 --
 
@@ -25,6 +25,7 @@ if PANDOC_VERSION >= {2,12} then
 end
 local loc_utils = dofile ((utilPath or '') .. 'utils.lua')
 
+local pdfcomment_author = nil
 
 -- box types
 local boxes = {
@@ -175,6 +176,9 @@ return {
         local crossref = "pandoc-crossref-de.yaml"
         local got_file = get_and_search(crossref)
         meta["crossrefYaml"] = got_file or crossref
+      end
+      if meta["pdfcomment-author"] ~= nil then
+        pdfcomment_author = utils.stringify(meta["pdfcomment-author"])
       end
       if meta.supertitle ~= nil then
         meta["supertitle-lined"] = meta.supertitle:walk(remove_break)
@@ -597,14 +601,14 @@ return {
         local finish = List:new()
         if div.classes:includes("sideways") then
           -- io.stderr:write(title .. "\n")
-          start = start .. "\\begin{sideways}"
-          finish = "\\end{sideways}" .. finish
+          table.insert(start, pandoc.RawInline(FORMAT,  "\\begin{sideways}"))
+          table.insert(finish, 1, pandoc.RawInline(FORMAT,"\\end{sideways}"))
           -- break -- allow only first box!
         end
         if div.classes:includes("multicols") then
           local number = div.attributes["columns"] or "2"
           table.insert(start, pandoc.RawInline(FORMAT, "\\begin{multicols}{" .. number .. "}"))
-          table.insert(pandoc.RawInline(FORMAT, finish), 1, "\\end{multicols}")
+          table.insert(finish, 1, pandoc.RawInline(FORMAT, "\\end{multicols}"))
         end
         -- wrap div in box containers
         for i, b in pairs(boxes) do
@@ -691,20 +695,20 @@ return {
         end
         if div.classes:includes("verse") then
           -- io.stderr:write(title .. "\n")
-          start = start .. "\\begin{poem}"
+          table.insert(start, pandoc.RawInline(FORMAT, "\\begin{poem}"))
           local title = div.attributes["title"]
           local author = div.attributes["author"]
           local prefix = div.attributes["prefix"] or ""
           if title ~= nil then
             if author ~= nil then
-              start = start .. "\\titleauthorpoem[" .. prefix .."]{" .. title .. "}{" .. author .."}"
+              table.insert(start, pandoc.RawInline(FORMAT, "\\titleauthorpoem[" .. prefix .."]{" .. title .. "}{" .. author .."}"))
             else
-              start = start .. "\\titlepoem{" .. title .. "}"
+              table.insert(start, pandoc.RawInline(FORMAT, "\\titlepoem{" .. title .. "}"))
             end
           elseif author ~= nil then
-            start = start .. "\\titleauthorpoem[" .. prefix .."]{\\poemblanktitle}{" .. author .."}"
+            table.insert(start, pandoc.RawInline(FORMAT, "\\titleauthorpoem[" .. prefix .."]{\\poemblanktitle}{" .. author .."}"))
           end
-          finish = "\\\\-\\end{poem}" .. finish
+          table.insert(finish, 1 , pandoc.RawInline(FORMAT, "\\\\-\\end{poem}"))
           -- break -- allow only first box!
         end
         local skip = div.attributes["skip"]
@@ -716,10 +720,10 @@ return {
           print(break_after)
           table.insert(pandoc.RawInline(FORMAT, finish), 1, "\\newpage")
         end
-        if start ~= nil and start ~= "" then
-          local ret = List:new({pandoc.RawBlock(FORMAT, start)})
+        if start ~= nil then
+          local ret = List:new(start)
           ret:extend(div.content)
-          ret:extend({pandoc.RawBlock(FORMAT, finish)})
+          ret:extend(finish)
           div.content = ret
           return div
         end
@@ -728,18 +732,29 @@ return {
     Span = function(span)
       if FORMAT:match 'html' or FORMAT:match 'html5' then
         if span.classes:includes("comment") then
-          local typ = "Highlight"
+          local typ = span.attributes["type"] or "Highlight"
           local color = "Yellow"
           local text = ""
+          local author = ""
           if not markup_types:includes(typ) then
             io.stderr:write(string.format("Unknown markup type %s in comment span, replacing by 'Highlight'\n", typ))
             typ = "Highlight"
+          elseif typ == "StrikeOut" then
+            color = "Red"
+          elseif typ == "Squiggly" then
+            color = "Red"
+          elseif typ == "Underline" then
+            color = "Red"
+          end
+          if span.attributes["author"] ~= nil then
+            author = span.attributes["author"]
+          elseif pdfcomment_author ~= nil then
+            author = pdfcomment_author
+          else
+            author = utils.stringify(author)
           end
           if span.attributes["text"] ~= nil then
             text = span.attributes["text"]
-          end
-          if span.attributes["type"] ~= nil then
-            typ = span.attributes["type"]
           end
           if span.attributes["hl-color"] ~= nil then
             color = span.attributes["hl-color"]
@@ -748,6 +763,13 @@ return {
           span.classes:insert("mark")
           if text ~= "" then
             span.attributes["title"] = text
+          end
+          if author ~= "" then
+            if span.attributes["title"] ~= nil then
+              span.attributes["title"] = "(" .. author .. ") " .. span.attributes["title"]
+            else
+              span.attributes["title"] = "(" .. author .. ")"
+            end
           end
           return span
         end
@@ -835,15 +857,27 @@ return {
           table.insert(pandoc.RawInline(FORMAT, finish), 1, ".}")
         end
         if span.classes:includes("comment") then
-          local typ = "Highlight"
+          local typ = span.attributes["type"] or "Highlight"
           local color = "Yellow"
+          local author=""
           local text = ""
           if not markup_types:includes(typ) then
             io.stderr:write(string.format("Unknown markup type %s in comment span, replacing by 'Highlight'\n", typ))
             typ = "Highlight"
+          elseif typ == "StrikeOut" then
+            color = "Red"
+          elseif typ == "Squiggly" then
+            color = "Red"
+          elseif typ == "Underline" then
+            color = "Red"
           end
           if span.attributes["text"] ~= nil then
             text = span.attributes["text"]
+          end
+          if span.attributes["author"] ~= nil then
+            author = span.attributes["author"]
+          elseif pdfcomment_author ~= nil then
+            author = pdfcomment_author
           end
           if span.attributes["type"] ~= nil then
             typ = span.attributes["type"]
@@ -853,7 +887,12 @@ return {
           end
           -- table.insert(start, pandoc.RawInline(FORMAT, "\\pdftooltip[markup=".. typ .. ",color=Yellow]{" .. "\\pdfmarkupcomment[markup=".. typ .. ",color=Yellow]{"))
           -- table.insert(pandoc.RawInline(FORMAT, finish), 1, "}{".. span.attributes["text"] .."}" .. "}{".. span.attributes["text"] .."}")
-          table.insert(start, pandoc.RawInline(FORMAT, "\\pdfmarkupcomment[markup=".. typ .. ",color=" .. color .. "]{"))
+          local prefix = "\\pdfmarkupcomment[markup=".. typ .. ",color=" .. color
+          if author ~= "" then
+            prefix = prefix .. ",author={" .. author .. "}"
+          end
+          prefix = prefix .. "]{"
+          table.insert(start, pandoc.RawInline(FORMAT, prefix))
           table.insert(finish, 1, pandoc.RawInline(FORMAT, "}{".. text .."}"))
         end
         if span.classes:includes("margincomment") then
