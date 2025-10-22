@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2025-09-28 10:22:09 (+02:00)
+-- Last Changed: 2025-10-22 20:07:15 (+02:00)
 --------------------------------------------------------------------------------
 --
 
@@ -78,6 +78,28 @@ local remarks = {
   "Frage/Bewertung",
   "Frage/Anregung",
   "Bewertung/Frage"
+}
+
+local qr_fields = {
+  "bic",
+  "name",
+  "iban",
+  "amount",
+  "reason",
+  "ref",
+  "text",
+  "information"
+}
+
+local qr_labels = {
+  ["bic"] = "BIC",
+  ["name"] = "Name",
+  ["iban"] = "IBAN",
+  ["amount"] = "Betrag",
+  ["reason"] = "Verwendungszweck",
+  ["ref"] = "Referenz",
+  ["text"] = "Text",
+  ["information"] = "Zusatzinformation"
 }
 
 local skips = pandoc.List({
@@ -802,6 +824,30 @@ return {
           -- start = "\\oldemph{"
           table.insert(start, pandoc.RawInline(FORMAT, "\\emph{"))
           table.insert(pandoc.RawInline(FORMAT, finish), 1, "}")
+        end
+        if span.classes:includes("bank_transfer") then
+          table.insert(start, pandoc.RawInline(FORMAT, "\\epcqr{"))
+          table.insert(finish, pandoc.LineBreak())
+          local field_list = List:new()
+          local qr_first = true
+          for i, qr_name in pairs(qr_fields) do
+            if span.attributes[qr_name] ~= nil then
+              table.insert(start, pandoc.RawInline(FORMAT, qr_name .. "=".. span.attributes[qr_name] .. ",\n"))
+              table.insert(finish,
+                pandoc.Span({(qr_first and "" or ",\n"), pandoc.LineBreak(), pandoc.Strong(qr_labels[qr_name]), ": "}))
+              if qr_name == "amount" then
+                span.attributes[qr_name] = string.gsub(span.attributes[qr_name], "%.", ",")
+              end
+              table.insert(finish,
+                pandoc.Span(span.attributes[qr_name]))
+              if qr_name == "amount" then
+                table.insert(finish,
+                  pandoc.Span(" €"))
+              end
+              qr_first = false
+            end
+          end
+          table.insert(start, pandoc.RawInline(FORMAT, "}"))
         end
         if span.classes:includes("icon") then
           table.insert(start, pandoc.RawInline(FORMAT, "\\icontext{"))
