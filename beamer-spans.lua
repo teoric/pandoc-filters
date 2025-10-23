@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2025-10-22 20:07:15 (+02:00)
+-- Last Changed: 2025-10-23 13:44:13 (+02:00)
 --------------------------------------------------------------------------------
 --
 
@@ -26,6 +26,9 @@ end
 local loc_utils = dofile ((utilPath or '') .. 'utils.lua')
 
 local pdfcomment_author = nil
+
+local doc_language = "en"
+local bank_language = "en"
 
 -- box types
 local boxes = {
@@ -92,14 +95,26 @@ local qr_fields = {
 }
 
 local qr_labels = {
-  ["bic"] = "BIC",
-  ["name"] = "Name",
-  ["iban"] = "IBAN",
-  ["amount"] = "Betrag",
-  ["reason"] = "Verwendungszweck",
-  ["ref"] = "Referenz",
-  ["text"] = "Text",
-  ["information"] = "Zusatzinformation"
+  ["de"] = {
+    ["bic"] = "BIC",
+    ["name"] = "Name",
+    ["iban"] = "IBAN",
+    ["amount"] = "Betrag",
+    ["reason"] = "Verwendungszweck",
+    ["ref"] = "Referenz",
+    ["text"] = "Text",
+    ["information"] = "Zusatzinformation"
+  }, 
+  ["en"] = {
+    ["bic"] = "BIC",
+    ["name"] = "Name",
+    ["iban"] = "IBAN",
+    ["amount"] = "Amount",
+    ["reason"] = "Reason",
+    ["ref"] = "Reference",
+    ["text"] = "Text",
+    ["information"] = "Information"
+  }
 }
 
 local skips = pandoc.List({
@@ -198,6 +213,8 @@ return {
         local crossref = "pandoc-crossref-de.yaml"
         local got_file = get_and_search(crossref)
         meta["crossrefYaml"] = got_file or crossref
+        doc_language = meta.lang
+        bank_language = "de"
       end
       if meta["pdfcomment-author"] ~= nil then
         pdfcomment_author = utils.stringify(meta["pdfcomment-author"])
@@ -834,8 +851,8 @@ return {
             if span.attributes[qr_name] ~= nil then
               table.insert(start, pandoc.RawInline(FORMAT, qr_name .. "=".. span.attributes[qr_name] .. ",\n"))
               table.insert(finish,
-                pandoc.Span({(qr_first and "" or ",\n"), pandoc.LineBreak(), pandoc.Strong(qr_labels[qr_name]), ": "}))
-              if qr_name == "amount" then
+                pandoc.Span({(qr_first and "" or ",\n"), pandoc.LineBreak(), pandoc.Strong(qr_labels[bank_language][qr_name]), ": "}))
+              if qr_name == "amount" and not string.match(bank_language, "^[eE][nN]")then
                 span.attributes[qr_name] = string.gsub(span.attributes[qr_name], "%.", ",")
               end
               table.insert(finish,
