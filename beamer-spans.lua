@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2025-10-23 13:44:13 (+02:00)
+-- Last Changed: 2025-11-11 09:36:31 (+01:00)
 --------------------------------------------------------------------------------
 --
 
@@ -917,7 +917,7 @@ return {
         end
         if span.classes:includes("number") then
           table.insert(start, pandoc.RawInline(FORMAT, "\\mbox{\\small{}\\bfseries{}"))
-          table.insert(pandoc.RawInline(FORMAT, finish), 1, ".}")
+          table.insert(finish, 1, pandoc.RawInline(FORMAT, ".}"))
         end
         if span.classes:includes("comment") then
           local typ = span.attributes["type"] or "Highlight"
@@ -965,7 +965,7 @@ return {
         -- weird hack
 
         if span.classes:includes("endstanza") then
-          table.insert(pandoc.RawInline(FORMAT, finish), 1, "\\\\!\\advance\\poemlineno by1")
+          table.insert(finish, 1, pandoc.RawInline(FORMAT, "\\\\!\\advance\\poemlineno by1"))
         end
         if start or finish then
           local ret = List:new(start)
