@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2025-11-20 13:13:04 (+01:00)
+-- Last Changed: 2025-11-21 14:32:17 (+01:00)
 --------------------------------------------------------------------------------
 --
 
@@ -31,6 +31,7 @@ local doc_language = "en"
 local bank_language = "en"
 
 local url_footnote = false
+local force_html_footnote = false
 
 -- box types
 local boxes = {
@@ -218,8 +219,11 @@ return {
         doc_language = meta.lang
         bank_language = "de"
       end
-      if meta["url-footnote"] ~= nil then
+      if meta["url-footnote"] ~= nil and meta["url-footnote"] ~= false then
         url_footnote = true
+      end
+      if meta["force-html-footnote"] ~= nil and meta["force-html-footnote"] ~= false then
+        force_html_footnote = true
       end
       if meta["pdfcomment-author"] ~= nil then
         pdfcomment_author = utils.stringify(meta["pdfcomment-author"])
@@ -398,22 +402,26 @@ return {
         local ret = List:new({pandoc.RawInline(FORMAT, "\\textsc{doi}: "), pandoc.Link(target, "https://doi.org/" .. target)})
         return ret
       end
-      if url_footnote and not loc_utils.startswith(el.target, "#") then
-        -- convert Link to footnote
-        local note_span = pandoc.Span(pandoc.Span(pandoc.Link(el.target,el.target)))
-        -- add title
-        if el.attributes["title"] ~= nil then
-          note_span.content:insert(pandoc.Space())
-          note_span.content:insert(eval_md(", " .. loc_utils.trim(utils.stringify(el.attributes["title"]))))
+      if (force_html_footnote) or (not loc_utils.startswith(FORMAT,  'html')) then
+        if url_footnote and (utils.stringify(el) ~= el.target) and not loc_utils.startswith(el.target, "#") 
+        then
+          -- print(utils.stringify(el))
+          -- convert Link to footnote
+          local note_span = pandoc.Span(pandoc.Span(pandoc.Link(el.target,el.target)))
+          -- add title
+          if el.attributes["title"] ~= nil then
+            note_span.content:insert(pandoc.Space())
+            note_span.content:insert(eval_md(", " .. loc_utils.trim(utils.stringify(el.attributes["title"]))))
+          end
+          -- add time / date visited
+          if el.attributes["visited"] ~= nil then
+            note_span.content:insert(pandoc.Space())
+            note_span.content:insert(eval_md("(" .. loc_utils.trim(utils.stringify(el.attributes["visited"])) .. ")"))
+          end
+          local note = pandoc.Note(note_span)
+          -- el.content:insert(note)
+          return pandoc.List({el,note})
         end
-        -- add time / date visited
-        if el.attributes["visited"] ~= nil then
-          note_span.content:insert(pandoc.Space())
-          note_span.content:insert(eval_md("(" .. loc_utils.trim(utils.stringify(el.attributes["visited"])) .. ")"))
-        end
-        local note = pandoc.Note(note_span)
-        -- el.content:insert(note)
-        return pandoc.List({el,note})
       end
       if FORMAT:match 'latex' then
         if el.attributes["type"] == "anlage" then
