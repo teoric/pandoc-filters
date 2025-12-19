@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2025-12-19 07:25:22 (+01:00)
+-- Last Changed: 2025-12-19 07:27:13 (+01:00)
 --------------------------------------------------------------------------------
 --
 
@@ -628,8 +628,10 @@ return {
             local title = div.attributes["title"] or ""
             -- io.stderr:write(title .. "\n")
             table.insert(start, pandoc.RawInline(FORMAT, "\\begin{" .. b .. "}" ..  "["))
-            local title_span = pandoc.Span(eval_md(title))
-            table.insert(start,  title_span)
+            if title ~= nil and title ~= "" then
+              local title_span = pandoc.Span(eval_md(title))
+              table.insert(start,  title_span)
+            end
             if div.attributes["rechts"] then
               table.extend(title_span.c,
                 {pandoc.RawInline(FORMAT, "\\rechtsanm{"),
