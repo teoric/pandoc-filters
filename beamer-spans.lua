@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2025-11-21 14:32:17 (+01:00)
+-- Last Changed: 2025-12-19 07:25:22 (+01:00)
 --------------------------------------------------------------------------------
 --
 
@@ -627,7 +627,7 @@ return {
           if div.classes:includes(b) then
             local title = div.attributes["title"] or ""
             -- io.stderr:write(title .. "\n")
-            table.insert(start, pandoc.RawInline(FORMAT, start .. "\\begin{" .. b .. "}" ..  "["))
+            table.insert(start, pandoc.RawInline(FORMAT, "\\begin{" .. b .. "}" ..  "["))
             local title_span = pandoc.Span(eval_md(title))
             table.insert(start,  title_span)
             if div.attributes["rechts"] then
@@ -636,7 +636,7 @@ return {
                 eval_md(div.attributes["rechts"]),
                 pandoc.RawInline(FORMAT, "}")})
             end
-            table.insert(start, pandoc.RawInline(FORMAT, "}"))
+            table.insert(start, pandoc.RawInline(FORMAT, "]"))
             table.insert(finish, 1, pandoc.RawInline(FORMAT, "\\end{" .. b .. "}"))
             -- break -- allow only first box!
           end
