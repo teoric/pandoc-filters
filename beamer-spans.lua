@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2025-12-19 07:27:13 (+01:00)
+-- Last Changed: 2025-12-29, 21:39:07 (CET)
 --------------------------------------------------------------------------------
 --
 
@@ -736,27 +736,27 @@ return {
         end
         if div.attributes["bgcolor"] then
           table.insert(start, pandoc.RawInline(FORMAT, '\\begin{tcolorbox}[colback='.. div.attributes["bgcolor"] ..'!20, colframe=' .. div.attributes["bgcolor"] .. '!80!black]'))
-          table.insert(pandoc.RawInline(FORMAT, finish), 1, '\\end{tcolorbox}')
+          table.insert(finish, 1, pandoc.RawInline(FORMAT, '\\end{tcolorbox}'))
         end
         if div.classes:includes("xml") then
           table.insert(start, pandoc.RawInline(FORMAT, "\\paragraph{XML}\\begingroup\\sffamily{}"))
-          table.insert(pandoc.RawInline(FORMAT, finish), 1, "\\endgroup{}")
+          table.insert(finish, 1, pandoc.RawInline(FORMAT, "\\endgroup{}"))
         end
         if div.classes:includes("xml_details") then
           table.insert(start, pandoc.RawInline(FORMAT, "\\begin{addmargin}{1em}\\sffamily{}\\relsize{-1}\\color{darkgray}"))
-          table.insert(pandoc.RawInline(FORMAT, finish), 1, "\\end{addmargin}")
+          table.insert(finish, 1, pandoc.RawInline(FORMAT, "\\end{addmargin}"))
         end
         if div.classes:includes("transcription") then
           table.insert(start, pandoc.RawInline(FORMAT, "\\begin{aeettranscription}"))
-          table.insert(pandoc.RawInline(FORMAT, finish), 1, "\\end{aeettranscription}")
+          table.insert(finish, 1, pandoc.RawInline(FORMAT, "\\end{aeettranscription}"))
         end
         if div.classes:includes("references") then
           table.insert(start, pandoc.RawInline(FORMAT, "\\begin{aeetreferences}"))
-          table.insert(pandoc.RawInline(FORMAT, finish), 1, "\\end{aeetreferences}")
+          table.insert(finish, 1, pandoc.RawInline(FORMAT, "\\end{aeetreferences}"))
         end
         if div.classes:includes("figure_text") then
           table.insert(start, pandoc.RawInline(FORMAT, "\\begin{figureText}"))
-          table.insert(pandoc.RawInline(FORMAT, finish), 1, "\\end{figureText}")
+          table.insert(finish, 1, pandoc.RawInline(FORMAT, "\\end{figureText}"))
         end
         if div.classes:includes("lineno") then
           -- io.stderr:write(title .. "\n")
