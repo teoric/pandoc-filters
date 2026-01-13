@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2025-12-29, 21:39:07 (CET)
+-- Last Changed: 2026-01-04 23:21:17 (+01:00)
 --------------------------------------------------------------------------------
 --
 
@@ -863,7 +863,7 @@ return {
         end
         if span.classes:includes("rkomment") then
           table.insert(start, pandoc.RawInline(FORMAT, "\\rechts{\\emph{"))
-          table.insert(pandoc.RawInline(FORMAT, finish), 1, "}}")
+          table.insert(finish, 1, pandoc.RawInline(FORMAT, "}}"))
         end
         if span.classes:includes("sans") or span.classes:includes("sf") then
           -- start = "\\oldemph{"
