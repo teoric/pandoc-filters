@@ -9,7 +9,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2026-01-04 23:21:17 (+01:00)
+-- Last Changed: 2026-01-14 13:25:09 (+01:00)
 --------------------------------------------------------------------------------
 --
 
@@ -163,12 +163,17 @@ function add_style(el, style, value)
   el.attributes['style'] = el.attributes['style'] .. style .. ': ' .. value .. ';'
 end
 
-function eval_md(code)
+function eval_md(code, FORMAT)
+  code = code:gsub("^%s*(.-)%s*$", "%1")
   if code:match("^%s*$") then
     return pandoc.Span("")
   end
   local md_text = pandoc.read(code, "markdown")
-  return pandoc.Span(md_text.blocks[1].c)
+  if FORMAT ~= nil then
+    return pandoc.write(md_text, FORMAT)
+  else
+    return pandoc.Span(md_text.blocks[1].c)
+  end
 end
 
 local remove_break = {
@@ -633,7 +638,7 @@ return {
               table.insert(start,  title_span)
             end
             if div.attributes["rechts"] then
-              table.extend(title_span.c,
+              title_span.c:extend(
                 {pandoc.RawInline(FORMAT, "\\rechtsanm{"),
                 eval_md(div.attributes["rechts"]),
                 pandoc.RawInline(FORMAT, "}")})
@@ -687,23 +692,25 @@ return {
           if div.classes:includes(b) then
             local title=div.attributes["title"] or ""
             -- io.stderr:write(title .. "\n")
-            table.insert(start, pandoc.RawInline(FORMAT, "\\begin{tcolorbox}["))
+            local to_insert = "\\begin{tcolorbox}["
             if div.classes:includes("breakable") then
-              table.insert(start, pandoc.RawInline(FORMAT, "breakable"))
+              to_insert = to_insert .. "breakable"
             end
             if title ~= nil and title ~= "" then
-              if start:match("[^%]]$") then
-                table.insert(start, pandoc.RawInline(FORMAT, ","))
+              -- if last element in start matches "[^%]]$"
+              if not utils.stringify(to_insert):match("[^%]]$") then
+                to_insert = to_insert .. ","
               end
-              table.extend(start, {pandoc.RawInline(FORMAT, "title={"), eval_md(title), pandoc.RawInline(FORMAT, "}")})
+              local title_code = eval_md(title, FORMAT)
+              to_insert = to_insert .. "title={" .. title_code .. "}"
             end
-            table.insert(start, pandoc.RawInline(FORMAT, "]"))
             if div.attributes["rechts"] then
-              table.extend(start,
-                {pandoc.RawInline(FORMAT, "\\rechtsanm{"),
-                eval_md(div.attributes["rechts"]),
-                pandoc.RawInline(FORMAT, "}")})
+              to_insert = to_insert ..
+                pandoc.RawInline(FORMAT, "\\rechtsanm{" ..
+                eval_md(div.attributes["rechts"], FORMAT) .. "}")
             end
+            to_insert = to_insert .. "]"
+            table.insert(start, pandoc.RawInline(FORMAT, to_insert))
             table.insert(finish, 1, pandoc.RawInline(FORMAT, "\\end{tcolorbox}"))
           end
         end
@@ -850,7 +857,7 @@ return {
         local finish = List:new()
         if span.classes:includes("key") then
           table.insert(start, pandoc.RawInline(FORMAT, "\\fbox{\\small{}"))
-          table.insert(pandoc.RawInline(FORMAT, finish), 1, "}")
+          table.insert(finish, 1, pandoc.RawInline(FORMAT, "}"))
         elseif span.classes:includes("rechts") then
           -- if FORMAT == "beamer" then
             table.insert(start, pandoc.RawInline(FORMAT, "\\rechts{"))

@@ -14,15 +14,19 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-03-17
--- Last Changed: 2023-05-24, 08:03:54 (+02:00)
+-- Last Changed: 2026-01-22, 08:41:36 (CET)
 --------------------------------------------------------------------------------
 --
 -- local inspect = require('inspect')
 local text = require 'text'
 local list = require 'pandoc.List'
 
-Loc_utils = require(debug.getinfo(1, "S").source:sub(2):match(
-  "(.*[\\/])") .. "utils")
+local utilPath = string.match(PANDOC_SCRIPT_FILE, '.*[/\\]')
+if PANDOC_VERSION >= {2,12} then
+  local path = require 'pandoc.path'
+  utilPath = path.directory(PANDOC_SCRIPT_FILE) .. path.separator
+end
+local Loc_utils = dofile ((utilPath or '') .. 'utils.lua')
 
 
 -- convert SVG to PDF
