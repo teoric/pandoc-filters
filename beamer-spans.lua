@@ -1,4 +1,3 @@
-
 --------------------------------------------------------------------------------
 --         File: beamer-spans.lua
 --
@@ -9,7 +8,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2026-01-14 13:25:09 (+01:00)
+-- Last Changed: 2026-01-28 08:20:40 (+01:00)
 --------------------------------------------------------------------------------
 --
 
@@ -19,11 +18,11 @@ local List = require 'pandoc.List'
 local utils = require 'pandoc.utils'
 
 local utilPath = string.match(PANDOC_SCRIPT_FILE, '.*[/\\]')
-if PANDOC_VERSION >= {2,12} then
+if PANDOC_VERSION >= { 2, 12 } then
   local path = require 'pandoc.path'
   utilPath = path.directory(PANDOC_SCRIPT_FILE) .. path.separator
 end
-local loc_utils = dofile ((utilPath or '') .. 'utils.lua')
+local loc_utils = dofile((utilPath or '') .. 'utils.lua')
 
 local pdfcomment_author = nil
 
@@ -107,7 +106,7 @@ local qr_labels = {
     ["ref"] = "Referenz",
     ["text"] = "Text",
     ["information"] = "Zusatzinformation"
-  }, 
+  },
   ["en"] = {
     ["bic"] = "BIC",
     ["name"] = "Name",
@@ -249,8 +248,8 @@ return {
       color_comments = meta["color-remarks"]
       local omitted = meta["omit"]
       if (meta["classoption"] ~= nil and meta["classoptions"] ~= nil) then
-          meta["classoption"] = loc_utils.listify(meta["classoption"])
-          meta["classoption"]:extend(loc_utils.listify(meta["classoptions"]))
+        meta["classoption"] = loc_utils.listify(meta["classoption"])
+        meta["classoption"]:extend(loc_utils.listify(meta["classoptions"]))
       end
       local highlighted = meta["highlight"]
       to_omit = loc_utils.listify(omitted):map(function(o)
@@ -283,20 +282,22 @@ return {
           -- local typ = el.attributes["type"]
 
           if loc_utils.startswith(el.identifier, "anlage:") then
-            local scale = (el.attributes["scale"] ~= nil) and ("[".. el.attributes["scale"] .. "]") or ""
+            local scale = (el.attributes["scale"] ~= nil) and ("[" .. el.attributes["scale"] .. "]") or ""
             local file = el.attributes["file"]
             if file == nil then
               if el.level == 2 then
-              local ret = List:new({pandoc.RawInline(FORMAT, "\\secanlage{" .. utils.stringify(el.content) .. "}{"
-              .. el.identifier .. "}")})
-              return ret
-              else error(string.format("No file for %s [#%s]", utils.stringify(el), el.identifier))
+                local ret = List:new({ pandoc.RawInline(FORMAT, "\\secanlage{" .. utils.stringify(el.content) .. "}{"
+                  .. el.identifier .. "}") })
+                return ret
+              else
+                error(string.format("No file for %s [#%s]", utils.stringify(el), el.identifier))
               end
             else
               local subtype = (el.level > 2) and "sub" or ""
-              local ret = List:new({pandoc.RawInline(FORMAT, "\\".. subtype .. "anlage" .. scale .. "{".. utils.stringify(el.content) .. "}{"
-              .. el.identifier .. "}{" .. file .. "}"
-              )})
+              local ret = List:new({ pandoc.RawInline(FORMAT,
+                "\\" .. subtype .. "anlage" .. scale .. "{" .. utils.stringify(el.content) .. "}{"
+                .. el.identifier .. "}{" .. file .. "}"
+              ) })
               return ret
             end
           end
@@ -304,7 +305,7 @@ return {
       end
     end
   },
- {
+  {
     Span = function(el)
       if FORMAT:match 'latex' or FORMAT:match 'beamer' then
         if el.classes:includes("voccom") then
@@ -370,7 +371,7 @@ return {
     Link = function(el)
       local typ = el.attributes["type"]
       if typ ~= nil then
-      local typ = text.lower(typ)
+        local typ = text.lower(typ)
       end
       -- print (utils.stringify(el.content))
       -- print(typ)
@@ -398,21 +399,23 @@ return {
         local target = el.target:gsub("^http[^:]*://[^/]+/", "")
         -- print(target)
         el.content = target
-        local ret = List:new({pandoc.RawInline(FORMAT, "\\textsc{urn}: "), pandoc.Link(target, "https://mdz-nbn-resolving.de/" .. target)})
+        local ret = List:new({ pandoc.RawInline(FORMAT, "\\textsc{urn}: "), pandoc.Link(target,
+          "https://mdz-nbn-resolving.de/" .. target) })
         return ret
       elseif string.find(utils.stringify(el.content), "doi.org") then
         local target = el.target:gsub("^http[^:]*://[^/]+/", "")
         -- print(target)
         el.content = target
-        local ret = List:new({pandoc.RawInline(FORMAT, "\\textsc{doi}: "), pandoc.Link(target, "https://doi.org/" .. target)})
+        local ret = List:new({ pandoc.RawInline(FORMAT, "\\textsc{doi}: "), pandoc.Link(target,
+          "https://doi.org/" .. target) })
         return ret
       end
-      if (force_html_footnote) or (not loc_utils.startswith(FORMAT,  'html')) then
-        if url_footnote and (utils.stringify(el) ~= el.target) and not loc_utils.startswith(el.target, "#") 
+      if (force_html_footnote) or (not loc_utils.startswith(FORMAT, 'html')) then
+        if url_footnote and (utils.stringify(el) ~= el.target) and not loc_utils.startswith(el.target, "#")
         then
           -- print(utils.stringify(el))
           -- convert Link to footnote
-          local note_span = pandoc.Span(pandoc.Span(pandoc.Link(el.target,el.target)))
+          local note_span = pandoc.Span(pandoc.Span(pandoc.Link(el.target, el.target)))
           -- add title
           if el.attributes["title"] ~= nil then
             note_span.content:insert(pandoc.Space())
@@ -425,12 +428,12 @@ return {
           end
           local note = pandoc.Note(note_span)
           -- el.content:insert(note)
-          return pandoc.List({el,note})
+          return pandoc.List({ el, note })
         end
       end
       if FORMAT:match 'latex' then
         if el.attributes["type"] == "anlage" then
-          local ret = pandoc.RawInline(FORMAT, "\\emnameref{anlage:".. utils.stringify(el) .. "}")
+          local ret = pandoc.RawInline(FORMAT, "\\emnameref{anlage:" .. utils.stringify(el) .. "}")
           return ret
         end
       end
@@ -442,7 +445,7 @@ return {
       local color = el.attributes['color']
       local bgcolor = el.attributes['bgcolor']
       if color ~= nil or bgcolor ~= nil then
-      -- if no color attribute, return unchanged -- redundant!
+        -- if no color attribute, return unchanged -- redundant!
         -- transform to <span style="color: red;"></span>
         if FORMAT:match 'html' or FORMAT:match 'html5' then
           -- remove color attributes
@@ -465,13 +468,13 @@ return {
           if color ~= nil then
             -- remove color attributes
             el.attributes['color'] = nil
-            table.insert(el.content, 1, pandoc.RawInline(FORMAT, '\\textcolor{'..color..'}{'))
+            table.insert(el.content, 1, pandoc.RawInline(FORMAT, '\\textcolor{' .. color .. '}{'))
             table.insert(el.content, pandoc.RawInline(FORMAT, "}"))
           end
           if bgcolor ~= nil then
             -- remove color attributes
             el.attributes['bgcolor'] = nil
-            table.insert(el.content, 1, pandoc.RawInline(FORMAT, '\\colorbox{'..bgcolor..'}{'))
+            table.insert(el.content, 1, pandoc.RawInline(FORMAT, '\\colorbox{' .. bgcolor .. '}{'))
             table.insert(el.content, pandoc.RawInline(FORMAT, "}"))
           end
           -- returns only span content
@@ -558,7 +561,7 @@ return {
       local color = div.attributes['color']
       local bgcolor = div.attributes['bgcolor']
       if color ~= nil or bgcolor ~= nil then
-      -- if no color attribute, return unchanged -- redundant!
+        -- if no color attribute, return unchanged -- redundant!
         -- transform to <span style="color: red;"></span>
         if FORMAT:match 'html' or FORMAT:match 'html5' then
           -- remove color attributes
@@ -584,13 +587,13 @@ return {
         if div.classes:includes("only") then
           local scope = div.attributes["scope"] or "+-"
           table.insert(start, 1, pandoc.RawInline(FORMAT, "\\only<" .. scope ..
-          ">{"))
+            ">{"))
           table.insert(finish, pandoc.RawInline(FORMAT, "}"))
         end
         if div.classes:includes("uncover") then
           local scope = div.attributes["scope"] or "+-"
           table.insert(start, 1, pandoc.RawInline(FORMAT, "\\uncover<" .. scope ..
-          ">{"))
+            ">{"))
           table.insert(finish, pandoc.RawInline(FORMAT, "}"))
         end
         if div.classes:includes("on_next") then
@@ -608,20 +611,20 @@ return {
           if div.classes:includes(b) then
             local title = div.attributes["title"] or ""
             local scope = div.attributes["scope"]
-            if scope ~= nil and not(div.classes:includes("uncover")) and not(div.classes:includes("only")) and not(div.classes:includes("on_next")) then
+            if scope ~= nil and not (div.classes:includes("uncover")) and not (div.classes:includes("only")) and not (div.classes:includes("on_next")) then
               scope = "<" .. scope .. ">"
             else
               scope = ""
             end
             -- io.stderr:write(title .. "\n")
-            table.insert(start, pandoc.RawInline(FORMAT, "\\begin{" .. b .. "}" .. scope ..  "{"))
+            table.insert(start, pandoc.RawInline(FORMAT, "\\begin{" .. b .. "}" .. scope .. "{"))
             local title_span = pandoc.Span(eval_md(title))
-            table.insert(start,  title_span)
+            table.insert(start, title_span)
             if div.attributes["rechts"] then
               table.insert(title_span.c, pandoc.Span(
-                {pandoc.RawInline(FORMAT, "\\rechtsanm{"),
-                eval_md(div.attributes["rechts"]),
-                pandoc.RawInline(FORMAT, "}")}))
+                { pandoc.RawInline(FORMAT, "\\rechtsanm{"),
+                  eval_md(div.attributes["rechts"]),
+                  pandoc.RawInline(FORMAT, "}") }))
             end
             table.insert(start, pandoc.RawInline(FORMAT, "}"))
             table.insert(finish, 1, pandoc.RawInline(FORMAT, "\\end{" .. b .. "}"))
@@ -632,16 +635,16 @@ return {
           if div.classes:includes(b) then
             local title = div.attributes["title"] or ""
             -- io.stderr:write(title .. "\n")
-            table.insert(start, pandoc.RawInline(FORMAT, "\\begin{" .. b .. "}" ..  "["))
+            table.insert(start, pandoc.RawInline(FORMAT, "\\begin{" .. b .. "}" .. "["))
             if title ~= nil and title ~= "" then
               local title_span = pandoc.Span(eval_md(title))
-              table.insert(start,  title_span)
+              table.insert(start, title_span)
             end
             if div.attributes["rechts"] then
               title_span.c:extend(
-                {pandoc.RawInline(FORMAT, "\\rechtsanm{"),
-                eval_md(div.attributes["rechts"]),
-                pandoc.RawInline(FORMAT, "}")})
+                { pandoc.RawInline(FORMAT, "\\rechtsanm{"),
+                  eval_md(div.attributes["rechts"]),
+                  pandoc.RawInline(FORMAT, "}") })
             end
             table.insert(start, pandoc.RawInline(FORMAT, "]"))
             table.insert(finish, 1, pandoc.RawInline(FORMAT, "\\end{" .. b .. "}"))
@@ -678,8 +681,8 @@ return {
         local finish = List:new()
         if div.classes:includes("sideways") then
           -- io.stderr:write(title .. "\n")
-          table.insert(start, pandoc.RawInline(FORMAT,  "\\begin{sideways}"))
-          table.insert(finish, 1, pandoc.RawInline(FORMAT,"\\end{sideways}"))
+          table.insert(start, pandoc.RawInline(FORMAT, "\\begin{sideways}"))
+          table.insert(finish, 1, pandoc.RawInline(FORMAT, "\\end{sideways}"))
           -- break -- allow only first box!
         end
         if div.classes:includes("multicols") then
@@ -690,7 +693,7 @@ return {
         -- wrap div in box containers
         for i, b in pairs(boxes) do
           if div.classes:includes(b) then
-            local title=div.attributes["title"] or ""
+            local title = div.attributes["title"] or ""
             -- io.stderr:write(title .. "\n")
             local to_insert = "\\begin{tcolorbox}["
             if div.classes:includes("breakable") then
@@ -706,8 +709,8 @@ return {
             end
             if div.attributes["rechts"] then
               to_insert = to_insert ..
-                pandoc.RawInline(FORMAT, "\\rechtsanm{" ..
-                eval_md(div.attributes["rechts"], FORMAT) .. "}")
+                  pandoc.RawInline(FORMAT, "\\rechtsanm{" ..
+                    eval_md(div.attributes["rechts"], FORMAT) .. "}")
             end
             to_insert = to_insert .. "]"
             table.insert(start, pandoc.RawInline(FORMAT, to_insert))
@@ -718,7 +721,7 @@ return {
         local is_comment = check_comment(div)
         -- io.stderr:write(table.concat(div.classes, ";;"), "\n")
         if div.attributes["color"] ~= nil then
-          color = '\\color{'.. div.attributes["color"] ..'}'
+          color = '\\color{' .. div.attributes["color"] .. '}'
         end
         if div.attributes["resolved"] then
           return List:new()
@@ -729,7 +732,8 @@ return {
           elseif is_remark then
             color = remark_color
           end
-          table.insert(start, pandoc.RawInline(FORMAT, "\\begin{tcolorbox}[title=" .. table.concat(div.classes, ";;") .. "]"))
+          table.insert(start,
+            pandoc.RawInline(FORMAT, "\\begin{tcolorbox}[title=" .. table.concat(div.classes, ";;") .. "]"))
           table.insert(pandoc.RawInline(FORMAT, finish), 1, "\\end{tcolorbox}")
           -- table.insert(start, pandoc.RawInline(FORMAT, "\\begin{addmargin}[1cm]{1cm}" .. color .."\\vskip1ex\\begingroup\\textbf{" .. table.concat(div.classes, ";;") .. "}"))
           -- table.insert(pandoc.RawInline(FORMAT, finish), 1, "\\endgroup\\vskip1ex\\end{addmargin}")
@@ -738,11 +742,14 @@ return {
           table.insert(pandoc.RawInline(FORMAT, finish), 1, '}')
         end
         if div.attributes["linestretch"] then
-          table.insert(start, pandoc.RawInline(FORMAT, '\\bgroup\\setstretch{' .. div.attributes["linestretch"] ..'}'))
+          table.insert(start, pandoc.RawInline(FORMAT, '\\bgroup\\setstretch{' .. div.attributes["linestretch"] .. '}'))
           finish = '\\egroup{}' .. finish
         end
         if div.attributes["bgcolor"] then
-          table.insert(start, pandoc.RawInline(FORMAT, '\\begin{tcolorbox}[colback='.. div.attributes["bgcolor"] ..'!20, colframe=' .. div.attributes["bgcolor"] .. '!80!black]'))
+          table.insert(start,
+            pandoc.RawInline(FORMAT,
+              '\\begin{tcolorbox}[colback=' ..
+              div.attributes["bgcolor"] .. '!20, colframe=' .. div.attributes["bgcolor"] .. '!80!black]'))
           table.insert(finish, 1, pandoc.RawInline(FORMAT, '\\end{tcolorbox}'))
         end
         if div.classes:includes("xml") then
@@ -750,7 +757,8 @@ return {
           table.insert(finish, 1, pandoc.RawInline(FORMAT, "\\endgroup{}"))
         end
         if div.classes:includes("xml_details") then
-          table.insert(start, pandoc.RawInline(FORMAT, "\\begin{addmargin}{1em}\\sffamily{}\\relsize{-1}\\color{darkgray}"))
+          table.insert(start,
+            pandoc.RawInline(FORMAT, "\\begin{addmargin}{1em}\\sffamily{}\\relsize{-1}\\color{darkgray}"))
           table.insert(finish, 1, pandoc.RawInline(FORMAT, "\\end{addmargin}"))
         end
         if div.classes:includes("transcription") then
@@ -780,14 +788,16 @@ return {
           local prefix = div.attributes["prefix"] or ""
           if title ~= nil then
             if author ~= nil then
-              table.insert(start, pandoc.RawInline(FORMAT, "\\titleauthorpoem[" .. prefix .."]{" .. title .. "}{" .. author .."}"))
+              table.insert(start,
+                pandoc.RawInline(FORMAT, "\\titleauthorpoem[" .. prefix .. "]{" .. title .. "}{" .. author .. "}"))
             else
               table.insert(start, pandoc.RawInline(FORMAT, "\\titlepoem{" .. title .. "}"))
             end
           elseif author ~= nil then
-            table.insert(start, pandoc.RawInline(FORMAT, "\\titleauthorpoem[" .. prefix .."]{\\poemblanktitle}{" .. author .."}"))
+            table.insert(start,
+              pandoc.RawInline(FORMAT, "\\titleauthorpoem[" .. prefix .. "]{\\poemblanktitle}{" .. author .. "}"))
           end
-          table.insert(finish, 1 , pandoc.RawInline(FORMAT, "\\\\-\\end{poem}"))
+          table.insert(finish, 1, pandoc.RawInline(FORMAT, "\\\\-\\end{poem}"))
           -- break -- allow only first box!
         end
         local skip = div.attributes["skip"]
@@ -860,8 +870,8 @@ return {
           table.insert(finish, 1, pandoc.RawInline(FORMAT, "}"))
         elseif span.classes:includes("rechts") then
           -- if FORMAT == "beamer" then
-            table.insert(start, pandoc.RawInline(FORMAT, "\\rechts{"))
-            table.insert(finish, 1, pandoc.RawInline(FORMAT, "}"))
+          table.insert(start, pandoc.RawInline(FORMAT, "\\rechts{"))
+          table.insert(finish, 1, pandoc.RawInline(FORMAT, "}"))
           -- nonsense: only for paragraphs!
           -- else
           --   table.insert(start, pandoc.RawInline(FORMAT, "\\begin{flushright}"))
@@ -889,10 +899,14 @@ return {
           local qr_first = true
           for i, qr_name in pairs(qr_fields) do
             if span.attributes[qr_name] ~= nil then
-              table.insert(start, pandoc.RawInline(FORMAT, qr_name .. "=".. span.attributes[qr_name] .. ",\n"))
+              table.insert(start, pandoc.RawInline(FORMAT, qr_name .. "=" .. span.attributes[qr_name] .. ",\n"))
               table.insert(finish,
-                pandoc.Span({(qr_first and "" or ",\n"), pandoc.LineBreak(), pandoc.Strong(qr_labels[bank_language][qr_name]), ": "}))
-              if qr_name == "amount" and not string.match(bank_language, "^[eE][nN]")then
+                pandoc.Span({
+                  (qr_first and "" or ",\n"),
+                  pandoc.LineBreak(),
+                  pandoc.Strong(qr_labels[bank_language][qr_name]),
+                  ": " }))
+              if qr_name == "amount" and not string.match(bank_language, "^[eE][nN]") then
                 span.attributes[qr_name] = string.gsub(span.attributes[qr_name], "%.", ",")
               end
               table.insert(finish,
@@ -923,7 +937,7 @@ return {
           table.insert(pandoc.RawInline(FORMAT, finish), 1, "}")
         end
         if span.classes:includes("underline")
-        or span.classes:includes("ul") then
+            or span.classes:includes("ul") then
           table.insert(start, pandoc.RawInline(FORMAT, "\\underline{"))
           table.insert(pandoc.RawInline(FORMAT, finish), 1, "}")
         end
@@ -962,7 +976,7 @@ return {
         if span.classes:includes("comment") then
           local typ = span.attributes["type"] or "Highlight"
           local color = "Yellow"
-          local author=""
+          local author = ""
           local text = ""
           if not markup_types:includes(typ) then
             io.stderr:write(string.format("Unknown markup type %s in comment span, replacing by 'Highlight'\n", typ))
@@ -990,17 +1004,17 @@ return {
           end
           -- table.insert(start, pandoc.RawInline(FORMAT, "\\pdftooltip[markup=".. typ .. ",color=Yellow]{" .. "\\pdfmarkupcomment[markup=".. typ .. ",color=Yellow]{"))
           -- table.insert(pandoc.RawInline(FORMAT, finish), 1, "}{".. span.attributes["text"] .."}" .. "}{".. span.attributes["text"] .."}")
-          local prefix = "\\pdfmarkupcomment[markup=".. typ .. ",color=" .. color
+          local prefix = "\\pdfmarkupcomment[markup=" .. typ .. ",color=" .. color
           if author ~= "" then
             prefix = prefix .. ",author={" .. author .. "}"
           end
           prefix = prefix .. "]{"
           table.insert(start, pandoc.RawInline(FORMAT, prefix))
-          table.insert(finish, 1, pandoc.RawInline(FORMAT, "}{".. text .."}"))
+          table.insert(finish, 1, pandoc.RawInline(FORMAT, "}{" .. text .. "}"))
         end
         if span.classes:includes("margincomment") then
           table.insert(start, pandoc.RawInline(FORMAT, "\\pdfmargincomment[color=Yellow]{" .. text .. "}"))
-          print("START: ".. start)
+          print("START: " .. start)
         end
         -- weird hack
 
