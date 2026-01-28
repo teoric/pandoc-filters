@@ -13,15 +13,16 @@
 --------------------------------------------------------------------------------
 --
 
-local text = require 'text'
+local text = require("text")
 
-return {{
-  SmallCaps = function (elem)
-    return pandoc.walk_inline(
-      pandoc.Span(elem.c), {
+return {
+  {
+    SmallCaps = function(elem)
+      return pandoc.walk_inline(pandoc.Span(elem.c), {
         Str = function(el)
           return pandoc.Str(text.upper(el.text))
-        end
-    })
-  end
-}}
+        end,
+      })
+    end,
+  },
+}
