@@ -13,16 +13,16 @@
 --
 
 -- local inspect = require('inspect')
-local text = require 'text'
-local List = require 'pandoc.List'
-local utils = require 'pandoc.utils'
+local text = require("text")
+local List = require("pandoc.List")
+local utils = require("pandoc.utils")
 
-local utilPath = string.match(PANDOC_SCRIPT_FILE, '.*[/\\]')
+local utilPath = string.match(PANDOC_SCRIPT_FILE, ".*[/\\]")
 if PANDOC_VERSION >= { 2, 12 } then
-  local path = require 'pandoc.path'
+  local path = require("pandoc.path")
   utilPath = path.directory(PANDOC_SCRIPT_FILE) .. path.separator
 end
-local loc_utils = dofile((utilPath or '') .. 'utils.lua')
+local loc_utils = dofile((utilPath or "") .. "utils.lua")
 
 local pdfcomment_author = nil
 
@@ -35,10 +35,14 @@ local force_html_footnote = false
 -- box types
 local boxes = {
   "block",
-  "goodbox", "badbox", "acceptbox",
+  "goodbox",
+  "badbox",
+  "acceptbox",
   "claimbox",
-  "yellowbox", "bluebox",
-  "exbox", "exxbox"
+  "yellowbox",
+  "bluebox",
+  "exbox",
+  "exxbox",
 }
 local fontsizes = {
   "tiny",
@@ -50,18 +54,22 @@ local fontsizes = {
   "Large",
   "LARGE",
   "huge",
-  "Huge"
+  "Huge",
 }
 
 local markup_types = pandoc.List:new({
   "Highlight",
   "Underline",
   "Squiggly",
-  "StrikeOut"
+  "StrikeOut",
 })
 
 local boxes_optional = {
-  "definition", "theorem", "claim", "remark", "anm"
+  "definition",
+  "theorem",
+  "claim",
+  "remark",
+  "anm",
 }
 
 local comments = {
@@ -72,7 +80,7 @@ local comments = {
   "Kommentar",
   "Erläuterung",
   "Beispiel",
-  "Lösung"
+  "Lösung",
 }
 
 local remarks = {
@@ -82,7 +90,7 @@ local remarks = {
   "Antwort",
   "Frage/Bewertung",
   "Frage/Anregung",
-  "Bewertung/Frage"
+  "Bewertung/Frage",
 }
 
 local qr_fields = {
@@ -93,7 +101,7 @@ local qr_fields = {
   "reason",
   "ref",
   "text",
-  "information"
+  "information",
 }
 
 local qr_labels = {
@@ -105,7 +113,7 @@ local qr_labels = {
     ["reason"] = "Verwendungszweck",
     ["ref"] = "Referenz",
     ["text"] = "Text",
-    ["information"] = "Zusatzinformation"
+    ["information"] = "Zusatzinformation",
   },
   ["en"] = {
     ["bic"] = "BIC",
@@ -115,12 +123,14 @@ local qr_labels = {
     ["reason"] = "Reason",
     ["ref"] = "Reference",
     ["text"] = "Text",
-    ["information"] = "Information"
-  }
+    ["information"] = "Information",
+  },
 }
 
 local skips = pandoc.List({
-  "big", "med", "small"
+  "big",
+  "med",
+  "small",
 })
 
 local name_caps
@@ -155,11 +165,11 @@ function check_classes(div, classes)
 end
 
 function add_style(el, style, value)
-  if el.attributes['style'] == nil then
-    el.attributes['style'] = ""
+  if el.attributes["style"] == nil then
+    el.attributes["style"] = ""
   end
   -- TODO: proof against missing semicolon?
-  el.attributes['style'] = el.attributes['style'] .. style .. ': ' .. value .. ';'
+  el.attributes["style"] = el.attributes["style"] .. style .. ": " .. value .. ";"
 end
 
 function eval_md(code, FORMAT)
@@ -178,15 +188,14 @@ end
 local remove_break = {
   LineBreak = function()
     return pandoc.Space()
-  end
+  end,
 }
 
 local search_dirs = {
   PANDOC_STATE.user_data_dir .. "/templates",
   PANDOC_STATE.user_data_dir,
   -- maybe not the best location, but why not:
-  PANDOC_STATE.user_data_dir .. "/filters"
-
+  PANDOC_STATE.user_data_dir .. "/filters",
 }
 
 function get_and_search(filename)
@@ -247,7 +256,7 @@ return {
       name_caps = meta["name-small-caps"]
       color_comments = meta["color-remarks"]
       local omitted = meta["omit"]
-      if (meta["classoption"] ~= nil and meta["classoptions"] ~= nil) then
+      if meta["classoption"] ~= nil and meta["classoptions"] ~= nil then
         meta["classoption"] = loc_utils.listify(meta["classoption"])
         meta["classoption"]:extend(loc_utils.listify(meta["classoptions"]))
       end
@@ -258,20 +267,20 @@ return {
       to_highlight = loc_utils.listify(highlighted):map(function(o)
         return utils.stringify(o)
       end)
-      if (meta["slide-level"]) then
+      if meta["slide-level"] then
         local meta_level = meta["slide-level"]
         slide_level = tonumber(utils.stringify(meta_level)) + 1
       end
       -- force different default document class
-      if FORMAT:match 'latex' and meta.documentclass ~= "article" then
+      if FORMAT:match("latex") and meta.documentclass ~= "article" then
         meta["documentclass"] = "scrartcl"
       end
       return meta
-    end
+    end,
   },
   {
     Header = function(el)
-      if FORMAT:match 'latex' then
+      if FORMAT:match("latex") then
         if utils.stringify(el) == "Anlagen" then
           local ret = pandoc.RawBlock(FORMAT, "\\Anlagen{}")
           return ret
@@ -286,28 +295,44 @@ return {
             local file = el.attributes["file"]
             if file == nil then
               if el.level == 2 then
-                local ret = List:new({ pandoc.RawInline(FORMAT, "\\secanlage{" .. utils.stringify(el.content) .. "}{"
-                  .. el.identifier .. "}") })
+                local ret = List:new({
+                  pandoc.RawInline(
+                    FORMAT,
+                    "\\secanlage{" .. utils.stringify(el.content) .. "}{" .. el.identifier .. "}"
+                  ),
+                })
                 return ret
               else
                 error(string.format("No file for %s [#%s]", utils.stringify(el), el.identifier))
               end
             else
               local subtype = (el.level > 2) and "sub" or ""
-              local ret = List:new({ pandoc.RawInline(FORMAT,
-                "\\" .. subtype .. "anlage" .. scale .. "{" .. utils.stringify(el.content) .. "}{"
-                .. el.identifier .. "}{" .. file .. "}"
-              ) })
+              local ret = List:new({
+                pandoc.RawInline(
+                  FORMAT,
+                  "\\"
+                    .. subtype
+                    .. "anlage"
+                    .. scale
+                    .. "{"
+                    .. utils.stringify(el.content)
+                    .. "}{"
+                    .. el.identifier
+                    .. "}{"
+                    .. file
+                    .. "}"
+                ),
+              })
               return ret
             end
           end
         end
       end
-    end
+    end,
   },
   {
     Span = function(el)
-      if FORMAT:match 'latex' or FORMAT:match 'beamer' then
+      if FORMAT:match("latex") or FORMAT:match("beamer") then
         if el.classes:includes("voccom") then
           local ret = List:new()
           table.insert(ret, pandoc.RawInline(FORMAT, "\\voclemCom"))
@@ -365,7 +390,7 @@ return {
           return ret
         end
       end
-    end
+    end,
   },
   {
     Link = function(el)
@@ -399,20 +424,23 @@ return {
         local target = el.target:gsub("^http[^:]*://[^/]+/", "")
         -- print(target)
         el.content = target
-        local ret = List:new({ pandoc.RawInline(FORMAT, "\\textsc{urn}: "), pandoc.Link(target,
-          "https://mdz-nbn-resolving.de/" .. target) })
+        local ret = List:new({
+          pandoc.RawInline(FORMAT, "\\textsc{urn}: "),
+          pandoc.Link(target, "https://mdz-nbn-resolving.de/" .. target),
+        })
         return ret
       elseif string.find(utils.stringify(el.content), "doi.org") then
         local target = el.target:gsub("^http[^:]*://[^/]+/", "")
         -- print(target)
         el.content = target
-        local ret = List:new({ pandoc.RawInline(FORMAT, "\\textsc{doi}: "), pandoc.Link(target,
-          "https://doi.org/" .. target) })
+        local ret = List:new({
+          pandoc.RawInline(FORMAT, "\\textsc{doi}: "),
+          pandoc.Link(target, "https://doi.org/" .. target),
+        })
         return ret
       end
-      if (force_html_footnote) or (not loc_utils.startswith(FORMAT, 'html')) then
-        if url_footnote and (utils.stringify(el) ~= el.target) and not loc_utils.startswith(el.target, "#")
-        then
+      if force_html_footnote or (not loc_utils.startswith(FORMAT, "html")) then
+        if url_footnote and (utils.stringify(el) ~= el.target) and not loc_utils.startswith(el.target, "#") then
           -- print(utils.stringify(el))
           -- convert Link to footnote
           local note_span = pandoc.Span(pandoc.Span(pandoc.Link(el.target, el.target)))
@@ -431,88 +459,76 @@ return {
           return pandoc.List({ el, note })
         end
       end
-      if FORMAT:match 'latex' then
+      if FORMAT:match("latex") then
         if el.attributes["type"] == "anlage" then
           local ret = pandoc.RawInline(FORMAT, "\\emnameref{anlage:" .. utils.stringify(el) .. "}")
           return ret
         end
       end
       return el
-    end
+    end,
   },
   {
     Span = function(el)
-      local color = el.attributes['color']
-      local bgcolor = el.attributes['bgcolor']
+      local color = el.attributes["color"]
+      local bgcolor = el.attributes["bgcolor"]
       if color ~= nil or bgcolor ~= nil then
         -- if no color attribute, return unchanged -- redundant!
         -- transform to <span style="color: red;"></span>
-        if FORMAT:match 'html' or FORMAT:match 'html5' then
+        if FORMAT:match("html") or FORMAT:match("html5") then
           -- remove color attributes
           if color ~= nil then
-            el.attributes['color'] = nil
+            el.attributes["color"] = nil
             -- use style attribute instead
             add_style(el, "color", color)
           end
           if bgcolor ~= nil then
-            el.attributes['bgcolor'] = nil
+            el.attributes["bgcolor"] = nil
             -- use style attribute instead
             add_style(el, "background-color", bgcolor)
             add_style(el, "padding", ".5ex")
           end
-          -- return full span element
-          -- return el
-        elseif FORMAT:match 'latex' or FORMAT:match 'beamer' then
+        -- return full span element
+        -- return el
+        elseif FORMAT:match("latex") or FORMAT:match("beamer") then
           local start = List:new()
           local finish = List:new()
           if color ~= nil then
             -- remove color attributes
-            el.attributes['color'] = nil
-            table.insert(el.content, 1, pandoc.RawInline(FORMAT, '\\textcolor{' .. color .. '}{'))
+            el.attributes["color"] = nil
+            table.insert(el.content, 1, pandoc.RawInline(FORMAT, "\\textcolor{" .. color .. "}{"))
             table.insert(el.content, pandoc.RawInline(FORMAT, "}"))
           end
           if bgcolor ~= nil then
             -- remove color attributes
-            el.attributes['bgcolor'] = nil
-            table.insert(el.content, 1, pandoc.RawInline(FORMAT, '\\colorbox{' .. bgcolor .. '}{'))
+            el.attributes["bgcolor"] = nil
+            table.insert(el.content, 1, pandoc.RawInline(FORMAT, "\\colorbox{" .. bgcolor .. "}{"))
             table.insert(el.content, pandoc.RawInline(FORMAT, "}"))
           end
-          -- returns only span content
-          -- return el.content
+        -- returns only span content
+        -- return el.content
         else
           -- for other format return unchanged
           -- return el
         end
       end
       if el.classes:includes("menu") then
-        if FORMAT:match 'latex' or FORMAT:match 'beamer' then
-          table.insert(
-            el.content, 1,
-            pandoc.RawInline('latex', '\\textsf{\\bfseries{}')
-          )
-          table.insert(
-            el.content,
-            pandoc.RawInline('latex', '}')
-          )
-          -- returns only span content
-          -- return el.content
+        if FORMAT:match("latex") or FORMAT:match("beamer") then
+          table.insert(el.content, 1, pandoc.RawInline("latex", "\\textsf{\\bfseries{}"))
+          table.insert(el.content, pandoc.RawInline("latex", "}"))
+        -- returns only span content
+        -- return el.content
         else
           -- for other format return unchanged
           -- return el
         end
       end
       if el.classes:includes("serif") then
-        if FORMAT:match 'latex' or FORMAT:match 'beamer' then
-          table.insert(
-            el.content, 1,
-            pandoc.RawInline('latex', '\\textrm{')
-          )
-          table.insert(
-            el.content,
-            pandoc.RawInline('latex', '}')
-          )
-          -- returns only span content
-          -- return el.content
+        if FORMAT:match("latex") or FORMAT:match("beamer") then
+          table.insert(el.content, 1, pandoc.RawInline("latex", "\\textrm{"))
+          table.insert(el.content, pandoc.RawInline("latex", "}"))
+        -- returns only span content
+        -- return el.content
         else
           -- for other format return unchanged
           -- return el
@@ -520,17 +536,11 @@ return {
       end
       for i, b in pairs(fontsizes) do
         if el.classes:includes(b) then
-          if FORMAT:match 'latex' or FORMAT:match 'beamer' then
-            table.insert(
-              el.content, 1,
-              pandoc.RawInline('latex', '\\begingroup\\' .. b .. '{}')
-            )
-            table.insert(
-              el.content,
-              pandoc.RawInline('latex', '\\endgroup')
-            )
-            -- returns only span content
-            -- return el.content
+          if FORMAT:match("latex") or FORMAT:match("beamer") then
+            table.insert(el.content, 1, pandoc.RawInline("latex", "\\begingroup\\" .. b .. "{}"))
+            table.insert(el.content, pandoc.RawInline("latex", "\\endgroup"))
+          -- returns only span content
+          -- return el.content
           else
             -- for other format return unchanged
             -- return el
@@ -538,7 +548,7 @@ return {
         end
       end
       return el
-    end
+    end,
   },
   {
     Div = function(div)
@@ -547,31 +557,25 @@ return {
           return pandoc.List:new()
         end
         if to_highlight:includes(class) then
-          table.insert(
-            div.content, 1,
-            pandoc.Para(pandoc.Strong("⇓ " .. text.upper(class) .. " ⇓"))
-          )
-          table.insert(
-            div.content,
-            pandoc.Para(pandoc.Strong("⇑ " .. text.upper(class) .. " ⇑"))
-          )
+          table.insert(div.content, 1, pandoc.Para(pandoc.Strong("⇓ " .. text.upper(class) .. " ⇓")))
+          table.insert(div.content, pandoc.Para(pandoc.Strong("⇑ " .. text.upper(class) .. " ⇑")))
         end
         -- return div
       end
-      local color = div.attributes['color']
-      local bgcolor = div.attributes['bgcolor']
+      local color = div.attributes["color"]
+      local bgcolor = div.attributes["bgcolor"]
       if color ~= nil or bgcolor ~= nil then
         -- if no color attribute, return unchanged -- redundant!
         -- transform to <span style="color: red;"></span>
-        if FORMAT:match 'html' or FORMAT:match 'html5' then
+        if FORMAT:match("html") or FORMAT:match("html5") then
           -- remove color attributes
           if color ~= nil then
-            div.attributes['color'] = nil
+            div.attributes["color"] = nil
             -- use style attribute instead
             add_style(div, "color", color)
           end
           if bgcolor ~= nil then
-            div.attributes['bgcolor'] = nil
+            div.attributes["bgcolor"] = nil
             -- use style attribute instead
             add_style(div, "background-color", bgcolor)
           end
@@ -586,14 +590,12 @@ return {
         -- wrap div in box containers
         if div.classes:includes("only") then
           local scope = div.attributes["scope"] or "+-"
-          table.insert(start, 1, pandoc.RawInline(FORMAT, "\\only<" .. scope ..
-            ">{"))
+          table.insert(start, 1, pandoc.RawInline(FORMAT, "\\only<" .. scope .. ">{"))
           table.insert(finish, pandoc.RawInline(FORMAT, "}"))
         end
         if div.classes:includes("uncover") then
           local scope = div.attributes["scope"] or "+-"
-          table.insert(start, 1, pandoc.RawInline(FORMAT, "\\uncover<" .. scope ..
-            ">{"))
+          table.insert(start, 1, pandoc.RawInline(FORMAT, "\\uncover<" .. scope .. ">{"))
           table.insert(finish, pandoc.RawInline(FORMAT, "}"))
         end
         if div.classes:includes("on_next") then
@@ -611,7 +613,12 @@ return {
           if div.classes:includes(b) then
             local title = div.attributes["title"] or ""
             local scope = div.attributes["scope"]
-            if scope ~= nil and not (div.classes:includes("uncover")) and not (div.classes:includes("only")) and not (div.classes:includes("on_next")) then
+            if
+              scope ~= nil
+              and not (div.classes:includes("uncover"))
+              and not (div.classes:includes("only"))
+              and not (div.classes:includes("on_next"))
+            then
               scope = "<" .. scope .. ">"
             else
               scope = ""
@@ -621,10 +628,14 @@ return {
             local title_span = pandoc.Span(eval_md(title))
             table.insert(start, title_span)
             if div.attributes["rechts"] then
-              table.insert(title_span.c, pandoc.Span(
-                { pandoc.RawInline(FORMAT, "\\rechtsanm{"),
+              table.insert(
+                title_span.c,
+                pandoc.Span({
+                  pandoc.RawInline(FORMAT, "\\rechtsanm{"),
                   eval_md(div.attributes["rechts"]),
-                  pandoc.RawInline(FORMAT, "}") }))
+                  pandoc.RawInline(FORMAT, "}"),
+                })
+              )
             end
             table.insert(start, pandoc.RawInline(FORMAT, "}"))
             table.insert(finish, 1, pandoc.RawInline(FORMAT, "\\end{" .. b .. "}"))
@@ -641,10 +652,11 @@ return {
               table.insert(start, title_span)
             end
             if div.attributes["rechts"] then
-              title_span.c:extend(
-                { pandoc.RawInline(FORMAT, "\\rechtsanm{"),
-                  eval_md(div.attributes["rechts"]),
-                  pandoc.RawInline(FORMAT, "}") })
+              title_span.c:extend({
+                pandoc.RawInline(FORMAT, "\\rechtsanm{"),
+                eval_md(div.attributes["rechts"]),
+                pandoc.RawInline(FORMAT, "}"),
+              })
             end
             table.insert(start, pandoc.RawInline(FORMAT, "]"))
             table.insert(finish, 1, pandoc.RawInline(FORMAT, "\\end{" .. b .. "}"))
@@ -667,7 +679,7 @@ return {
         -- same code below for LATEX
         local skip = div.attributes["skip"]
         if skip ~= nil and skips:includes(skip) then
-          table.insert(start, pandoc.RawInline(FORMAT, '\\' .. skip .. "skip{}"))
+          table.insert(start, pandoc.RawInline(FORMAT, "\\" .. skip .. "skip{}"))
         end
         if start ~= "" then
           local ret = start
@@ -708,9 +720,8 @@ return {
               to_insert = to_insert .. "title={" .. title_code .. "}"
             end
             if div.attributes["rechts"] then
-              to_insert = to_insert ..
-                  pandoc.RawInline(FORMAT, "\\rechtsanm{" ..
-                    eval_md(div.attributes["rechts"], FORMAT) .. "}")
+              to_insert = to_insert
+                .. pandoc.RawInline(FORMAT, "\\rechtsanm{" .. eval_md(div.attributes["rechts"], FORMAT) .. "}")
             end
             to_insert = to_insert .. "]"
             table.insert(start, pandoc.RawInline(FORMAT, to_insert))
@@ -721,44 +732,55 @@ return {
         local is_comment = check_comment(div)
         -- io.stderr:write(table.concat(div.classes, ";;"), "\n")
         if div.attributes["color"] ~= nil then
-          color = '\\color{' .. div.attributes["color"] .. '}'
+          color = "\\color{" .. div.attributes["color"] .. "}"
         end
         if div.attributes["resolved"] then
           return List:new()
-        elseif (is_remark or is_comment) then
+        elseif is_remark or is_comment then
           local color = ""
           if is_comment and color_comments then
             color = remark_color
           elseif is_remark then
             color = remark_color
           end
-          table.insert(start,
-            pandoc.RawInline(FORMAT, "\\begin{tcolorbox}[title=" .. table.concat(div.classes, ";;") .. "]"))
+          table.insert(
+            start,
+            pandoc.RawInline(FORMAT, "\\begin{tcolorbox}[title=" .. table.concat(div.classes, ";;") .. "]")
+          )
           table.insert(pandoc.RawInline(FORMAT, finish), 1, "\\end{tcolorbox}")
-          -- table.insert(start, pandoc.RawInline(FORMAT, "\\begin{addmargin}[1cm]{1cm}" .. color .."\\vskip1ex\\begingroup\\textbf{" .. table.concat(div.classes, ";;") .. "}"))
-          -- table.insert(pandoc.RawInline(FORMAT, finish), 1, "\\endgroup\\vskip1ex\\end{addmargin}")
-        elseif (color ~= nil) then
-          table.insert(start, pandoc.RawInline(FORMAT, '{' .. color))
-          table.insert(pandoc.RawInline(FORMAT, finish), 1, '}')
+        -- table.insert(start, pandoc.RawInline(FORMAT, "\\begin{addmargin}[1cm]{1cm}" .. color .."\\vskip1ex\\begingroup\\textbf{" .. table.concat(div.classes, ";;") .. "}"))
+        -- table.insert(pandoc.RawInline(FORMAT, finish), 1, "\\endgroup\\vskip1ex\\end{addmargin}")
+        elseif color ~= nil then
+          table.insert(start, pandoc.RawInline(FORMAT, "{" .. color))
+          table.insert(pandoc.RawInline(FORMAT, finish), 1, "}")
         end
         if div.attributes["linestretch"] then
-          table.insert(start, pandoc.RawInline(FORMAT, '\\bgroup\\setstretch{' .. div.attributes["linestretch"] .. '}'))
-          finish = '\\egroup{}' .. finish
+          table.insert(start, pandoc.RawInline(FORMAT, "\\bgroup\\setstretch{" .. div.attributes["linestretch"] .. "}"))
+          finish = "\\egroup{}" .. finish
         end
         if div.attributes["bgcolor"] then
-          table.insert(start,
-            pandoc.RawInline(FORMAT,
-              '\\begin{tcolorbox}[colback=' ..
-              div.attributes["bgcolor"] .. '!20, colframe=' .. div.attributes["bgcolor"] .. '!80!black]'))
-          table.insert(finish, 1, pandoc.RawInline(FORMAT, '\\end{tcolorbox}'))
+          table.insert(
+            start,
+            pandoc.RawInline(
+              FORMAT,
+              "\\begin{tcolorbox}[colback="
+                .. div.attributes["bgcolor"]
+                .. "!20, colframe="
+                .. div.attributes["bgcolor"]
+                .. "!80!black]"
+            )
+          )
+          table.insert(finish, 1, pandoc.RawInline(FORMAT, "\\end{tcolorbox}"))
         end
         if div.classes:includes("xml") then
           table.insert(start, pandoc.RawInline(FORMAT, "\\paragraph{XML}\\begingroup\\sffamily{}"))
           table.insert(finish, 1, pandoc.RawInline(FORMAT, "\\endgroup{}"))
         end
         if div.classes:includes("xml_details") then
-          table.insert(start,
-            pandoc.RawInline(FORMAT, "\\begin{addmargin}{1em}\\sffamily{}\\relsize{-1}\\color{darkgray}"))
+          table.insert(
+            start,
+            pandoc.RawInline(FORMAT, "\\begin{addmargin}{1em}\\sffamily{}\\relsize{-1}\\color{darkgray}")
+          )
           table.insert(finish, 1, pandoc.RawInline(FORMAT, "\\end{addmargin}"))
         end
         if div.classes:includes("transcription") then
@@ -788,21 +810,25 @@ return {
           local prefix = div.attributes["prefix"] or ""
           if title ~= nil then
             if author ~= nil then
-              table.insert(start,
-                pandoc.RawInline(FORMAT, "\\titleauthorpoem[" .. prefix .. "]{" .. title .. "}{" .. author .. "}"))
+              table.insert(
+                start,
+                pandoc.RawInline(FORMAT, "\\titleauthorpoem[" .. prefix .. "]{" .. title .. "}{" .. author .. "}")
+              )
             else
               table.insert(start, pandoc.RawInline(FORMAT, "\\titlepoem{" .. title .. "}"))
             end
           elseif author ~= nil then
-            table.insert(start,
-              pandoc.RawInline(FORMAT, "\\titleauthorpoem[" .. prefix .. "]{\\poemblanktitle}{" .. author .. "}"))
+            table.insert(
+              start,
+              pandoc.RawInline(FORMAT, "\\titleauthorpoem[" .. prefix .. "]{\\poemblanktitle}{" .. author .. "}")
+            )
           end
           table.insert(finish, 1, pandoc.RawInline(FORMAT, "\\\\-\\end{poem}"))
           -- break -- allow only first box!
         end
         local skip = div.attributes["skip"]
         if skip ~= nil and skips:includes(skip) then
-          table.insert(start, pandoc.RawInline(FORMAT, '\\' .. skip .. "skip{}"))
+          table.insert(start, pandoc.RawInline(FORMAT, "\\" .. skip .. "skip{}"))
         end
         local break_after = div.attributes["break-after"] or div.classes:includes("break_after")
         if break_after ~= nil and break_after ~= false and break_after ~= "" then
@@ -819,7 +845,7 @@ return {
       end
     end,
     Span = function(span)
-      if FORMAT:match 'html' or FORMAT:match 'html5' then
+      if FORMAT:match("html") or FORMAT:match("html5") then
         if span.classes:includes("comment") then
           local typ = span.attributes["type"] or "Highlight"
           local color = "Yellow"
@@ -900,20 +926,21 @@ return {
           for i, qr_name in pairs(qr_fields) do
             if span.attributes[qr_name] ~= nil then
               table.insert(start, pandoc.RawInline(FORMAT, qr_name .. "=" .. span.attributes[qr_name] .. ",\n"))
-              table.insert(finish,
+              table.insert(
+                finish,
                 pandoc.Span({
                   (qr_first and "" or ",\n"),
                   pandoc.LineBreak(),
                   pandoc.Strong(qr_labels[bank_language][qr_name]),
-                  ": " }))
+                  ": ",
+                })
+              )
               if qr_name == "amount" and not string.match(bank_language, "^[eE][nN]") then
                 span.attributes[qr_name] = string.gsub(span.attributes[qr_name], "%.", ",")
               end
-              table.insert(finish,
-                pandoc.Span(span.attributes[qr_name]))
+              table.insert(finish, pandoc.Span(span.attributes[qr_name]))
               if qr_name == "amount" then
-                table.insert(finish,
-                  pandoc.Span(" €"))
+                table.insert(finish, pandoc.Span(" €"))
               end
               qr_first = false
             end
@@ -936,8 +963,7 @@ return {
           table.insert(start, pandoc.RawInline(FORMAT, "\\emojiText{"))
           table.insert(pandoc.RawInline(FORMAT, finish), 1, "}")
         end
-        if span.classes:includes("underline")
-            or span.classes:includes("ul") then
+        if span.classes:includes("underline") or span.classes:includes("ul") then
           table.insert(start, pandoc.RawInline(FORMAT, "\\underline{"))
           table.insert(pandoc.RawInline(FORMAT, finish), 1, "}")
         end
@@ -1026,10 +1052,10 @@ return {
           ret:extend(span.content)
           ret:extend(finish)
           return {
-            pandoc.Span(ret, span.attr)
+            pandoc.Span(ret, span.attr),
           }
         end
       end
-    end
-  }
+    end,
+  },
 }

@@ -7,11 +7,71 @@ local export = {}
 -- -- end https://stackoverflow.com/questions/6380820/get-containing-path-of-lua-file
 
 -- http://lua-users.org/wiki/BaseSixtyFour
-local bs = { [0] =
-'A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P',
-'Q','R','S','T','U','V','W','X','Y','Z','a','b','c','d','e','f',
-'g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v',
-'w','x','y','z','0','1','2','3','4','5','6','7','8','9','+','/',
+local bs = {
+  [0] = "A",
+  "B",
+  "C",
+  "D",
+  "E",
+  "F",
+  "G",
+  "H",
+  "I",
+  "J",
+  "K",
+  "L",
+  "M",
+  "N",
+  "O",
+  "P",
+  "Q",
+  "R",
+  "S",
+  "T",
+  "U",
+  "V",
+  "W",
+  "X",
+  "Y",
+  "Z",
+  "a",
+  "b",
+  "c",
+  "d",
+  "e",
+  "f",
+  "g",
+  "h",
+  "i",
+  "j",
+  "k",
+  "l",
+  "m",
+  "n",
+  "o",
+  "p",
+  "q",
+  "r",
+  "s",
+  "t",
+  "u",
+  "v",
+  "w",
+  "x",
+  "y",
+  "z",
+  "0",
+  "1",
+  "2",
+  "3",
+  "4",
+  "5",
+  "6",
+  "7",
+  "8",
+  "9",
+  "+",
+  "/",
 }
 
 --- encode according to base64
@@ -44,7 +104,7 @@ function export.startswith(String, Start)
 end
 
 function export.endswith(String, End)
-  return End == '' or string.sub(String, - string.len(End)) == End
+  return End == "" or string.sub(String, -string.len(End)) == End
 end
 
 -- https://gist.github.com/liukun/f9ce7d6d14fa45fe9b924a3eed5c3d99
@@ -67,7 +127,6 @@ local hex_to_char = function(x)
   return string.char(tonumber(x, 16))
 end
 
-
 function export.urldecode(url)
   if url == nil then
     return
@@ -82,7 +141,6 @@ end
 -- to encode table as parameters, see https://github.com/stuartpb/tvtropes-lua/blob/master/urlencode.lua
 
 -- end https://gist.github.com/liukun/f9ce7d6d14fa45fe9b924a3eed5c3d99
-
 
 --- check if a file exists
 -- @param name The name of the hypothetical file
@@ -109,10 +167,10 @@ function export.get_keys(tab)
 end
 
 function export.listify(listee)
-  if type(listee) == 'table' then
+  if type(listee) == "table" then
     return pandoc.List:new(listee)
   else
-    return pandoc.List:new({listee})
+    return pandoc.List:new({ listee })
   end
 end
 

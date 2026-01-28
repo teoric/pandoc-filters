@@ -34,34 +34,31 @@ PDF viewers, e.g. for me not in Evince.)
 --]]
 
 -- local inspect = require('inspect')
-local text = require 'text'
-local list = require 'pandoc.List'
-local utils = require 'pandoc.utils'
+local text = require("text")
+local list = require("pandoc.List")
+local utils = require("pandoc.utils")
 -- io.stderr:write(FORMAT .. "\n")
-local utilPath = string.match(PANDOC_SCRIPT_FILE, '.*[/\\]')
-if PANDOC_VERSION >= {2,12} then
-  local path = require 'pandoc.path'
+local utilPath = string.match(PANDOC_SCRIPT_FILE, ".*[/\\]")
+if PANDOC_VERSION >= { 2, 12 } then
+  local path = require("pandoc.path")
   utilPath = path.directory(PANDOC_SCRIPT_FILE) .. path.separator
 end
-local loc_utils = dofile ((utilPath or '') .. 'utils.lua')
+local loc_utils = dofile((utilPath or "") .. "utils.lua")
 -- does not work anymore!
 -- local loc_utils = require(debug.getinfo(1, "S").source:sub(2):match( "(.*[\\/])") .. "utils")
 
-
 -- https://stackoverflow.com/questions/6380820/get-containing-path-of-lua-file
-
-
 
 -- features for which defaults can be defined, by query type
 local query_values = {
   ["ANNIS"] = {
     "base",
-    "corpus"
+    "corpus",
   },
   ["KorAP"] = {
     "base",
-    "lang"
-  }
+    "lang",
+  },
 }
 
 local server_types = loc_utils.get_keys(query_values)
@@ -96,7 +93,6 @@ local function read_file(file_name, limit)
   file:close()
   return content
 end
-
 
 --- get a value, relying on defaults
 -- @param typ The type of query
@@ -133,7 +129,7 @@ return {
           end
         end
       end
-    end
+    end,
   },
   {
     -- process query links
@@ -143,11 +139,7 @@ return {
         local file = string.gsub(el.target, "^file:/*", "")
         if loc_utils.file_exists(file) then
           io.stderr:write(string.format("will include %s\n", file))
-          return pandoc.RawInline(
-            "beamer",
-            string.format("\\textattachfile{%s}{%s}",
-            file,
-            utils.stringify(el)))
+          return pandoc.RawInline("beamer", string.format("\\textattachfile{%s}{%s}", file, utils.stringify(el)))
         else
           io.stderr:write("cannot attach '" .. file .. "' (does not exist).")
         end
@@ -155,14 +147,16 @@ return {
         local server = get_server(el, typ)
         local base = get_value(typ, el, server, "base")
         -- add slash to base if necessary
-        if not(loc_utils.endswith(base, "/")) then
+        if not (loc_utils.endswith(base, "/")) then
           base = base .. "/"
         end
         local corpus = get_value("ANNIS", el, server, "corpus")
         -- io.stderr:write(utils.stringify(el) .. "\n")
-        el.target =  base ..
-        "#_q=" .. loc_utils.base64(loc_utils.trim(utils.stringify(el))) ..
-        "&_c=" .. loc_utils.base64(loc_utils.trim(corpus))
+        el.target = base
+          .. "#_q="
+          .. loc_utils.base64(loc_utils.trim(utils.stringify(el)))
+          .. "&_c="
+          .. loc_utils.base64(loc_utils.trim(corpus))
         -- io.stderr:write(el.target .. "\n")
         return el
       elseif typ == "KorAP" then
@@ -170,9 +164,11 @@ return {
         local base = get_value(typ, el, server, "base")
         local lang = get_value(typ, el, server, "lang")
         -- io.stderr:write(utils.stringify(el) .. "\n")
-        el.target =  base ..
-        "?q=" .. loc_utils.urlencode(loc_utils.trim(utils.stringify(el))) ..
-        "&ql=" .. loc_utils.urlencode(loc_utils.trim(lang))
+        el.target = base
+          .. "?q="
+          .. loc_utils.urlencode(loc_utils.trim(utils.stringify(el)))
+          .. "&ql="
+          .. loc_utils.urlencode(loc_utils.trim(lang))
         -- io.stderr:write(el.target .. "\n")
         return el
       elseif el.attributes["type"] == "DWDS" then
@@ -197,12 +193,14 @@ return {
           end
         end
         -- io.stderr:write(utils.stringify(el) .. "\n")
-        el.target =  base ..
-        "?expression=" .. loc_utils.urlencode("/" .. loc_utils.trim(utils.stringify(el)) .. "/g") ..
-        "&engine=pcre&text=" .. loc_utils.urlencode(loc_utils.trim(text))
+        el.target = base
+          .. "?expression="
+          .. loc_utils.urlencode("/" .. loc_utils.trim(utils.stringify(el)) .. "/g")
+          .. "&engine=pcre&text="
+          .. loc_utils.urlencode(loc_utils.trim(text))
         -- io.stderr:write(el.target .. "\n")
         return el
       end
-    end
-  }
+    end,
+  },
 }
