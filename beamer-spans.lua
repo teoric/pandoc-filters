@@ -8,7 +8,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2026-01-28 08:20:40 (+01:00)
+-- Last Changed: 2026-02-17 14:32:05 (+01:00)
 --------------------------------------------------------------------------------
 --
 
@@ -747,12 +747,12 @@ return {
             start,
             pandoc.RawInline(FORMAT, "\\begin{tcolorbox}[title=" .. table.concat(div.classes, ";;") .. "]")
           )
-          table.insert(pandoc.RawInline(FORMAT, finish), 1, "\\end{tcolorbox}")
+          table.insert(finish, 1, pandoc.RawInline(FORMAT, "\\end{tcolorbox}"))
         -- table.insert(start, pandoc.RawInline(FORMAT, "\\begin{addmargin}[1cm]{1cm}" .. color .."\\vskip1ex\\begingroup\\textbf{" .. table.concat(div.classes, ";;") .. "}"))
-        -- table.insert(pandoc.RawInline(FORMAT, finish), 1, "\\endgroup\\vskip1ex\\end{addmargin}")
+        -- table.insert(finish, 1, pandoc.RawInline(FORMAT, "\\endgroup\\vskip1ex\\end{addmargin}"))
         elseif color ~= nil then
           table.insert(start, pandoc.RawInline(FORMAT, "{" .. color))
-          table.insert(pandoc.RawInline(FORMAT, finish), 1, "}")
+          table.insert(finish, 1, pandoc.RawInline(FORMAT, "}"))
         end
         if div.attributes["linestretch"] then
           table.insert(start, pandoc.RawInline(FORMAT, "\\bgroup\\setstretch{" .. div.attributes["linestretch"] .. "}"))
@@ -833,7 +833,7 @@ return {
         local break_after = div.attributes["break-after"] or div.classes:includes("break_after")
         if break_after ~= nil and break_after ~= false and break_after ~= "" then
           print(break_after)
-          table.insert(pandoc.RawInline(FORMAT, finish), 1, "\\newpage")
+          table.insert(finish, 1, pandoc.RawInline(FORMAT, "\\newpage"))
         end
         if start ~= nil then
           local ret = List:new(start)
@@ -901,7 +901,7 @@ return {
           -- nonsense: only for paragraphs!
           -- else
           --   table.insert(start, pandoc.RawInline(FORMAT, "\\begin{flushright}"))
-          --   table.insert(pandoc.RawInline(FORMAT, finish), 1, "\\end{flushright}")
+          --   table.insert(finish, 1, pandoc.RawInline(FORMAT, "\\end{flushright}"))
           -- end
         end
         if span.classes:includes("rkomment") then
@@ -911,12 +911,12 @@ return {
         if span.classes:includes("sans") or span.classes:includes("sf") then
           -- start = "\\oldemph{"
           table.insert(start, pandoc.RawInline(FORMAT, "\\textsf{"))
-          table.insert(pandoc.RawInline(FORMAT, finish), 1, "}")
+          table.insert(finish, 1, pandoc.RawInline(FORMAT, "}"))
         end
         if span.classes:includes("emph") then
           -- start = "\\oldemph{"
           table.insert(start, pandoc.RawInline(FORMAT, "\\emph{"))
-          table.insert(pandoc.RawInline(FORMAT, finish), 1, "}")
+          table.insert(finish, 1, pandoc.RawInline(FORMAT, "}"))
         end
         if span.classes:includes("bank_transfer") then
           table.insert(start, pandoc.RawInline(FORMAT, "\\epcqr{"))
@@ -949,51 +949,55 @@ return {
         end
         if span.classes:includes("icon") then
           table.insert(start, pandoc.RawInline(FORMAT, "\\icontext{"))
-          table.insert(pandoc.RawInline(FORMAT, finish), 1, "}")
+          table.insert(finish, 1, pandoc.RawInline(FORMAT, "}"))
         end
         if span.classes:includes("lig") then
           table.insert(start, pandoc.RawInline(FORMAT, "\\ligtext{\\unemph{"))
-          table.insert(pandoc.RawInline(FORMAT, finish), 1, "}}")
+          table.insert(finish, 1, pandoc.RawInline(FORMAT, "}}"))
         end
         if span.classes:includes("uni") then
           table.insert(start, pandoc.RawInline(FORMAT, "\\unitext{\\unemph{"))
-          table.insert(pandoc.RawInline(FORMAT, finish), 1, "}}")
+          table.insert(finish, 1, pandoc.RawInline(FORMAT, "}}"))
+        end
+        if span.classes:includes("frak") then
+          table.insert(start, pandoc.RawInline(FORMAT, "\\fraktext{\\unemph{"))
+          table.insert(finish, 1, pandoc.RawInline(FORMAT, "}}"))
         end
         if span.classes:includes("emoji") then
           table.insert(start, pandoc.RawInline(FORMAT, "\\emojiText{"))
-          table.insert(pandoc.RawInline(FORMAT, finish), 1, "}")
+          table.insert(finish, 1, pandoc.RawInline(FORMAT, "}"))
         end
         if span.classes:includes("underline") or span.classes:includes("ul") then
           table.insert(start, pandoc.RawInline(FORMAT, "\\underline{"))
-          table.insert(pandoc.RawInline(FORMAT, finish), 1, "}")
+          table.insert(finish, 1, pandoc.RawInline(FORMAT, "}"))
         end
         if span.classes:includes("unemph") then
           table.insert(start, pandoc.RawInline(FORMAT, "\\unemph{"))
-          table.insert(pandoc.RawInline(FORMAT, finish), 1, "}")
+          table.insert(finish, 1, pandoc.RawInline(FORMAT, "}"))
         end
         if span.classes:includes("fnhd_text") then
           table.insert(start, pandoc.RawInline(FORMAT, "{\\normalfont\\unifont{}"))
-          table.insert(pandoc.RawInline(FORMAT, finish), 1, "}")
+          table.insert(finish, 1, pandoc.RawInline(FORMAT, "}"))
         end
         if span.classes:includes("so") or span.classes:includes("ls") or span.classes:includes("gesperrt") then
           table.insert(start, pandoc.RawInline(FORMAT, "\\textso{"))
-          table.insert(pandoc.RawInline(FORMAT, finish), 1, "}")
+          table.insert(finish, 1, pandoc.RawInline(FORMAT, "}"))
         end
         if span.classes:includes("name") then
           table.insert(start, pandoc.RawInline(FORMAT, "\\textsc{"))
-          table.insert(pandoc.RawInline(FORMAT, finish), 1, "}")
+          table.insert(finish, 1, pandoc.RawInline(FORMAT, "}"))
         end
         if span.classes:includes("sl") or span.classes:includes("slanted") or span.classes:includes("schraeg") then
           table.insert(start, pandoc.RawInline(FORMAT, "\\textsl{"))
-          table.insert(pandoc.RawInline(FORMAT, finish), 1, "}")
+          table.insert(finish, 1, pandoc.RawInline(FORMAT, "}"))
         end
         if span.classes:includes("transl") then
           table.insert(start, pandoc.RawInline(FORMAT, "\\transl{"))
-          table.insert(pandoc.RawInline(FORMAT, finish), 1, "}")
+          table.insert(finish, 1, pandoc.RawInline(FORMAT, "}"))
         end
         if span.classes:includes("kbd") then
           table.insert(start, pandoc.RawInline(FORMAT, "\\fbox{\\small{}\\bfseries{}"))
-          table.insert(pandoc.RawInline(FORMAT, finish), 1, "}")
+          table.insert(finish, 1, pandoc.RawInline(FORMAT, "}"))
         end
         if span.classes:includes("number") then
           table.insert(start, pandoc.RawInline(FORMAT, "\\mbox{\\small{}\\bfseries{}"))
@@ -1029,7 +1033,7 @@ return {
             color = span.attributes["hl-color"]
           end
           -- table.insert(start, pandoc.RawInline(FORMAT, "\\pdftooltip[markup=".. typ .. ",color=Yellow]{" .. "\\pdfmarkupcomment[markup=".. typ .. ",color=Yellow]{"))
-          -- table.insert(pandoc.RawInline(FORMAT, finish), 1, "}{".. span.attributes["text"] .."}" .. "}{".. span.attributes["text"] .."}")
+          -- table.insert(finish, 1, pandoc.RawInline(FORMAT, "}{".. span.attributes["text"] .."}" .. "}{".. span.attributes["text"] .."}"))
           local prefix = "\\pdfmarkupcomment[markup=" .. typ .. ",color=" .. color
           if author ~= "" then
             prefix = prefix .. ",author={" .. author .. "}"
