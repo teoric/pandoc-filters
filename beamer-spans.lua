@@ -8,7 +8,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2026-02-17 14:32:05 (+01:00)
+-- Last Changed: 2026-04-14 15:15:17 (+02:00)
 --------------------------------------------------------------------------------
 --
 
@@ -102,6 +102,14 @@ local qr_fields = {
   "ref",
   "text",
   "information",
+}
+
+
+local qr_fields_usual = {
+  "height",
+  "level",
+  "version"
+  -- TODO: add empty options nolink, tight, padding
 }
 
 local qr_labels = {
@@ -420,6 +428,19 @@ return {
         local hdl = loc_utils.trim(utils.stringify(el))
         el.target = base .. hdl
         return el
+      elseif el.attributes["type"] == "qr" then
+        local qr_params = ""
+        local qr_first = true
+        for i, qr_name in pairs(qr_fields_usual) do
+          if el.attributes[qr_name] ~= nil then
+            qr_params = qr_params .. (qr_first and "" or ",\n" .. qr_name .. "=" .. el.attributes[qr_name])
+            qr_first = false
+          end
+        end
+        return List:new({
+          pandoc.RawInline(FORMAT, "\\qrcode[nolink,padding,".. qr_params .. "]{" .. utils.stringify(el.target) .. "}"),pandoc.LineBreak(),
+          pandoc.Link(el.target, el.target)
+        })
       elseif string.find(utils.stringify(el.content), "mdz.nbn.resolving.de") then
         local target = el.target:gsub("^http[^:]*://[^/]+/", "")
         -- print(target)
