@@ -8,7 +8,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2026-04-14 15:15:17 (+02:00)
+-- Last Changed: 2026-04-15, 12:08:13 (CEST)
 --------------------------------------------------------------------------------
 --
 
@@ -104,6 +104,12 @@ local qr_fields = {
   "information",
 }
 
+
+local qr_fields_margin = {
+  ["height"] = "qrheight",
+  ["level"] = "qrlevel",
+  -- TODO: add empty options nolink, tight, padding
+}
 
 local qr_fields_usual = {
   "height",
@@ -428,6 +434,19 @@ return {
         local hdl = loc_utils.trim(utils.stringify(el))
         el.target = base .. hdl
         return el
+      elseif el.attributes["type"] == "margin-qr" then
+        local qr_params = ""
+        local qr_first = true
+        for i, qr_name in pairs(qr_fields_margin) do
+          if el.attributes[i] ~= nil then
+            qr_params = qr_params .. (qr_first and "" or ",\n" .. qr_name .. "=" .. el.attributes[qr_name])
+            qr_first = false
+          end
+        end
+        return List:new({
+          pandoc.RawInline(FORMAT, "\\hvqurl[".. qr_params .. "]{" .. utils.stringify(el.target) .. "}"),pandoc.LineBreak(),
+          pandoc.Link(el.target, el.target)
+        })
       elseif el.attributes["type"] == "qr" then
         local qr_params = ""
         local qr_first = true
