@@ -8,7 +8,7 @@
 --       Author: Bernhard Fisseni (teoric), <bernhard.fisseni@mail.de>
 --      Version: 0.5
 --      Created: 2019-07-20
--- Last Changed: 2026-04-15, 12:08:13 (CEST)
+-- Last Changed: 2026-04-15, 12:09:12 (CEST)
 --------------------------------------------------------------------------------
 --
 
@@ -444,8 +444,7 @@ return {
           end
         end
         return List:new({
-          pandoc.RawInline(FORMAT, "\\hvqurl[".. qr_params .. "]{" .. utils.stringify(el.target) .. "}"),pandoc.LineBreak(),
-          pandoc.Link(el.target, el.target)
+          pandoc.RawInline(FORMAT, "\\hvqurl[".. qr_params .. "]{" .. utils.stringify(el.target) .. "}"),pandoc.LineBreak()
         })
       elseif el.attributes["type"] == "qr" then
         local qr_params = ""
